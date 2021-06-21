@@ -285,7 +285,7 @@ resources:
 
 ## Advanced examples:
 
-This section contains several more advanced examples which should make your live easier
+This section contains several more advanced examples which should make your life easier
 
 ### Rest Server with Swagger docu
 
@@ -421,7 +421,7 @@ All ```logName``` which start with ```rahla.msg.``` are not logged into ```log:d
 
 ```xml
 <route>
-  <log message="${body}" loggingLevel="INFO" logName="log4j2.logger.flt.name=rahla.msg."/>
+  <log message="${body}" loggingLevel="INFO" logName="rahla.msg."/>
 </route>
 ```
 ### Kafka
