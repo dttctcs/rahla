@@ -15,8 +15,8 @@ configMapGenerator:
 - name: data-cm
 
 images:
-  - name: dttcts/rahla
-    newTag: "v4.0.0"
+  - name: dttctcs/rahla
+    newTag: "4.0.0"
 
 generatorOptions:
   disableNameSuffixHash: true
