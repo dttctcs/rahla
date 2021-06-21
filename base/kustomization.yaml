@@ -1,0 +1,22 @@
+
+resources:
+- deployment.yaml
+- service.yaml
+
+configMapGenerator:
+- name: rahla-base-env
+
+- name: configs-cm
+  files:
+  - configs/org.ops4j.pax.logging.cfg
+  - configs/rahla.metrics.cfg
+
+- name: deploy-cm
+- name: data-cm
+
+images:
+  - name: dttcts/rahla
+    newTag: "v4.0.0"
+
+generatorOptions:
+  disableNameSuffixHash: true

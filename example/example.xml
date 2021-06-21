@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
+  <cm:property-placeholder id="example.props" persistent-id="example" update-strategy="reload"/>
+
+  <reference id="my-processor" interface="org.apache.camel.Processor" filter="(rahla.camel.processor=my-processor)"/>
+
+  <bean id="registry" class="com.codahale.metrics.MetricRegistry"/>
+  <bean id="routeStats" class="org.apache.camel.component.metrics.routepolicy.MetricsRoutePolicyFactory">
+    <property name="metricsRegistry" ref="registry"/>
+  </bean>
+
+  <camelContext id="example-context" xmlns="http://camel.apache.org/schema/blueprint/camel-blueprint-3.10.0.xsd">
+    <!--this is not needed-->
+    <propertyPlaceholder id="properties" location="blueprint:example.props"/>
+
+
+    <restConfiguration component="jetty" bindingMode="json"
+      contextPath="{{rest.base.path}}"
+      port="8183"
+      apiHost="localhost"
+      apiContextListing="true"
+      apiContextPath="api-docs"
+      enableCORS="true">
+      <dataFormatProperty key="prettyPrint" value="true"/>
+      <apiProperty key="api.version" value="1.0.0"/>
+      <apiProperty key="api.title" value="{{title}}"/>
+      <apiProperty key="api.description" value="{{description}}"/>
+      <apiProperty key="api.contact.name" value="{{contact.name}}"/>
+      <apiProperty key="api.contact.email" value="{{contact.email}}"/>
+      <apiProperty key="api.contact.url" value="{{contact.url}}"/>
+    </restConfiguration>
+
+    <rest path="/api/v0/">
+      <get uri="/test" id="rest-get-test-service" produces="text/plan">
+        <to uri="direct:dttcs"/>
+      </get>
+    </rest>
+
+    <route id="timer-routes">
+      <from uri="timer://test?fixedRate=true&amp;period=5000"/>
+      <setBody>
+        <simple>Rahla created a message at ${date:now:yyyy-MM-dd HH:mm:ss}</simple>
+      </setBody>
+      <to uri="metrics:counter:matthias.rules?increment=7"/>
+      <to uri="log:rahlatimer"/>
+      <process ref="my-processor"/>
+    </route>
+
+    <route id="dttcs-route">
+      <from uri="direct:dttcs"/>
+      <transform>
+        <constant>
+          datatactics is the way
+        </constant>
+      </transform>
+      <to uri="log:dttcs"/>
+    </route>
+
+
+  </camelContext>
+
+</blueprint>

@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C)  2020 Matthias Leinweber - DataTactics
+  ~
+  ~ This code is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License, version 3,
+  ~ as published by the Free Software Foundation.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License, version 3,
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses />
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <artifactId>rahla</artifactId>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Bundle-Version>${project.version}</Bundle-Version>
+            <Export-Package>
+              rahla.api;version=${project.version},
+              rahla.provider;version=${project.version}
+            </Export-Package>
+            <DynamicImport-Package>*</DynamicImport-Package>
+            <Import-Package>
+              org.apache.camel.catalog,
+              *
+            </Import-Package>
+            <Private-Package />
+          </instructions>
+        </configuration>
+        <groupId>org.apache.felix</groupId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+
+    <dependency>
+      <artifactId>simpleclient</artifactId>
+      <groupId>io.prometheus</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>simpleclient_servlet</artifactId>
+      <groupId>io.prometheus</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>simpleclient_hotspot</artifactId>
+      <groupId>io.prometheus</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>slf4j-log4j12</artifactId>
+      <groupId>org.slf4j</groupId>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.logging</groupId>
+      <artifactId>pax-logging-log4j2</artifactId>
+    </dependency>
+    <dependency>
+      <artifactId>osgi.core</artifactId>
+      <groupId>org.osgi</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>osgi.annotation</artifactId>
+      <groupId>org.osgi</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>osgi.cmpn</artifactId>
+      <groupId>org.osgi</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>javax.ws.rs-api</artifactId>
+      <groupId>javax.ws.rs</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>junit</artifactId>
+      <groupId>junit</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>lombok</artifactId>
+      <groupId>org.projectlombok</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>javax.servlet-api</artifactId>
+      <groupId>javax.servlet</groupId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.karaf.features</groupId>
+      <artifactId>org.apache.karaf.features.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-metrics</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.fileinstall</artifactId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-dateutil</artifactId>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-cli-commons</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-cli-picocli</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-console</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-datetime</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <!--    <dependency>-->
+    <!--      <groupId>org.codehaus.groovy</groupId>-->
+    <!--      <artifactId>groovy-docgenerator</artifactId>-->
+    <!--      <version>2.5.13</version>-->
+    <!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>org.codehaus.groovy</groupId>-->
+    <!--      <artifactId>groovy-groovydoc</artifactId>-->
+    <!--      <version>2.5.13</version>-->
+    <!--    </dependency>-->
+    <dependency>
+      <artifactId>groovy-groovysh</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-jmx</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-json</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-jsr223</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-macro</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-nio</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-sql</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-swing</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-templates</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>groovy-xml</artifactId>
+      <classifier>indy</classifier>
+      <groupId>org.codehaus.groovy</groupId>
+    </dependency>
+   </dependencies>
+
+
+  <description />
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>rahla.provider Bundle</name>
+
+  <packaging>bundle</packaging>
+
+  <parent>
+    <artifactId>reactor</artifactId>
+    <groupId>rahla</groupId>
+    <relativePath>../pom.xml</relativePath>
+    <version>4.0.2-SNAPSHOT</version>
+  </parent>
+
+</project>

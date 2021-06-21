@@ -1,0 +1,81 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rahla
+  labels:
+    app: rahla
+spec:
+  selector:
+    matchLabels:
+      app: rahla
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: rahla
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8181"
+        prometheus.io/scrape: "true"
+        loki.io/parser: log4j2json
+    spec:
+      containers:
+      - image: dttcts/rahla
+        imagePullPolicy: Always
+        name: rahla
+        resources:
+          limits:
+            cpu: 1
+            memory: 768Mi
+          requests:
+            cpu: 100m
+            memory: 768Mi
+        #readinessProbe:
+        #    httpGet:
+        #      path: /healthy
+        #      port: 8181
+        #    initialDelaySeconds: 10
+        #    timeoutSeconds: 30
+        #    failureThreshold: 3
+        #    successThreshold: 1
+        #livenessProbe:
+        #  httpGet:
+        #    path: /healthy
+        #    port: 8181
+        #  initialDelaySeconds: 30
+        #  timeoutSeconds: 30
+        #  failureThreshold: 3
+        #  successThreshold: 1
+
+        ports:
+        - name: osgi
+          containerPort: 8181
+          protocol: TCP
+        volumeMounts:
+        - name: configs-volume
+          subPath: "org.ops4j.pax.logging.cfg"
+          mountPath: "/rahla/etc/org.ops4j.pax.logging.cfg"
+          readOnly: true
+        - name: configs-volume
+          subPath: "rahla.metrics.cfg"
+          mountPath: "/rahla/etc/rahla.metrics.cfg"
+          readOnly: true
+        - name: deploy-volume
+          mountPath: "/deploy/"
+          readOnly: true
+        - name: data-volume
+          mountPath: "/data/"
+          readOnly: true
+      volumes:
+      - name: configs-volume
+        configMap:
+          name: configs-cm
+      - name: deploy-volume
+        configMap:
+          name: deploy-cm
+      - name: data-volume
+        configMap:
+          name: data-cm
