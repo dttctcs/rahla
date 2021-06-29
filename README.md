@@ -22,7 +22,7 @@ You can locally run an example with:
 ```shell
 $ docker run --network host --rm -v ./example/local:/deploy -d --name rahla dttctcs/rahla:latest debug
 ```
-
+If you have a custom settings.xml mount it to `/rahla/etc/settings.xml`
 ## Connect to a running instance
 
 You can connect via  ```docker/podman/kunectl exec -it rahla client``` to the gogo shell. Or via
