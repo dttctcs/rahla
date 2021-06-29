@@ -10,7 +10,9 @@
     <property name="metricsRegistry" ref="registry"/>
   </bean>
 
-  <camelContext id="example-context" xmlns="http://camel.apache.org/schema/blueprint/camel-blueprint-3.10.0.xsd">
+  <camelContext id="example-context" xmlns="http://camel.apache.org/schema/blueprint"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint-3.10.0.xsd">
     <!--this is not needed-->
     <propertyPlaceholder id="properties" location="blueprint:example.props"/>
 

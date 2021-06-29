@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rahla
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rahla
+    spec:
+      containers:
+      - name: rahla
+        envFrom:
+        - configMapRef:
+            name: env-cm
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1024Mi
+          requests:
+            cpu: "0.1"
+            memory: 768M
+
+

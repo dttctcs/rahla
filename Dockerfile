@@ -1,8 +1,9 @@
 FROM maven:3.6.3-jdk-11 as compile
+ARG EXTRA_MAVEN
 RUN mkdir /build
 COPY . /build
 WORKDIR /build
-RUN mvn  -B -f pom.xml clean package
+RUN mvn $EXTRA_MAVEN -B -f pom.xml clean package
 
 FROM openjdk:11-jre-slim
 ENV KARAF_INSTALL_PATH /

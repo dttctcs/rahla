@@ -1,0 +1,32 @@
+
+
+commonLabels:
+  customer: myCustomer
+  application: myAppication
+  service: rahla
+  serviceType: integration
+
+configMapGenerator:
+- name: env-cm
+  envs:
+  - environment.properties
+
+- name: deploy-cm
+  behavior: merge
+  files:
+  - features.xml
+
+- name: data-cm
+  behavior: replace
+  files:
+  - keystore.jks
+
+generatorOptions:
+  disableNameSuffixHash: false
+
+patchesStrategicMerge:
+- patch.yaml
+- settings-xml-patch.yaml
+
+resources:
+- https://github.com/dttctcs/rahla.git//base?tag=v4.0.0

@@ -20,7 +20,7 @@ possibility of managing (add/remove/start/stop) routes during runtime over remot
 You can locally run an example with:
 ```
 ```shell
-$ docker run --network host --rm -v ./example:/deploy -d --name rahla dttctcs/rahla:latest debug
+$ docker run --network host --rm -v ./example/local:/deploy -d --name rahla dttctcs/rahla:latest debug
 ```
 
 ## Connect to a running instance
@@ -38,8 +38,8 @@ via ``ADMIN_PASS`` environment variable.
 
 ## Example kustomize project structure
 
-When starting a new integration project we recommend the following project structure. If its more
-simple you could merge ```common``` and ```oneintegration```. But config files stay the same.
+When starting a new integration project we recommend the following project structure. You can find an example project in the examples folter. If its more
+simple you could merge ```common``` into ```oneintegration/contexts```. But config files stay the same.
 
 ```
 ├── common
@@ -50,7 +50,7 @@ simple you could merge ```common``` and ```oneintegration```. But config files s
 │     ├── settings.xml
 │     └── patch.yaml
 ├── oneintegration
-│     ├── camel
+│     ├── contexts
 │     │    ├── routes.xml
 │     │    ├── kustomization.yaml
 │     │    └── aGroovyProcessor.groovy
@@ -182,7 +182,7 @@ central (our local Maven repo)
 
 ```
 
-### oneintegration/camel/routes.xml
+### oneintegration/contexts/routes.xml
 ***!!! Important Hint !!!***
 Remember url encoding for &```&amp;```
 
@@ -225,7 +225,7 @@ resources:
 
 ```
 
-### oneintegration/camel/aGroovyProcessor.groovy
+### oneintegration/contexts/aGroovyProcessor.groovy
 
 You can add groovy processors during runtime which are registred as osgi services with the
 property ```rahla.camel.processor=<filename>```
@@ -280,7 +280,7 @@ configMapGenerator:
       - settings.cfg
 
 resources:
-  - ../camel
+  - ../contexts
 ```
 
 ## Advanced examples:

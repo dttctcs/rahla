@@ -5,8 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Dictionary;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Processor;
@@ -33,7 +32,8 @@ public class GroovyProcessorInstaller implements ArtifactInstaller {
   private static final String CONFIG_NAME = "rahla.camel.processor";
   private static final String ARTIFACT_EXTENSION = "groovy";
 
-  private Map<String, ServiceRegistration<Processor>> serviceRegistrations = new LinkedHashMap<>();
+  private ServiceRegistration<Processor> serviceRegistration;
+
   @Reference private ConfigurationAdmin admin;
   private BundleContext bundleContext;
 
@@ -50,7 +50,6 @@ public class GroovyProcessorInstaller implements ArtifactInstaller {
           InstantiationException, IllegalAccessException {
 
     String absolutePath = file.getAbsolutePath();
-    removeProcessor(file);
     addProcessor(file);
   }
 
@@ -86,17 +85,28 @@ public class GroovyProcessorInstaller implements ArtifactInstaller {
     String fileName = file.getName();
 
     Class clazz = groovyClassLoader.parseClass(file);
+    Class[] interfaces = clazz.getInterfaces();
+
+    for (Class anInterface : interfaces) {
+      if (anInterface.getName().toLowerCase(Locale.ROOT).contains("processor")) {
+        registerProcessor(file, clazz);
+      }
+    }
+  }
+
+  private void registerProcessor(File file, Class clazz)
+      throws InstantiationException, IllegalAccessException, InvocationTargetException,
+          NoSuchMethodException {
+    String absolutePath = file.getAbsolutePath();
+    String fileName = file.getName();
     Dictionary dict = new Properties();
     dict.put(CONFIG_NAME, absolutePath);
     dict.put("rahla.camel.processor", fileName.substring(0, fileName.lastIndexOf('.')));
     Processor o = (Processor) clazz.getDeclaredConstructor().newInstance();
-    serviceRegistrations.put(absolutePath, bundleContext.registerService(Processor.class, o, dict));
+    serviceRegistration = bundleContext.registerService(Processor.class, o, dict);
   }
 
   private void removeProcessor(File file) throws InvalidSyntaxException, IOException {
-    String absolutePath = file.getAbsolutePath();
-    ServiceRegistration<Processor> processorServiceRegistration =
-        serviceRegistrations.remove(absolutePath);
-    if (processorServiceRegistration != null) processorServiceRegistration.unregister();
+    if (serviceRegistration != null) serviceRegistration.unregister();
   }
 }
