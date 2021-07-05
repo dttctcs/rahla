@@ -49,7 +49,22 @@ spec:
         #  timeoutSeconds: 30
         #  failureThreshold: 3
         #  successThreshold: 1
-
+        env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podName
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
         ports:
         - name: osgi
           containerPort: 8181

@@ -12,9 +12,11 @@ import org.apache.camel.Processor;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.apache.felix.fileinstall.ArtifactListener;
 import org.apache.groovy.json.internal.FastStringUtils;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -26,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
     property = {"GroovyProcessorInstaller=true"},
     immediate = true)
 @Slf4j
-public class GroovyProcessorInstaller implements ArtifactInstaller {
+public class GroovyCompiler implements ArtifactInstaller {
 
   private static final String CONFIG_FILENAME = "file.groovy.processor.installer";
   private static final String CONFIG_NAME = "rahla.camel.processor";
@@ -37,7 +39,7 @@ public class GroovyProcessorInstaller implements ArtifactInstaller {
   @Reference private ConfigurationAdmin admin;
   private BundleContext bundleContext;
 
-  public GroovyProcessorInstaller() {}
+  public GroovyCompiler() {}
 
   @Activate
   public void activate(ComponentContext cc) throws InvalidSyntaxException, IOException {
@@ -79,12 +81,14 @@ public class GroovyProcessorInstaller implements ArtifactInstaller {
     Thread.currentThread().setContextClassLoader(FastStringUtils.class.getClassLoader());
     Object opaque = FastStringUtils.toCharArray("opaque");
     Thread.currentThread().setContextClassLoader(contextClassLoader);
-    ClassLoader classLoader = GroovyProcessorInstaller.class.getClassLoader();
-    GroovyClassLoader groovyClassLoader = new GroovyClassLoader(classLoader);
-    String absolutePath = file.getAbsolutePath();
-    String fileName = file.getName();
 
+    Bundle bundle = bundleContext.getBundle();
+    BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
+    ClassLoader classLoader = bundleWiring.getClassLoader();
+
+    GroovyClassLoader groovyClassLoader = new GroovyClassLoader(classLoader);
     Class clazz = groovyClassLoader.parseClass(file);
+
     Class[] interfaces = clazz.getInterfaces();
 
     for (Class anInterface : interfaces) {
@@ -93,6 +97,7 @@ public class GroovyProcessorInstaller implements ArtifactInstaller {
       }
     }
   }
+
 
   private void registerProcessor(File file, Class clazz)
       throws InstantiationException, IllegalAccessException, InvocationTargetException,

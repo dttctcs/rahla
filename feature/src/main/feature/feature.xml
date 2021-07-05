@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (C)  2020 Matthias Leinweber - DataTactics
+  ~ Copyright (C)  2020 Matthias Leinweber - datatactics
   ~
   ~ This code is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU Affero General Public License, version 3,
@@ -20,11 +20,11 @@
   <feature description='${project.name}' name='${project.artifactId}' start-level="75"
     version='${project.version}'>
     <config name="org.apache.aries.jax.rs.whiteboard.default">
-      default.web=true
+      default.web=false
       application.base.prefix=/
     </config>
     <config name="org.apache.felix.fileinstall-camel">
-      felix.fileinstall.dir = /deploy/
+      felix.fileinstall.dir = ${env:RAHLA_DEPLOY_PATH:-/deploy/}
       felix.fileinstall.filter = .*\\.(xml|cfg|groovy)
       felix.fileinstall.poll = 1000
       felix.fileinstall.start.level = 100
@@ -51,6 +51,17 @@
     <bundle dependency="true">
       mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/2.9.0
     </bundle>
+
+
+    <bundle>mvn:com.jayway.jsonpath/json-path/2.4.0</bundle>
+    <bundle dependency='true'>mvn:net.minidev/json-smart/${json-smart-version}</bundle>
+    <bundle dependency='true'>mvn:net.minidev/accessors-smart/${json-smart-version}</bundle>
+    <bundle dependency='true'>mvn:org.ow2.asm/asm/${asm.bundle.version}</bundle>
+    <bundle dependency='true'>mvn:org.ow2.asm/asm-analysis/${asm.bundle.version}</bundle>
+    <bundle dependency='true'>mvn:org.ow2.asm/asm-commons/${asm.bundle.version}</bundle>
+    <bundle dependency='true'>mvn:org.ow2.asm/asm-tree/${asm.bundle.version}</bundle>
+    <bundle dependency='true'>mvn:org.ow2.asm/asm-util/${asm.bundle.version}</bundle>
+    <bundle>mvn:org.apache.camel/camel-jsonpath/${camel.version}</bundle>
   </feature>
 
 

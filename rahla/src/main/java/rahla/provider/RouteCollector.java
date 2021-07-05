@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.extern.slf4j.Slf4j;
@@ -230,29 +231,25 @@ public class RouteCollector extends Collector {
         if (metricsRegistryService != null) {
           MetricRegistry metricsRegistry = metricsRegistryService.getMetricsRegistry();
           for (Entry<String, Meter> e : metricsRegistry.getMeters().entrySet()) {
-            String metricName = e.getKey().replaceAll("[^a-z]", "_");
+            String metricName = e.getKey().toLowerCase(Locale.ROOT).replaceAll("[^a-z]", "_");
             GaugeMetricFamily gaugeMetricFamily =
                 gauges.computeIfAbsent(
                     metricName,
                     s ->
                         new GaugeMetricFamily(
-                            "camel_route_" + s,
-                            "Custom Camel Gauge",
-                            Collections.singletonList("context")));
+                            s, "Custom Camel Gauge", Collections.singletonList("context")));
             gaugeMetricFamily.addMetric(
                 Collections.singletonList(contextName), e.getValue().getCount());
           }
           for (Entry<String, Counter> e : metricsRegistry.getCounters().entrySet()) {
-            String metricName = e.getKey().replaceAll("[^a-z]", "_");
+            String metricName = e.getKey().toLowerCase(Locale.ROOT).replaceAll("[^a-z]", "_");
 
             CounterMetricFamily counterMetricFamily =
                 counters.computeIfAbsent(
                     metricName,
                     s ->
                         new CounterMetricFamily(
-                            "camel_" + s,
-                            "Custom Camel Counter",
-                            Collections.singletonList("context")));
+                            s, "Custom Camel Counter", Collections.singletonList("context")));
             counterMetricFamily.addMetric(
                 Collections.singletonList(contextName), e.getValue().getCount());
           }
