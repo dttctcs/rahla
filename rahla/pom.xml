@@ -15,7 +15,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses />
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <artifactId>rahla</artifactId>
   <build>
@@ -27,6 +29,7 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Version>${project.version}</Bundle-Version>
             <Export-Package>
+              rahla.dynamic;version=${project.version},
               rahla.api;version=${project.version},
               rahla.provider;version=${project.version}
             </Export-Package>
@@ -35,7 +38,7 @@
               org.apache.camel.catalog,
               *
             </Import-Package>
-            <Private-Package />
+            <Private-Package/>
           </instructions>
         </configuration>
         <groupId>org.apache.felix</groupId>
@@ -48,7 +51,18 @@
   </build>
 
   <dependencies>
-
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-opentracing</artifactId>
+      <version>${camel.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-opentelemetry</artifactId>
+      <version>${camel.version}</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <artifactId>simpleclient</artifactId>
       <groupId>io.prometheus</groupId>
@@ -214,10 +228,10 @@
       <classifier>indy</classifier>
       <groupId>org.codehaus.groovy</groupId>
     </dependency>
-   </dependencies>
+  </dependencies>
 
 
-  <description />
+  <description/>
 
   <modelVersion>4.0.0</modelVersion>
 

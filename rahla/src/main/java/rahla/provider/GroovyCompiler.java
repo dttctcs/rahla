@@ -12,6 +12,7 @@ import org.apache.camel.Processor;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.apache.felix.fileinstall.ArtifactListener;
 import org.apache.groovy.json.internal.FastStringUtils;
+import org.codehaus.groovy.control.CompilerConfiguration;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -33,7 +34,6 @@ public class GroovyCompiler implements ArtifactInstaller {
   private static final String CONFIG_FILENAME = "file.groovy.processor.installer";
   private static final String CONFIG_NAME = "rahla.camel.processor";
   private static final String ARTIFACT_EXTENSION = "groovy";
-
   private ServiceRegistration<Processor> serviceRegistration;
 
   @Reference private ConfigurationAdmin admin;
@@ -50,7 +50,6 @@ public class GroovyCompiler implements ArtifactInstaller {
   public synchronized void install(File file)
       throws IOException, InvalidSyntaxException, InvocationTargetException, NoSuchMethodException,
           InstantiationException, IllegalAccessException {
-
     String absolutePath = file.getAbsolutePath();
     addProcessor(file);
   }

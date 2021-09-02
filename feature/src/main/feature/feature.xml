@@ -44,6 +44,8 @@
     <feature>camel-jackson</feature>
     <feature>camel-base64</feature>
     <feature>camel-metrics</feature>
+    <feature>camel-opentelemetry</feature>
+    <feature>camel-opentracing</feature>
 
     <bundle dependency="true">
       mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.2/2.9.0
@@ -52,8 +54,6 @@
       mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/2.9.0
     </bundle>
 
-
-    <bundle>mvn:com.jayway.jsonpath/json-path/2.4.0</bundle>
     <bundle dependency='true'>mvn:net.minidev/json-smart/${json-smart-version}</bundle>
     <bundle dependency='true'>mvn:net.minidev/accessors-smart/${json-smart-version}</bundle>
     <bundle dependency='true'>mvn:org.ow2.asm/asm/${asm.bundle.version}</bundle>
@@ -61,7 +61,7 @@
     <bundle dependency='true'>mvn:org.ow2.asm/asm-commons/${asm.bundle.version}</bundle>
     <bundle dependency='true'>mvn:org.ow2.asm/asm-tree/${asm.bundle.version}</bundle>
     <bundle dependency='true'>mvn:org.ow2.asm/asm-util/${asm.bundle.version}</bundle>
-    <bundle>mvn:org.apache.camel/camel-jsonpath/${camel.version}</bundle>
+
   </feature>
 
 
