@@ -20,7 +20,7 @@ possibility of managing (add/remove/start/stop) routes during runtime over remot
 You can locally run an example with:
 ```
 ```shell
-$ docker run --network host --rm -v ./example/local:/deploy -d --name rahla dttctcs/rahla:latest debug
+$ docker run --network host --rm -v ./example/local:/deploy -d --name rahla datatactics/rahla:latest
 ```
 If you have a custom settings.xml mount it to `/rahla/etc/settings.xml`
 ## Connect to a running instance
