@@ -1,4 +1,4 @@
-package rahla.provider;
+package rahla;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;

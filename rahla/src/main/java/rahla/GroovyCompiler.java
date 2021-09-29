@@ -1,4 +1,4 @@
-package rahla.provider;
+package rahla;
 
 import groovy.lang.GroovyClassLoader;
 import java.io.File;
@@ -12,7 +12,6 @@ import org.apache.camel.Processor;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.apache.felix.fileinstall.ArtifactListener;
 import org.apache.groovy.json.internal.FastStringUtils;
-import org.codehaus.groovy.control.CompilerConfiguration;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -58,7 +57,11 @@ public class GroovyCompiler implements ArtifactInstaller {
   public synchronized void update(File file)
       throws IOException, InvalidSyntaxException, InvocationTargetException, NoSuchMethodException,
           InstantiationException, IllegalAccessException {
-    removeProcessor(file);
+    try {
+      removeProcessor(file);
+    } catch (Exception e) {
+      log.info("action=remove processor, reason={}", e.getMessage());
+    }
     addProcessor(file);
   }
 
@@ -97,7 +100,6 @@ public class GroovyCompiler implements ArtifactInstaller {
     }
   }
 
-
   private void registerProcessor(File file, Class clazz)
       throws InstantiationException, IllegalAccessException, InvocationTargetException,
           NoSuchMethodException {
@@ -111,6 +113,9 @@ public class GroovyCompiler implements ArtifactInstaller {
   }
 
   private void removeProcessor(File file) throws InvalidSyntaxException, IOException {
-    if (serviceRegistration != null) serviceRegistration.unregister();
+    if (serviceRegistration != null) {
+      serviceRegistration.unregister();
+      serviceRegistration = null;
+    }
   }
 }

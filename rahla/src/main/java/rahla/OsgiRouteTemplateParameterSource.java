@@ -1,4 +1,4 @@
-package rahla.provider;
+package rahla;
 
 import java.io.IOException;
 import java.util.Dictionary;

@@ -16,4 +16,4 @@ RUN apt update && apt install -y openssh-client \
   && rm -rf /var/lib/apt/lists/*
 EXPOSE 8101 1099 44444 8181
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["karaf", "daemon"]
+CMD ["karaf", "run", "--vm", "1", "--vm-bytes", "250M", "--vm-hang", "1", "clean"]

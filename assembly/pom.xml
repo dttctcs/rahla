@@ -15,7 +15,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses />
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <artifactId>rahla</artifactId>
 
@@ -132,6 +134,11 @@
     <!--      <version>${javax.ws.rs-api.version}4.0</version>-->
     <!--      <scope>compile</scope>-->
     <!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>org.apache.felix</groupId>-->
+<!--      <artifactId>org.apache.felix.fileinstall</artifactId>-->
+<!--      <scope>compile</scope>-->
+<!--    </dependency>-->
   </dependencies>
 
 
@@ -175,22 +182,41 @@
             <feature>shell-compat</feature>
           </installedFeatures>
           <javase>11</javase>
-          <resolverParallelism>2</resolverParallelism>
+<!--          <blacklistedBundles>-->
+<!--            <bundle>mvn:org.apache.felix/org.apache.felix.fileinstall/3.7.0</bundle>-->
+<!--          </blacklistedBundles>-->
           <blacklistedRepositories>
-            <repository>mvn:org.apache.karaf.features/framework/${karaf-next.version}/xml/features</repository>
-            <repository>mvn:org.apache.karaf.features/standard/${karaf-next.version}/xml/features</repository>
-            <repository>mvn:org.apache.karaf.features/enterprise/${karaf-next.version}/xml/features</repository>
-            <repository>mvn:org.apache.karaf.features/enterprise-legacy/${karaf-next.version}/xml/features</repository>
-            <repository>mvn:org.apache.karaf.features/spring/${karaf-next.version}/xml/features</repository>
-            <repository>mvn:org.apache.karaf.features/spring-legacy/${karaf-next.version}/xml/features</repository>
-            <repository>mvn:org.apache.karaf.features/framework/${karaf-next.version}/xml/features</repository>
-            <repository>mvn:org.apache.karaf.features/standard/${karaf-next.version}/xml/features</repository>
-            <repository>mvn:org.apache.karaf.features/enterprise/${karaf-next.version}/xml/features</repository>
-            <repository>mvn:org.apache.karaf.features/enterprise-legacy/${karaf-next.version}/xml/features</repository>
-            <repository>mvn:org.apache.karaf.features/spring/${karaf-next.version}/xml/features</repository>
-            <repository>mvn:org.apache.karaf.features/spring-legacy/${karaf-next.version}/xml/features</repository>
+            <repository>mvn:org.apache.karaf.features/framework/[2,${karaf.version})/xml/features
+            </repository>
+            <repository>mvn:org.apache.karaf.features/standard/[2,${karaf.version})/xml/features
+            </repository>
+            <repository>mvn:org.apache.karaf.features/enterprise/[2,${karaf.version})/xml/features
+            </repository>
+            <repository>
+              mvn:org.apache.karaf.features/enterprise-legacy/[2,${karaf.version})/xml/features
+            </repository>
+            <repository>mvn:org.apache.karaf.features/spring/[2,${karaf.version})/xml/features
+            </repository>
+            <repository>
+              mvn:org.apache.karaf.features/spring-legacy/[2,${karaf.version})/xml/features
+            </repository>
+
+            <repository>mvn:org.apache.karaf.features/framework/(${karaf.version},5)/xml/features
+            </repository>
+            <repository>mvn:org.apache.karaf.features/standard/(${karaf.version},5)/xml/features
+            </repository>
+            <repository>mvn:org.apache.karaf.features/enterprise/(${karaf.version},5)/xml/features
+            </repository>
+            <repository>
+              mvn:org.apache.karaf.features/enterprise-legacy/(${karaf.version},5)/xml/features
+            </repository>
+            <repository>mvn:org.apache.karaf.features/spring/(${karaf.version},5)/xml/features
+            </repository>
+            <repository>
+              mvn:org.apache.karaf.features/spring-legacy/(${karaf.version},5)/xml/features
+            </repository>
           </blacklistedRepositories>
-          <libraries />
+          <libraries/>
           <startupFeatures>
             <feature>eventadmin</feature>
           </startupFeatures>

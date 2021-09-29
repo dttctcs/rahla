@@ -1,4 +1,4 @@
-package rahla.provider;
+package rahla;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
