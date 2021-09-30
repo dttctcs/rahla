@@ -15,11 +15,17 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses />
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <artifactId>rahla</artifactId>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-services-maven-plugin</artifactId>
+      </plugin>
       <plugin>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
@@ -28,15 +34,17 @@
             <Bundle-Version>${project.version}</Bundle-Version>
             <Export-Package>
               rahla.dynamic;version=${project.version},
-              rahla.api;version=${project.version},
               rahla;version=${project.version}
             </Export-Package>
             <DynamicImport-Package>*</DynamicImport-Package>
             <Import-Package>
               org.apache.camel.catalog,
+              org.apache.karaf.shell*;version="[4,5)",
               *
             </Import-Package>
-            <Private-Package />
+            <Private-Package>
+              rahla.commands
+            </Private-Package>
           </instructions>
         </configuration>
         <groupId>org.apache.felix</groupId>
@@ -162,6 +170,11 @@
       <groupId>org.codehaus.groovy</groupId>
     </dependency>
     <dependency>
+      <artifactId>org.apache.karaf.shell.core</artifactId>
+      <groupId>org.apache.karaf.shell</groupId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <artifactId>groovy-datetime</artifactId>
       <classifier>indy</classifier>
       <groupId>org.codehaus.groovy</groupId>
@@ -229,7 +242,7 @@
   </dependencies>
 
 
-  <description />
+  <description/>
 
   <modelVersion>4.0.0</modelVersion>
 

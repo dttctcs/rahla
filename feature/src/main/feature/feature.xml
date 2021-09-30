@@ -25,7 +25,6 @@
     </config>
     <config name="org.apache.felix.fileinstall-camel">
       felix.fileinstall.dir = ${env:RAHLA_DEPLOY_PATH:-/deploy/}
-      felix.fileinstall.filter = .*\\.(xml|cfg|groovy)
       felix.fileinstall.poll = 1000
       felix.fileinstall.start.level = 80
       felix.fileinstall.active.level  = 100

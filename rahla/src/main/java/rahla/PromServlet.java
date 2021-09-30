@@ -21,9 +21,8 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 
 @Component(
-    configurationPid = "rahla.metrics",
-    property = {"alias=/metrics", "servlet-name=Metrics"},
-    configurationPolicy = ConfigurationPolicy.REQUIRE)
+    property = {"alias=/metrics", "servlet-name=metrics"},
+    immediate = true)
 @Slf4j
 public class PromServlet extends MetricsServlet implements Servlet {
 

@@ -3,12 +3,25 @@
   xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
   <cm:property-placeholder id="example.props" persistent-id="example" update-strategy="reload"/>
 
-  <reference id="my-processor" interface="org.apache.camel.Processor" filter="(rahla.camel.processor=my-processor)"/>
+  <reference id="my-processor" interface="org.apache.camel.Processor"
+    filter="(rahla.camel.processor=my-processor)"/>
 
   <bean id="registry" class="com.codahale.metrics.MetricRegistry"/>
-  <bean id="routeStats" class="org.apache.camel.component.metrics.routepolicy.MetricsRoutePolicyFactory">
+  <bean id="routeStats"
+    class="org.apache.camel.component.metrics.routepolicy.MetricsRoutePolicyFactory">
     <property name="metricsRegistry" ref="registry"/>
   </bean>
+
+
+  <!--  <bean id="tracer" class="org.apache.camel.opentelemetry.OpenTelemcetryTracer"/>-->
+  <!-- <property name="tracer" ref="tracer"/>-->
+  <!--<bean class="org.apache.camel.opentracing.OpenTracingTracer">
+
+
+
+  </bean>-->
+
+  <bean class="rahla.RahlaLogFormatter"/>
 
   <camelContext id="example-context" xmlns="http://camel.apache.org/schema/blueprint"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,8 +29,7 @@
     <!--this is not needed-->
     <propertyPlaceholder id="properties" location="blueprint:example.props"/>
 
-
-    <restConfiguration component="jetty" bindingMode="json"
+    <restConfiguration component="jetty" bindingMode="off"
       contextPath="{{rest.base.path}}"
       port="8183"
       apiHost="localhost"
@@ -34,7 +46,7 @@
     </restConfiguration>
 
     <rest path="/api/v0/">
-      <get uri="/test" id="rest-get-test-service" produces="text/plan">
+      <get uri="/test" id="rest-get-test-service" produces="application/json">
         <to uri="direct:dttcs"/>
       </get>
     </rest>
@@ -42,20 +54,24 @@
     <route id="timer-routes">
       <from uri="timer://test?fixedRate=true&amp;period=5000"/>
       <setBody>
-        <simple>Rahla created a message at ${date:now:yyyy-MM-dd HH:mm:ss}</simple>
+        <simple>Rahla micreated a message at ${date:now:yyyy-MM-dd HH:mm:ss}</simple>
       </setBody>
       <to uri="metrics:counter:matthias.rules?increment=7"/>
       <to uri="log:rahlatimer"/>
-      <process ref="my-processor"/>
+
     </route>
 
     <route id="dttcs-route">
       <from uri="direct:dttcs"/>
-      <transform>
-        <constant>
-          datatactics is the way
-        </constant>
-      </transform>
+      <process ref="my-processor"/>
+      <marshal>
+        <json/>
+      </marshal>
+      <!--      <transform>-->
+      <!--        <constant>-->
+      <!--          datatactics is the way-->
+      <!--        </constant>-->
+      <!--      </transform>-->
       <to uri="log:dttcs"/>
     </route>
 

@@ -21,6 +21,20 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <artifactId>karaf-services-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <goals>
+                <goal>service-metadata-generate</goal>
+              </goals>
+              <id>service-metadata-generate</id>
+              <phase>process-classes</phase>
+            </execution>
+          </executions>
+          <groupId>org.apache.karaf.tooling</groupId>
+          <version>${karaf.version}</version>
+        </plugin>
+        <plugin>
           <artifactId>maven-install-plugin</artifactId>
           <groupId>org.apache.maven.plugins</groupId>
           <version>${maven-install-plugin.version}</version>
@@ -203,6 +217,12 @@
         <artifactId>camel-metrics</artifactId>
         <version>${camel.version}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <artifactId>org.apache.karaf.shell.core</artifactId>
+        <groupId>org.apache.karaf.shell</groupId>
+        <scope>provided</scope>
+        <version>${karaf.version}</version>
       </dependency>
       <dependency>
         <artifactId>simpleclient</artifactId>

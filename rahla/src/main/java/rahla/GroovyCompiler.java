@@ -3,6 +3,7 @@ package rahla;
 import groovy.lang.GroovyClassLoader;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Dictionary;
 import java.util.Locale;
@@ -33,7 +34,7 @@ public class GroovyCompiler implements ArtifactInstaller {
   private static final String CONFIG_FILENAME = "file.groovy.processor.installer";
   private static final String CONFIG_NAME = "rahla.camel.processor";
   private static final String ARTIFACT_EXTENSION = "groovy";
-  private ServiceRegistration<Processor> serviceRegistration;
+  private ServiceRegistration<Processor> serviceRegistration = null;
 
   @Reference private ConfigurationAdmin admin;
   private BundleContext bundleContext;
@@ -47,9 +48,8 @@ public class GroovyCompiler implements ArtifactInstaller {
 
   @Override
   public synchronized void install(File file)
-      throws IOException, InvalidSyntaxException, InvocationTargetException, NoSuchMethodException,
-          InstantiationException, IllegalAccessException {
-    String absolutePath = file.getAbsolutePath();
+      throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException,
+          IllegalAccessException {
     addProcessor(file);
   }
 
@@ -108,8 +108,22 @@ public class GroovyCompiler implements ArtifactInstaller {
     Dictionary dict = new Properties();
     dict.put(CONFIG_NAME, absolutePath);
     dict.put("rahla.camel.processor", fileName.substring(0, fileName.lastIndexOf('.')));
-    Processor o = (Processor) clazz.getDeclaredConstructor().newInstance();
-    serviceRegistration = bundleContext.registerService(Processor.class, o, dict);
+    Processor processor = null;
+    try {
+      Constructor<Processor> declaredConstructor =
+          clazz.getDeclaredConstructor(BundleContext.class);
+      processor = declaredConstructor.newInstance(bundleContext);
+    } catch (NoSuchMethodException ignored) {
+    }
+    if (processor == null) {
+      try {
+        Constructor<Processor> declaredConstructor = clazz.getDeclaredConstructor();
+        processor = declaredConstructor.newInstance();
+      } catch (NoSuchMethodException ignored) {
+        log.error("action=create service, reason=no constructor found");
+      }
+    }
+    serviceRegistration = bundleContext.registerService(Processor.class, processor, dict);
   }
 
   private void removeProcessor(File file) throws InvalidSyntaxException, IOException {
