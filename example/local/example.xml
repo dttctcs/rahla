@@ -54,7 +54,7 @@
     <route id="timer-routes">
       <from uri="timer://test?fixedRate=true&amp;period=5000"/>
       <setBody>
-        <simple>Rahla micreated a message at ${date:now:yyyy-MM-dd HH:mm:ss}</simple>
+        <simple>Rahla created a message at ${date:now:yyyy-MM-dd HH:mm:ss}</simple>
       </setBody>
       <to uri="metrics:counter:matthias.rules?increment=7"/>
       <to uri="log:rahlatimer"/>
