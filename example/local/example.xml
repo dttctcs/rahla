@@ -67,11 +67,11 @@
       <marshal>
         <json/>
       </marshal>
-      <!--      <transform>-->
-      <!--        <constant>-->
-      <!--          datatactics is the way-->
-      <!--        </constant>-->
-      <!--      </transform>-->
+            <transform>
+              <constant>
+                datatactics is the way
+              </constant>
+            </transform>
       <to uri="log:dttcs"/>
     </route>
 
