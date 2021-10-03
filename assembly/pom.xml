@@ -15,7 +15,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses />
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <artifactId>rahla</artifactId>
 
@@ -34,7 +36,7 @@
     <artifactId>reactor</artifactId>
     <groupId>rahla</groupId>
     <relativePath>../pom.xml</relativePath>
-    <version>4.1.1</version>
+    <version>4.1.1-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -214,7 +216,7 @@
               mvn:org.apache.karaf.features/spring-legacy/(${karaf.version},5)/xml/features
             </repository>
           </blacklistedRepositories>
-          <libraries />
+          <libraries/>
           <startupFeatures>
             <feature>eventadmin</feature>
           </startupFeatures>
