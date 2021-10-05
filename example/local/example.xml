@@ -6,11 +6,11 @@
   <reference id="my-processor" interface="org.apache.camel.Processor"
     filter="(rahla.camel.processor=my-processor)"/>
 
-  <bean id="registry" class="com.codahale.metrics.MetricRegistry"/>
-  <bean id="routeStats"
-    class="org.apache.camel.component.metrics.routepolicy.MetricsRoutePolicyFactory">
-    <property name="metricsRegistry" ref="registry"/>
-  </bean>
+    <bean id="registry" class="com.codahale.metrics.MetricRegistry"/>
+    <bean id="routeStats"
+      class="org.apache.camel.component.metrics.routepolicy.MetricsRoutePolicyFactory">
+      <property name="metricsRegistry" ref="registry"/>
+    </bean>
 
 
   <!--  <bean id="tracer" class="org.apache.camel.opentelemetry.OpenTelemcetryTracer"/>-->

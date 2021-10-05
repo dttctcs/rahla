@@ -2,12 +2,20 @@ package rahla;
 
 import groovy.lang.GroovyClassLoader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Processor;
 import org.apache.felix.fileinstall.ArtifactInstaller;
@@ -34,7 +42,10 @@ public class GroovyCompiler implements ArtifactInstaller {
   private static final String CONFIG_FILENAME = "file.groovy.processor.installer";
   private static final String CONFIG_NAME = "rahla.camel.processor";
   private static final String ARTIFACT_EXTENSION = "groovy";
-  private ServiceRegistration<Processor> serviceRegistration = null;
+  private Map<String, ServiceRegistration<Processor>> serviceRegistrations = new LinkedHashMap<>();
+  private Set<String> files = new HashSet<>();
+  private ScheduledExecutorService executor =
+      Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 
   @Reference private ConfigurationAdmin admin;
   private BundleContext bundleContext;
@@ -50,6 +61,7 @@ public class GroovyCompiler implements ArtifactInstaller {
   public synchronized void install(File file)
       throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException,
           IllegalAccessException {
+  files.add(file.getAbsolutePath());
     addProcessor(file);
   }
 
@@ -67,6 +79,7 @@ public class GroovyCompiler implements ArtifactInstaller {
 
   @Override
   public synchronized void uninstall(File file) throws IOException, InvalidSyntaxException {
+    files.remove(file.getAbsolutePath());
     removeProcessor(file);
   }
 
@@ -75,10 +88,10 @@ public class GroovyCompiler implements ArtifactInstaller {
     return file.getName().toLowerCase().endsWith(ARTIFACT_EXTENSION.toLowerCase());
   }
 
-  private void addProcessor(File file)
-      throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException,
-          IllegalAccessException {
-
+  private void addProcessor(File file) {
+    if (!files.contains(file.getAbsolutePath())) {
+      return;
+    }
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(FastStringUtils.class.getClassLoader());
     Object opaque = FastStringUtils.toCharArray("opaque");
@@ -87,22 +100,27 @@ public class GroovyCompiler implements ArtifactInstaller {
     Bundle bundle = bundleContext.getBundle();
     BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
     ClassLoader classLoader = bundleWiring.getClassLoader();
-
     GroovyClassLoader groovyClassLoader = new GroovyClassLoader(classLoader);
-    Class clazz = groovyClassLoader.parseClass(file);
+    try {
+      Class clazz = groovyClassLoader.parseClass(file);
 
-    Class[] interfaces = clazz.getInterfaces();
+      Class[] interfaces = clazz.getInterfaces();
 
-    for (Class anInterface : interfaces) {
-      if (anInterface.getName().toLowerCase(Locale.ROOT).contains("processor")) {
-        registerProcessor(file, clazz);
+      for (Class anInterface : interfaces) {
+        if (anInterface.getName().toLowerCase(Locale.ROOT).contains("processor")) {
+          registerProcessor(file, clazz);
+        }
       }
+    } catch (FileNotFoundException fne) {
+      log.warn("action=add processor, reason={}", fne.getMessage());
+    } catch (Exception e) {
+      log.info("action=add processor retry, reason={}", e.getMessage(), e);
+      executor.schedule(() -> addProcessor(file), 5, TimeUnit.SECONDS);
     }
   }
 
   private void registerProcessor(File file, Class clazz)
-      throws InstantiationException, IllegalAccessException, InvocationTargetException,
-          NoSuchMethodException {
+      throws InstantiationException, IllegalAccessException, InvocationTargetException{
     String absolutePath = file.getAbsolutePath();
     String fileName = file.getName();
     Dictionary dict = new Properties();
@@ -123,13 +141,16 @@ public class GroovyCompiler implements ArtifactInstaller {
         log.error("action=create service, reason=no constructor found");
       }
     }
-    serviceRegistration = bundleContext.registerService(Processor.class, processor, dict);
+
+    serviceRegistrations.put(
+        file.getAbsolutePath(), bundleContext.registerService(Processor.class, processor, dict));
   }
 
   private void removeProcessor(File file) throws InvalidSyntaxException, IOException {
+    ServiceRegistration<Processor> serviceRegistration =
+        serviceRegistrations.remove(file.getAbsolutePath());
     if (serviceRegistration != null) {
       serviceRegistration.unregister();
-      serviceRegistration = null;
     }
   }
 }
