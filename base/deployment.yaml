@@ -23,7 +23,7 @@ spec:
         loki.io/parser: log4j2json
     spec:
       containers:
-      - image: dttctcs/rahla
+      - image: datatactics/rahla
         imagePullPolicy: Always
         name: rahla
         resources:
