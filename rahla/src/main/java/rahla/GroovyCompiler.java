@@ -61,7 +61,7 @@ public class GroovyCompiler implements ArtifactInstaller {
   public synchronized void install(File file)
       throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException,
           IllegalAccessException {
-  files.add(file.getAbsolutePath());
+    files.add(file.getAbsolutePath());
     addProcessor(file);
   }
 
@@ -120,7 +120,7 @@ public class GroovyCompiler implements ArtifactInstaller {
   }
 
   private void registerProcessor(File file, Class clazz)
-      throws InstantiationException, IllegalAccessException, InvocationTargetException{
+      throws InstantiationException, IllegalAccessException, InvocationTargetException {
     String absolutePath = file.getAbsolutePath();
     String fileName = file.getName();
     Dictionary dict = new Properties();
@@ -141,15 +141,17 @@ public class GroovyCompiler implements ArtifactInstaller {
         log.error("action=create service, reason=no constructor found");
       }
     }
-
-    serviceRegistrations.put(
-        file.getAbsolutePath(), bundleContext.registerService(Processor.class, processor, dict));
+    ServiceRegistration serviceRegistration =
+        bundleContext.registerService(Processor.class, processor, dict);
+    log.info("action=register processor , file={}", file.getAbsolutePath());
+    serviceRegistrations.put(file.getAbsolutePath(), serviceRegistration);
   }
 
-  private void removeProcessor(File file) throws InvalidSyntaxException, IOException {
+  private void removeProcessor(File file) {
     ServiceRegistration<Processor> serviceRegistration =
         serviceRegistrations.remove(file.getAbsolutePath());
     if (serviceRegistration != null) {
+      log.info("action=unregister processor , file={}", file.getAbsolutePath());
       serviceRegistration.unregister();
     }
   }
