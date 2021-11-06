@@ -1,8 +1,0 @@
-configMapGenerator:
-- name: deploy-cm
-  behavior: merge
-  files:
-  - config.cfg
-
-resources:
-- ../contexts

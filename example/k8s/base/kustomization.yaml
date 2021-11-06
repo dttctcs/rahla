@@ -8,15 +8,15 @@ configMapGenerator:
 
 - name: configs-cm
   files:
-  - configs/org.ops4j.pax.logging.cfg
-  - configs/rahla.metrics.cfg
+  - org.ops4j.pax.logging.cfg
+  - rahla.metrics.cfg
 
 - name: deploy-cm
 - name: data-cm
 
 images:
   - name: dttctcs/rahla
-    newTag: "4.0.2"
+    newTag: "latest"
 
 generatorOptions:
   disableNameSuffixHash: true

@@ -42,32 +42,29 @@ When starting a new integration project we recommend the following project struc
 simple you could merge ```common``` into ```oneintegration/contexts```. But config files stay the same.
 
 ```
-├── common
-│     ├── environment.properties
-│     ├── features.xml
-│     ├── keystore.jks
-│     ├── kustomization.yaml
-│     ├── settings.xml
-│     └── patch.yaml
-├── oneintegration
-│     ├── contexts
-│     │    ├── routes.xml
-│     │    ├── kustomization.yaml
-│     │    └── aGroovyProcessor.groovy
-│     ├── int
-│     │    ├── settings.cfg
-│     │    └── kustomization.yaml
-│     └── prod
-│          ├── settings.cfg
-│          └── kustomization.yaml
-└── anotherintegration
-│     ├── ...
+├── base
+│   ├── deployment.yaml
+│   ├── kustomization.yaml
+│   ├── org.ops4j.pax.logging.cfg
+│   ├── rahla.metrics.cfg
+│   └── service.yaml
+└── my-config
+    ├── config.cfg
+    ├── context1.xml
+    ├── context2.xml
+    ├── environment.properties
+    ├── features.xml
+    ├── keystore.jks
+    ├── kustomization.yaml
+    ├── patch.yaml
+    ├── settings.xml
+    └── settings-xml-patch.yaml
 
 
 
 ```
 
-### common/kustomization.yaml
+### base/kustomization.yaml
 
 ***!!! Important Hint !!!***
 When using runtime updates of mounted config maps in kubernetes it can take up to one minute until
@@ -108,12 +105,9 @@ generatorOptions:
 patchesStrategicMerge:
   - patch.yaml
 
-resources:
-  - ssh://git@github.com:dttctcs/rahla.git//base?ref=v4.0.0
-# we use the base kustomization from this repo in a specific released version
 ```
 
-### common/environment.properties
+### my-config/environment.properties
 
 See [Karaf documentation](https://karaf.apache.org/manual/latest/#_environment_variables_system_properties)
 for detailed usage on env variables and how to overwrite java properties.
@@ -125,7 +119,7 @@ JAVA_MAX_MEM=768M
 EXTRA_JAVA_OPTS=-Dcom.ibm.mq.cfg.useIBMCipherMappings=false -Djavax.net.ssl.trustStore=/data/keystore.jks -Djavax.net.ssl.trustStorePassword=123456 -Djavax.net.ssl.keyStore=/data/keystore.jks -Djavax.net.ssl.keyStorePassword=123456
 ```
 
-### common/patch.yaml
+### my-config/patch.yaml
 
 We patch limits and add our settings.xml
 
@@ -164,7 +158,7 @@ spec:
             name: settings-xml-cm
 ```
 
-### common/features.xml
+### my-config/features.xml
 
 This feature is automatically installed on startup and adds all features and bundles even from maven
 central (our local Maven repo)
@@ -182,7 +176,7 @@ central (our local Maven repo)
 
 ```
 
-### oneintegration/contexts/routes.xml
+### my-config/routes.xml
 ***!!! Important Hint !!!***
 Remember url encoding for &```&amp;```
 
@@ -209,7 +203,7 @@ settings.cfg during runtime and updates the context duriing rutime
 
 ```
 
-### oneintegration/came/kustomization.yaml
+### my-config/kustomization.yaml
 
 Adds the routes/camel contexts to the deploy-cm
 
@@ -225,7 +219,7 @@ resources:
 
 ```
 
-### oneintegration/contexts/aGroovyProcessor.groovy
+### my-config/myGroovyProcessor.groovy
 
 You can add groovy processors during runtime which are registred as osgi services with the
 property ```rahla.camel.processor=<filename>```
@@ -259,7 +253,7 @@ In a route you can then use the processor with
 <process ref="myProcessor"/>
 ```
 
-### oneintegration/[int/prod]/settings.cfg
+### my-config/settings.cfg
 
 You can add configurable variables with ```{{EXAMPLE_VAR}}``` to your camel contexts which are
 replaced with the config from here. (If you configured property placeholder correctly)
@@ -268,7 +262,7 @@ replaced with the config from here. (If you configured property placeholder corr
 EXAMPLE_VAR=value
 ```
 
-### oneintegration/[int/prod]/settings.cfg
+### my-config/settings.cfg
 
 The final kustomization only merges the settings into the deploy config map.
 

@@ -6,11 +6,11 @@
   <reference id="my-processor" interface="org.apache.camel.Processor"
     filter="(rahla.camel.processor=my-processor)"/>
 
-    <bean id="registry" class="com.codahale.metrics.MetricRegistry"/>
-    <bean id="routeStats"
-      class="org.apache.camel.component.metrics.routepolicy.MetricsRoutePolicyFactory">
-      <property name="metricsRegistry" ref="registry"/>
-    </bean>
+  <bean id="registry" class="com.codahale.metrics.MetricRegistry"/>
+  <bean id="routeStats"
+    class="org.apache.camel.component.metrics.routepolicy.MetricsRoutePolicyFactory">
+    <property name="metricsRegistry" ref="registry"/>
+  </bean>
 
 
   <!--  <bean id="tracer" class="org.apache.camel.opentelemetry.OpenTelemcetryTracer"/>-->
@@ -20,6 +20,14 @@
 
 
   </bean>-->
+
+  <bean id="test" class="java.util.LinkedHashMap">
+    <argument>
+      <map>
+        <entry key="key" value="1"/>
+      </map>
+    </argument>
+  </bean>
 
   <bean class="rahla.RahlaLogFormatter"/>
 
@@ -67,11 +75,11 @@
       <marshal>
         <json/>
       </marshal>
-            <transform>
-              <constant>
-                datatactics is the way
-              </constant>
-            </transform>
+      <transform>
+        <constant>
+          datatactics is the way
+        </constant>
+      </transform>
       <to uri="log:dttcs"/>
     </route>
 

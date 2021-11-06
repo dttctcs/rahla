@@ -33,22 +33,22 @@ spec:
           requests:
             cpu: 100m
             memory: 768Mi
-        #readinessProbe:
-        #    httpGet:
-        #      path: /healthy
-        #      port: 8181
-        #    initialDelaySeconds: 10
-        #    timeoutSeconds: 30
-        #    failureThreshold: 3
-        #    successThreshold: 1
-        #livenessProbe:
-        #  httpGet:
-        #    path: /healthy
-        #    port: 8181
-        #  initialDelaySeconds: 30
-        #  timeoutSeconds: 30
-        #  failureThreshold: 3
-        #  successThreshold: 1
+        readinessProbe:
+            httpGet:
+              path: /healthy
+              port: 8181
+            initialDelaySeconds: 10
+            timeoutSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+        livenessProbe:
+          httpGet:
+            path: /healthy
+            port: 8181
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+          failureThreshold: 3
+          successThreshold: 1
         env:
           - name: POD_IP
             valueFrom:
@@ -69,6 +69,9 @@ spec:
         - name: osgi
           containerPort: 8181
           protocol: TCP
+        - name: ssh
+          containerPort: 8081
+          protocol: TCP          
         volumeMounts:
         - name: configs-volume
           subPath: "org.ops4j.pax.logging.cfg"
