@@ -29,6 +29,7 @@
       felix.fileinstall.start.level = 100
       felix.fileinstall.active.level  = 100
       felix.fileinstall.log.level = 3
+      felix.fileinstall.disableNio2 = true
     </config>
 
     <feature>jolokia</feature>
