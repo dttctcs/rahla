@@ -70,7 +70,7 @@ spec:
           containerPort: 8181
           protocol: TCP
         - name: ssh
-          containerPort: 8081
+          containerPort: 8101
           protocol: TCP          
         volumeMounts:
         - name: configs-volume
