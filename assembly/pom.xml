@@ -34,7 +34,7 @@
     <artifactId>reactor</artifactId>
     <groupId>rahla</groupId>
     <relativePath>../pom.xml</relativePath>
-    <version>4.2.5-SNAPSHOT</version>
+    <version>4.2.5</version>
   </parent>
 
   <dependencies>
