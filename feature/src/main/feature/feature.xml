@@ -25,9 +25,10 @@
     </config>
     <config name="org.apache.felix.fileinstall-camel">
       felix.fileinstall.dir = ${env:RAHLA_DEPLOY_PATH:-/deploy/}
+      felix.fileinstall.filter = .*
       felix.fileinstall.poll = 1000
-      felix.fileinstall.start.level = 100
-      felix.fileinstall.active.level  = 100
+      felix.fileinstall.start.level = 80
+      felix.fileinstall.active.level  = 80
       felix.fileinstall.log.level = 3
       felix.fileinstall.disableNio2 = true
     </config>
