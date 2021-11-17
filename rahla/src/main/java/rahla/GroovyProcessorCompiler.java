@@ -26,6 +26,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleWiring;
+import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -37,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
     property = {"GroovyProcessorInstaller=true"},
     immediate = true)
 @Slf4j
-public class GroovyCompiler implements ArtifactInstaller {
+public class GroovyProcessorCompiler implements ArtifactInstaller {
 
   private static final String CONFIG_FILENAME = "file.groovy.processor.installer";
   private static final String CONFIG_NAME = "rahla.camel.processor";
@@ -50,7 +51,7 @@ public class GroovyCompiler implements ArtifactInstaller {
   @Reference private ConfigurationAdmin admin;
   private BundleContext bundleContext;
 
-  public GroovyCompiler() {}
+  public GroovyProcessorCompiler() {}
 
   @Activate
   public void activate(ComponentContext cc) throws InvalidSyntaxException, IOException {
@@ -88,7 +89,7 @@ public class GroovyCompiler implements ArtifactInstaller {
     return file.getName().toLowerCase().endsWith(ARTIFACT_EXTENSION.toLowerCase());
   }
 
-  private void addProcessor(File file) {
+  private synchronized void addProcessor(File file) {
     if (!files.contains(file.getAbsolutePath())) {
       return;
     }
@@ -147,12 +148,24 @@ public class GroovyCompiler implements ArtifactInstaller {
     serviceRegistrations.put(file.getAbsolutePath(), serviceRegistration);
   }
 
-  private void removeProcessor(File file) {
+  private synchronized void removeProcessor(File file) {
     ServiceRegistration<Processor> serviceRegistration =
         serviceRegistrations.remove(file.getAbsolutePath());
     if (serviceRegistration != null) {
       log.info("action=unregister processor , file={}", file.getAbsolutePath());
       serviceRegistration.unregister();
+    }
+    String fileName = file.getName();
+    String configFilter = String.format("(%s=%s)", CONFIG_NAME,
+        fileName.substring(0, fileName.lastIndexOf('.')));
+
+    try {
+      Configuration[] configurations = admin.listConfigurations(configFilter);
+      for (Configuration configuration : configurations) {
+        configuration.delete();
+      }
+    } catch (IOException | InvalidSyntaxException e) {
+      log.error("action=remove processor, reason={}",e.getMessage());
     }
   }
 }
