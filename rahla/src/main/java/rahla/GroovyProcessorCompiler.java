@@ -59,17 +59,13 @@ public class GroovyProcessorCompiler implements ArtifactInstaller {
   }
 
   @Override
-  public synchronized void install(File file)
-      throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException,
-          IllegalAccessException {
+  public synchronized void install(File file) {
     files.add(file.getAbsolutePath());
     addProcessor(file);
   }
 
   @Override
-  public synchronized void update(File file)
-      throws IOException, InvalidSyntaxException, InvocationTargetException, NoSuchMethodException,
-          InstantiationException, IllegalAccessException {
+  public synchronized void update(File file){
     try {
       removeProcessor(file);
     } catch (Exception e) {
@@ -79,7 +75,7 @@ public class GroovyProcessorCompiler implements ArtifactInstaller {
   }
 
   @Override
-  public synchronized void uninstall(File file) throws IOException, InvalidSyntaxException {
+  public synchronized void uninstall(File file) {
     files.remove(file.getAbsolutePath());
     removeProcessor(file);
   }
