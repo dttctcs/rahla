@@ -177,11 +177,6 @@
       <classifier>indy</classifier>
       <groupId>org.codehaus.groovy</groupId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.camel</groupId>
-      <artifactId>camel-graphql</artifactId>
-      <version>${camel.version}</version>
-    </dependency>
 
     <!--    <dependency>-->
     <!--      <groupId>org.codehaus.groovy</groupId>-->
