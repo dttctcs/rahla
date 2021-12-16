@@ -443,7 +443,7 @@
     <commons-collections4.version>4.4</commons-collections4.version>
     <simpleclient_hotspot.version>0.9.0</simpleclient_hotspot.version>
     <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>
-    <pax-logging-log4j2-extra.version>2.0.10</pax-logging-log4j2-extra.version>
+    <pax-logging-log4j2-extra.version>2.0.12</pax-logging-log4j2-extra.version>
     <lombok.version>1.18.10</lombok.version>
     <org.apache.felix.fileinstall.version>3.6.8</org.apache.felix.fileinstall.version>
     <junit.version>4.12</junit.version>
