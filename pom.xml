@@ -436,7 +436,7 @@
 
     <karaf.version>4.3.3.dtac</karaf.version>
     <osgi.version>7.0.0</osgi.version>
-    <camel.version>3.12.0</camel.version>
+    <camel.version>3.11.4</camel.version>
     <groovy.version>3.0.8</groovy.version>
     <slf4j-log4j12.version>1.7.29</slf4j-log4j12.version>
     <jackson2.version>2.12.5</jackson2.version>
