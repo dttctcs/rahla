@@ -5,7 +5,7 @@
 #WORKDIR /build
 #RUN mvn $EXTRA_MAVEN -B -f pom.xml clean package
 
-FROM eclipse-temurin:11-jre-focal
+FROM openjdk:11-jre-slim
 ENV KARAF_HOME /rahla
 ENV PATH $PATH:$KARAF_HOME/bin
 ENV KARAF_EXEC exec

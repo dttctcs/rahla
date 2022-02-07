@@ -5,9 +5,9 @@ services.
 
 | Component | Version|
 |:---|:---|
-|karaf|4.3.3|
+|karaf|4.3.6|
 |osgi|7.0.0|
-|camel|3.11.2|
+|camel|3.14.1|
 |groovy|3.0.8|
 
 
