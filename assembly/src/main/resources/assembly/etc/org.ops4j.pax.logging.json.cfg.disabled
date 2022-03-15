@@ -44,7 +44,7 @@ log4j2.logger.flt.additivity=false
 
 # SSHD logger
 log4j2.logger.sshd.name = org.apache.sshd
-log4j2.logger.sshd.level = INFO
+log4j2.logger.sshd.level = ERROR
 
 # Spifly logger
 log4j2.logger.spifly.name = org.apache.aries.spifly
@@ -64,14 +64,14 @@ log4j2.appender.console.name = Console
 log4j2.appender.console.layout.type = JsonLayout
 log4j2.appender.console.layout.compact=true
 log4j2.appender.console.layout.eventEol=true
-#log4j2.appender.console.layout.complete=true
-#log4j2.appender.console.layout.properties=false
+log4j2.appender.console.layout.complete=false
+log4j2.appender.console.layout.properties=true
 #log4j2.appender.console.layout.propertiesAsList=false
 #log4j2.appender.console.layout.locationInfo=true
-#log4j2.appender.console.layout.includeStacktrace=true
+log4j2.appender.console.layout.includeStacktrace=true
 log4j2.appender.console.layout.stacktraceAsString=true
 #log4j2.appender.console.layout.includeNullDelimiter=false
-#log4j2.appender.console.layout.objectMessageAsJsonObject=true
+log4j2.appender.console.layout.objectMessageAsJsonObject=true
 
 
 # Audit file appender

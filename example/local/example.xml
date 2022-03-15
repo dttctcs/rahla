@@ -3,7 +3,8 @@
   xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
 
   <cm:property-placeholder id="example.props" persistent-id="example" update-strategy="reload"/>
-  <cm:property-placeholder id="template.trigger" persistent-id="example" update-strategy="reload" placeholder-prefix="$[" placeholder-suffix="]"/>
+  <cm:property-placeholder id="template.trigger" persistent-id="example" update-strategy="reload"
+    placeholder-prefix="$[" placeholder-suffix="]"/>
 
   <reference id="my-processor" interface="org.apache.camel.Processor"
     filter="(rahla.camel.processor=my-processor)"/>
@@ -23,11 +24,22 @@
 
   </bean>-->
 
+
+  <bean class="org.apache.camel.opentelemetry.AttributeProcessor">
+    <a
+    <argument type="java.lang.String" value="test"/>
+
+    <argument type="org.apache.camel.Expression">
+      <value>
+
+        <constant>foo</constant>
+      </value>
+
+    </argument>
+  </bean>
   <bean id="test" class="java.util.LinkedHashMap">
-    <argument>
-      <map>
-        <entry key="key" value="1"/>
-      </map>
+    <argument type="java.lang.String" value="test">
+      <ref component-id=""/>
     </argument>
   </bean>
 

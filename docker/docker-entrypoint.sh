@@ -4,4 +4,9 @@ export EXTRA_JAVA_OPTS="-XX:+UseG1GC -Duser.timezone=UTC -Dkaraf.log.console=ALL
 if [ "$LOG_FORMAT" == "json" ]; then
   cp /rahla/etc/org.ops4j.pax.logging.json.cfg.disabled /rahla/etc/org.ops4j.pax.logging.cfg
 fi
+
+if [ "$OTLP_TRACE_EXPORTER" == "true" ]; then
+  touch /rahla/etc/rahla.opentelemetry.otlp.trace.exporter.cfg
+fi
+
 exec "$@"

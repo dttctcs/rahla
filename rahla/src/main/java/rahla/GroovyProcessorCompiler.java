@@ -6,15 +6,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.Dictionary;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Processor;
@@ -26,7 +26,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleWiring;
-import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -40,11 +39,13 @@ import org.osgi.service.component.annotations.Reference;
 @Slf4j
 public class GroovyProcessorCompiler implements ArtifactInstaller {
 
-  private static final String CONFIG_FILENAME = "file.groovy.processor.installer";
+  private static final String SCRIPT_FILENAME = "file.groovy.processor.installer";
   private static final String CONFIG_NAME = "rahla.camel.processor";
   private static final String ARTIFACT_EXTENSION = "groovy";
-  private Map<String, ServiceRegistration<Processor>> serviceRegistrations = new LinkedHashMap<>();
-  private Set<String> files = new HashSet<>();
+  private Map<String, ServiceRegistration<Processor>> serviceRegistrations =
+      Collections.synchronizedMap(new LinkedHashMap<>());
+  private Map<String, ScheduledFuture<?>> asyncCompile =
+      Collections.synchronizedMap(new LinkedHashMap<>());
   private ScheduledExecutorService executor =
       Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -60,24 +61,17 @@ public class GroovyProcessorCompiler implements ArtifactInstaller {
 
   @Override
   public synchronized void install(File file) {
-    files.add(file.getAbsolutePath());
-    addProcessor(file);
+    processScript(file);
   }
 
   @Override
-  public synchronized void update(File file){
-    try {
-      removeProcessor(file);
-    } catch (Exception e) {
-      log.info("action=remove processor, reason={}", e.getMessage());
-    }
-    addProcessor(file);
+  public synchronized void update(File file) {
+    processScript(file);
   }
 
   @Override
   public synchronized void uninstall(File file) {
-    files.remove(file.getAbsolutePath());
-    removeProcessor(file);
+    unregister(file);
   }
 
   @Override
@@ -85,10 +79,18 @@ public class GroovyProcessorCompiler implements ArtifactInstaller {
     return file.getName().toLowerCase().endsWith(ARTIFACT_EXTENSION.toLowerCase());
   }
 
-  private synchronized void addProcessor(File file) {
-    if (!files.contains(file.getAbsolutePath())) {
-      return;
+  private synchronized void processScript(File file) {
+    ScheduledFuture<?> scheduledFuture = asyncCompile.get(file.getAbsolutePath());
+    if (scheduledFuture != null) {
+      if (!scheduledFuture.isDone() || scheduledFuture.isCancelled()) {
+        scheduledFuture.cancel(true);
+      }
     }
+
+    doAddProcessor(file);
+  }
+
+  private synchronized void doAddProcessor(File file) {
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(FastStringUtils.class.getClassLoader());
     Object opaque = FastStringUtils.toCharArray("opaque");
@@ -101,9 +103,7 @@ public class GroovyProcessorCompiler implements ArtifactInstaller {
     try {
       Class clazz = groovyClassLoader.parseClass(file);
 
-      Class[] interfaces = clazz.getInterfaces();
-
-      for (Class anInterface : interfaces) {
+      for (Class anInterface : clazz.getInterfaces()) {
         if (anInterface.getName().toLowerCase(Locale.ROOT).contains("processor")) {
           registerProcessor(file, clazz);
         }
@@ -111,18 +111,25 @@ public class GroovyProcessorCompiler implements ArtifactInstaller {
     } catch (FileNotFoundException fne) {
       log.warn("action=add processor, reason={}", fne.getMessage());
     } catch (Exception e) {
-      log.info("action=add processor retry, reason={}", e.getMessage(), e);
-      executor.schedule(() -> addProcessor(file), 5, TimeUnit.SECONDS);
+      log.info(
+          "action=add compile retry, file={}, reason={}",
+          file.getAbsolutePath(),
+          e.getMessage(),
+          e);
+      asyncCompile.put(
+          file.getAbsolutePath(), executor.schedule(() -> processScript(file), 5, TimeUnit.SECONDS));
     }
+    log.info("action=compiled, file={}", file.getAbsolutePath());
   }
 
-  private void registerProcessor(File file, Class clazz)
+  private synchronized void registerProcessor(File file, Class clazz)
       throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    unregister(file);
     String absolutePath = file.getAbsolutePath();
     String fileName = file.getName();
     Dictionary dict = new Properties();
-    dict.put(CONFIG_NAME, absolutePath);
-    dict.put("rahla.camel.processor", fileName.substring(0, fileName.lastIndexOf('.')));
+    dict.put(SCRIPT_FILENAME, absolutePath);
+    dict.put(CONFIG_NAME, fileName.substring(0, fileName.lastIndexOf('.')));
     Processor processor = null;
     try {
       Constructor<Processor> declaredConstructor =
@@ -140,28 +147,16 @@ public class GroovyProcessorCompiler implements ArtifactInstaller {
     }
     ServiceRegistration serviceRegistration =
         bundleContext.registerService(Processor.class, processor, dict);
-    log.info("action=register processor , file={}", file.getAbsolutePath());
     serviceRegistrations.put(file.getAbsolutePath(), serviceRegistration);
+    log.info("action=register processor, file={}", file.getAbsolutePath());
   }
 
-  private synchronized void removeProcessor(File file) {
+  private synchronized void unregister(File file) {
     ServiceRegistration<Processor> serviceRegistration =
         serviceRegistrations.remove(file.getAbsolutePath());
     if (serviceRegistration != null) {
       log.info("action=unregister processor , file={}", file.getAbsolutePath());
       serviceRegistration.unregister();
-    }
-    String fileName = file.getName();
-    String configFilter = String.format("(%s=%s)", CONFIG_NAME,
-        fileName.substring(0, fileName.lastIndexOf('.')));
-
-    try {
-      Configuration[] configurations = admin.listConfigurations(configFilter);
-      for (Configuration configuration : configurations) {
-        configuration.delete();
-      }
-    } catch (IOException | InvalidSyntaxException e) {
-      log.error("action=remove processor, reason={}",e.getMessage());
     }
   }
 }
