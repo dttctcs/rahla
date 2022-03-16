@@ -253,6 +253,11 @@
         <version>${pax-logging-log4j2-extra.version}</version>
       </dependency>
       <dependency>
+        <artifactId>simple-xml-safe</artifactId>
+        <groupId>com.carrotsearch.thirdparty</groupId>
+        <version>${simple-xml-safe.version}</version>
+      </dependency>
+      <dependency>
         <artifactId>jackson-dataformat-yaml</artifactId>
         <groupId>com.fasterxml.jackson.dataformat</groupId>
         <scope>provided</scope>
@@ -430,11 +435,6 @@
         <artifactId>opentelemetry-exporter-otlp</artifactId>
         <version>${opentelemetry.version}</version>
       </dependency>
-      <dependency>
-        <groupId>com.squareup.okhttp3</groupId>
-        <artifactId>okhttp</artifactId>
-        <version>${okhttp.version}</version>
-      </dependency>
     </dependencies>
 
   </dependencyManagement>
@@ -477,14 +477,15 @@
     <asm.bundle.version>8.0.1</asm.bundle.version>
     <json-smart-version>2.4.7</json-smart-version>
     <opentelemetry.version>1.9.1</opentelemetry.version>
-    <okhttp.version>3.14.9</okhttp.version>
-
     <maven-bundle-plugin.version>5.1.2</maven-bundle-plugin.version>
     <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
     <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
     <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
     <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+    <simple-xml-safe.version>2.7.1</simple-xml-safe.version>
+    <okclient-version>3.14.9</okclient-version>
+    <minio-commons-compress-version>1.21</minio-commons-compress-version>
   </properties>
 
   <scm>
