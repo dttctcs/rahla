@@ -17,31 +17,6 @@
 
 
   <!--  <bean id="tracer" class="org.apache.camel.opentelemetry.OpenTelemcetryTracer"/>-->
-  <!-- <property name="tracer" ref="tracer"/>-->
-  <!--<bean class="org.apache.camel.opentracing.OpenTracingTracer">
-
-
-
-  </bean>-->
-
-
-  <bean class="org.apache.camel.opentelemetry.AttributeProcessor">
-    <a
-    <argument type="java.lang.String" value="test"/>
-
-    <argument type="org.apache.camel.Expression">
-      <value>
-
-        <constant>foo</constant>
-      </value>
-
-    </argument>
-  </bean>
-  <bean id="test" class="java.util.LinkedHashMap">
-    <argument type="java.lang.String" value="test">
-      <ref component-id=""/>
-    </argument>
-  </bean>
 
   <bean class="rahla.RahlaLogFormatter"/>
 
@@ -72,6 +47,18 @@
         <to uri="direct:dttcs"/>
       </get>
     </rest>
+
+    <routeTemplate id="exampleTemplate">
+      <templateParameter name="from"/>
+      <templateParameter name="to"/>
+      <templateParameter name="description" defaultValue="No description"/>
+      <route template="true">
+        <description>{{description}}</description>
+        <from uri="{{from}}"/>
+        <to uri="{{to}}"/>
+      </route>
+    </routeTemplate>
+
 
     <route id="timer-routes">
       <from uri="timer://test?fixedRate=true&amp;period=5000"/>

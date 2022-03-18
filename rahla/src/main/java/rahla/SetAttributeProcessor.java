@@ -10,19 +10,19 @@ import org.slf4j.LoggerFactory;
 
 public class SetAttributeProcessor implements Processor {
   private static final Logger LOG = LoggerFactory.getLogger(SetAttributeProcessor.class);
-  private final String tagNameHeader;
-  private final String tagValueHeader;
+  private final String tagName;
+  private final String tagFromHeader;
 
   public SetAttributeProcessor() {
-    tagNameHeader = "tagName";
-    tagValueHeader = "tagValue";
+    tagName = "tag";
+    tagFromHeader = "tag";
   }
 
-  public SetAttributeProcessor(String tagNameHeader, String tagValueHeader) {
-    this.tagNameHeader = tagNameHeader;
-    this.tagValueHeader = tagValueHeader;
-    ObjectHelper.notNull(tagNameHeader, "tagNameHeader");
-    ObjectHelper.notNull(tagValueHeader, "tagValueHeader");
+  public SetAttributeProcessor(String tagName, String tagFromHeader) {
+    this.tagName = tagName;
+    this.tagFromHeader = tagFromHeader;
+    ObjectHelper.notNull(tagName, "tagName");
+    ObjectHelper.notNull(tagFromHeader, "tagFromHeader");
   }
 
   @Override
@@ -33,12 +33,8 @@ public class SetAttributeProcessor implements Processor {
           (OpenTelemetrySpanAdapter) ActiveSpanManager.getSpan(exchange);
 
       if (camelSpan != null) {
-        String tagName = (String) exchange.getMessage().getHeader(tagNameHeader);
-        if (tagName == null) {
-          tagName = tagNameHeader;
-        }
-        Object tagValue = exchange.getMessage().getHeader(tagValueHeader);
-        ObjectHelper.notNull(tagValue, tagValueHeader);
+        Object tagValue = exchange.getMessage().getHeader(tagFromHeader);
+        ObjectHelper.notNull(tagValue, tagFromHeader);
         camelSpan.setTag(tagName, tagValue.toString());
       } else {
         LOG.warn("OpenTelemetry: could not find managed span for exchange={}", exchange);

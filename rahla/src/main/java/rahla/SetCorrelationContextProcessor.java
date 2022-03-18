@@ -10,19 +10,19 @@ import org.slf4j.LoggerFactory;
 
 public class SetCorrelationContextProcessor implements Processor {
   private static final Logger LOG = LoggerFactory.getLogger(SetAttributeProcessor.class);
-  private final String baggageNameHeader;
-  private final String baggageValueHeader;
+  private final String baggageName;
+  private final String baggageFromHeader;
 
   public SetCorrelationContextProcessor() {
-    baggageNameHeader = "baggageName";
-    baggageValueHeader = "baggageValue";
+    baggageName = "baggage";
+    baggageFromHeader = "baggage";
   }
 
-  public SetCorrelationContextProcessor(String baggageNameHeader, String baggageValueHeader) {
-    this.baggageNameHeader = baggageNameHeader;
-    this.baggageValueHeader = baggageValueHeader;
-    ObjectHelper.notNull(baggageNameHeader, "baggageNameHeader");
-    ObjectHelper.notNull(baggageValueHeader, "baggageValueHeader");
+  public SetCorrelationContextProcessor(String baggageNameHeader, String baggageFromHeader) {
+    this.baggageName = baggageNameHeader;
+    this.baggageFromHeader = baggageFromHeader;
+    ObjectHelper.notNull(baggageNameHeader, "baggageName");
+    ObjectHelper.notNull(baggageFromHeader, "baggageFromHeader");
   }
 
   @Override
@@ -33,12 +33,8 @@ public class SetCorrelationContextProcessor implements Processor {
           (OpenTelemetrySpanAdapter) ActiveSpanManager.getSpan(exchange);
 
       if (camelSpan != null) {
-        String baggageName = (String) exchange.getMessage().getHeader(baggageNameHeader);
-        if (baggageName == null) {
-          baggageName = baggageNameHeader;
-        }
-        Object baggageValue = exchange.getMessage().getHeader(baggageValueHeader);
-        ObjectHelper.notNull(baggageValue, baggageValueHeader);
+        Object baggageValue = exchange.getMessage().getHeader(baggageFromHeader);
+        ObjectHelper.notNull(baggageValue, baggageFromHeader);
         camelSpan.setCorrelationContextItem(baggageName, baggageValue.toString());
       } else {
         LOG.warn("OpenTelemetry: could not find managed span for exchange={}", exchange);

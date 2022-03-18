@@ -78,13 +78,13 @@ public class HealthServlet extends HttpServlet implements Servlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     if (!camelCheck() || (strictHealth && !bundleCheck() )) {
       resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      resp.getWriter().write("Sick");
+      resp.getWriter().write("Bad");
       resp.getWriter().flush();
       resp.getWriter().close();
       return;
     }
     resp.setStatus(HttpServletResponse.SC_OK);
-    resp.getWriter().write("Healthy");
+    resp.getWriter().write("Good");
     resp.getWriter().flush();
     resp.getWriter().close();
   }
@@ -94,10 +94,8 @@ public class HealthServlet extends HttpServlet implements Servlet {
       List<Route> routes = camelContext.getRoutes();
       for (Route route : routes) {
         ServiceStatus routeStatus = camelContext.getRouteController().getRouteStatus(route.getId());
-        boolean started = routeStatus.isStarted();
-        boolean startable = routeStatus.isStartable();
-        if (!started && !startable) {
-          log.warn("action=health check failed, reason={}", "camel route not startable");
+        if (!(routeStatus.isStarted() ||  routeStatus.isStartable())) {
+          log.warn("action=health check failed, reason={}", "camel route not startable or started");
           return false;
         }
       }

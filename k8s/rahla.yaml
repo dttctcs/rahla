@@ -1,0 +1,129 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rahla
+  labels:
+    app: rahla
+spec:
+  selector:
+    matchLabels:
+      app: rahla
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: rahla
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8181"
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+        - image: datatactics/rahla
+          imagePullPolicy: Always
+          name: rahla
+          resources:
+            limits:
+              cpu: 1
+              memory: 768Mi
+            requests:
+              cpu: 100m
+              memory: 768Mi
+          readinessProbe:
+            httpGet:
+              path: /healthy
+              port: 8181
+            initialDelaySeconds: 10
+            timeoutSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /healthy
+              port: 8181
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+          env:
+            - name: LOG_FORMAT
+              value: json
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+          envFrom:
+            - configMapRef:
+                name: env-cm
+          ports:
+            - name: osgi
+              containerPort: 8181
+              protocol: TCP
+            - name: ssh
+              containerPort: 8101
+              protocol: TCP
+          volumeMounts:
+            - name: deploy-volume
+              mountPath: "/deploy/"
+              readOnly: true
+            - name: data-volume
+              mountPath: "/data/"
+              readOnly: true
+            - name: data
+              mountPath: "/rahla/data"
+      volumes:
+        - name: deploy-volume
+          configMap:
+            name: deploy-cm
+        - name: data-volume
+          configMap:
+            name: data-cm
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rahla
+  labels:
+    app: rahla
+spec:
+  ports:
+    - name: osgi
+      port: 8181
+      protocol: TCP
+      targetPort: osgi
+  selector:
+    app: rahla
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rahla-ssh
+  labels:
+    app: rahla
+spec:
+  ports:
+    - name: ssh
+      port: 8101
+      protocol: TCP
+      targetPort: ssh
+  selector:
+    app: rahla
+  type: ClusterIP
