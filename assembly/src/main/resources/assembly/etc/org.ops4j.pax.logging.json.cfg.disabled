@@ -26,41 +26,36 @@ color.debug = cyan
 color.trace = cyan
 
 # Common pattern layout for appenders
-log4j2.pattern = %d{ISO8601} | %-5p | %-16t | %-32c{1} | %X{bundle.id} - %X{bundle.name} - %X{bundle.version} | %m%n
+log4j2.pattern = %d{ISO8601} | %-5p | %-16t | %-32c{1} | %X{bundle.id} - %X{bundle.name} - %X{bundle.version} | %encode{%.-500m}{CRLF}%n
 log4j2.out.pattern = \u001b[90m%d{HH:mm:ss\.SSS}\u001b[0m %highlight{%-5level}{FATAL=${color.fatal}, ERROR=${color.error}, WARN=${color.warn}, INFO=${color.info}, DEBUG=${color.debug}, TRACE=${color.trace}} \u001b[90m[%t]\u001b[0m %msg%n%throwable
-log4j2.formatMsgNoLookups=true
+
 
 # Root logger
 log4j2.rootLogger.level = INFO
+# uncomment to use asynchronous loggers, which require mvn:com.lmax/disruptor/3.3.2 and mvn:org.ops4j.pax.logging/pax-logging-log4j2-extra/1.11.4 libraries
+#log4j2.rootLogger.type = asyncRoot
+#log4j2.rootLogger.includeLocation = false
+
+
 log4j2.rootLogger.appenderRef.PaxOsgi.ref = PaxOsgi
 log4j2.rootLogger.appenderRef.Console.ref = Console
-
-log4j2.logger.trace.msg.name=trace.msg
-log4j2.logger.trace.msg.level=INFO
-log4j2.logger.trace.msg.appenderRef.Console.ref = Console
-log4j2.logger.trace.msg.additivity=false
+log4j2.rootLogger.appenderRef.Console.filter.threshold.type = ThresholdFilter
+log4j2.rootLogger.appenderRef.Console.filter.threshold.level = ${karaf.log.console:-OFF}
 
 
+log4j2.logger.trace.name=trace.msg
+log4j2.logger.trace.level=INFO
+log4j2.logger.trace.appenderRef.console.ref = Console
+log4j2.logger.trace.appenderRef.file.ref = TraceFile
+log4j2.logger.trace.additivity=false
 
-# Loggers configuration
 
-# SSHD logger
 log4j2.logger.sshd.name = org.apache.sshd
-log4j2.logger.sshd.level = ERROR
+log4j2.logger.sshd.level = WARN
 
-# Spifly logger
 log4j2.logger.spifly.name = org.apache.aries.spifly
 log4j2.logger.spifly.level = WARN
 
-# Security audit logger
-log4j2.logger.audit.name = audit
-log4j2.logger.audit.level = TRACE
-log4j2.logger.audit.additivity = false
-log4j2.logger.audit.appenderRef.AuditRollingFile.ref = AuditRollingFile
-
-# Appenders configuration
-
-# Console appender not used by default (see log4j2.rootLogger.appenderRefs)
 log4j2.appender.console.type = Console
 log4j2.appender.console.name = Console
 log4j2.appender.console.layout.type = JsonLayout
@@ -72,18 +67,29 @@ log4j2.appender.console.layout.includeStacktrace=true
 log4j2.appender.console.layout.stacktraceAsString=true
 log4j2.appender.console.layout.objectMessageAsJsonObject=true
 
+# Rolling file appender
+log4j2.appender.rolling.type = RollingRandomAccessFile
+log4j2.appender.rolling.name = TraceFile
+log4j2.appender.rolling.fileName = ${karaf.log}/karaf.log
+log4j2.appender.rolling.filePattern = ${karaf.log}/karaf.log.%i
+#log4j2.appender.rolling.immediateFlush = false
+log4j2.appender.rolling.append = true
+log4j2.appender.rolling.policies.type = Policies
+log4j2.appender.rolling.policies.size.type = SizeBasedTriggeringPolicy
+log4j2.appender.rolling.policies.size.size = 16MB
+log4j2.appender.rolling.strategy.type=DefaultRolloverStrategy
+log4j2.appender.rolling.strategy.min = 1
+log4j2.appender.rolling.strategy.max = 1
+log4j2.appender.rolling.strategy.compressionLevel = 9
 
-# Audit file appender
-log4j2.appender.audit.type = RollingRandomAccessFile
-log4j2.appender.audit.name = AuditRollingFile
-log4j2.appender.audit.fileName = ${karaf.log}/security.log
-log4j2.appender.audit.filePattern = ${karaf.log}/security-%i.log
-log4j2.appender.audit.append = true
-log4j2.appender.audit.layout.type = PatternLayout
-log4j2.appender.audit.layout.pattern = %m%n
-log4j2.appender.audit.policies.type = Policies
-log4j2.appender.audit.policies.size.type = SizeBasedTriggeringPolicy
-log4j2.appender.audit.policies.size.size = 8MB
+log4j2.appender.rolling.layout.type = JsonLayout
+log4j2.appender.rolling.layout.compact=true
+log4j2.appender.rolling.layout.eventEol=true
+log4j2.appender.rolling.layout.complete=false
+log4j2.appender.rolling.layout.properties=true
+log4j2.appender.rolling.layout.includeStacktrace=true
+log4j2.appender.rolling.layout.stacktraceAsString=true
+log4j2.appender.rolling.layout.objectMessageAsJsonObject=true
 
 # OSGi appender
 log4j2.appender.osgi.type = PaxOsgi

@@ -188,6 +188,13 @@
       <groupId>org.codehaus.groovy</groupId>
     </dependency>
 
+    <dependency>
+      <artifactId>pax-logging-api</artifactId>
+      <groupId>org.ops4j.pax.logging</groupId>
+      <version>${pax-logging.version}</version>
+    </dependency>
+
+
     <!--    <dependency>-->
     <!--      <groupId>org.codehaus.groovy</groupId>-->
     <!--      <artifactId>groovy-docgenerator</artifactId>-->

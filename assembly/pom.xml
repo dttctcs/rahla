@@ -118,12 +118,11 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <scope>compile</scope>
     </dependency>
-
-<!--   <dependency>-->
-<!--      <artifactId>pax-logging-log4j2-extra</artifactId>-->
-<!--      <groupId>org.ops4j.pax.logging</groupId>-->
-<!--      <scope>compile</scope>-->
-<!--    </dependency>-->
+   <dependency>
+      <artifactId>pax-logging-log4j2-extra</artifactId>
+      <groupId>org.ops4j.pax.logging</groupId>
+      <scope>compile</scope>
+    </dependency>
 
   </dependencies>
 
@@ -184,9 +183,9 @@
             <feature>shell-compat</feature>
           </installedFeatures>
           <javase>11</javase>
-          <framework>
+         <!-- <framework>
             framework-logback
-          </framework>
+          </framework>-->
 
           <blacklistedRepositories>
             <repository>mvn:org.apache.karaf.features/framework/[2,${karaf.version})/xml/features

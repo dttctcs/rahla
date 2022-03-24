@@ -107,7 +107,7 @@
                 <groupId>org.ops4j.pax.logging</groupId>
                 <artifactId>pax-logging-log4j2</artifactId>
                 <scope>provided</scope>
-                <version>${pax-logging-log4j2-extra.version}</version>
+                <version>${pax-logging.version}</version>
             </dependency>
             <dependency>
                 <artifactId>osgi.core</artifactId>
@@ -263,7 +263,7 @@
                 <artifactId>pax-logging-log4j2-extra</artifactId>
                 <groupId>org.ops4j.pax.logging</groupId>
                 <scope>provided</scope>
-                <version>${pax-logging-log4j2-extra.version}</version>
+                <version>${pax-logging.version}</version>
             </dependency>
             <dependency>
                 <artifactId>simple-xml-safe</artifactId>
@@ -481,7 +481,7 @@
         <commons-collections4.version>4.4</commons-collections4.version>
         <simpleclient_hotspot.version>0.9.0</simpleclient_hotspot.version>
         <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>
-        <pax-logging-log4j2-extra.version>2.0.14</pax-logging-log4j2-extra.version>
+        <pax-logging.version>2.0.14</pax-logging.version>
         <lombok.version>1.18.10</lombok.version>
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
         <junit.version>4.12</junit.version>
