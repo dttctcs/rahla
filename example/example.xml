@@ -67,7 +67,6 @@
       </setBody>
       <to uri="metrics:counter:matthias.rules?increment=7"/>
       <to uri="log:rahlatimer"/>
-
     </route>
 
     <route id="dttcs-route">

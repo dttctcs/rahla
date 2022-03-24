@@ -119,11 +119,11 @@
       <scope>compile</scope>
     </dependency>
 
-    <dependency>
-      <artifactId>pax-logging-log4j2-extra</artifactId>
-      <groupId>org.ops4j.pax.logging</groupId>
-      <scope>compile</scope>
-    </dependency>
+<!--   <dependency>-->
+<!--      <artifactId>pax-logging-log4j2-extra</artifactId>-->
+<!--      <groupId>org.ops4j.pax.logging</groupId>-->
+<!--      <scope>compile</scope>-->
+<!--    </dependency>-->
 
   </dependencies>
 
@@ -184,9 +184,10 @@
             <feature>shell-compat</feature>
           </installedFeatures>
           <javase>11</javase>
-<!--          <blacklistedBundles>-->
-<!--            <bundle>mvn:org.apache.felix/org.apache.felix.fileinstall/3.7.0</bundle>-->
-<!--          </blacklistedBundles>-->
+          <framework>
+            framework-logback
+          </framework>
+
           <blacklistedRepositories>
             <repository>mvn:org.apache.karaf.features/framework/[2,${karaf.version})/xml/features
             </repository>
