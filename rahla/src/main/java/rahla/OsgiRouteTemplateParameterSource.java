@@ -25,9 +25,9 @@ import org.osgi.service.component.annotations.Reference;
     immediate = true)
 @Slf4j
 public class OsgiRouteTemplateParameterSource implements RouteTemplateParameterSource {
-  private static final String SHARED_CONFIG_PID = "shared.config.pid";
-  private static final String SHARED_CONFIG_COUNTER = "shared.config.counter";
-  private static final String TEMPLATE_PREFIX = "camel.route.template.";
+  public static final String SHARED_CONFIG_PID = "shared.config.pid";
+  public static final String SHARED_CONFIG_COUNTER = "shared.config.counter";
+  public static final String TEMPLATE_PREFIX = "camel.route.template.";
 
   private String templateId;
   private Set<String> routeIds = new HashSet();

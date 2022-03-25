@@ -278,7 +278,12 @@
       <groupId>org.apache.servicemix.bundles</groupId>
       <version>1.15.0_1</version>
     </dependency>
-<!--    <dependency>-->
+      <dependency>
+          <groupId>com.fasterxml.jackson.dataformat</groupId>
+          <artifactId>jackson-dataformat-yaml</artifactId>
+          <scope>compile</scope>
+      </dependency>
+      <!--    <dependency>-->
 <!--      <groupId>org.apache.servicemix.bundles</groupId>-->
 <!--      <artifactId>org.apache.servicemix.bundles.okhttp</artifactId>-->
 <!--      <version>3.14.1_1</version>-->

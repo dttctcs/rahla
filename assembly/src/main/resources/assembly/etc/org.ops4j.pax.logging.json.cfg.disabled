@@ -34,8 +34,7 @@ log4j2.out.pattern = \u001b[90m%d{HH:mm:ss\.SSS}\u001b[0m %highlight{%-5level}{F
 log4j2.rootLogger.level = INFO
 # uncomment to use asynchronous loggers, which require mvn:com.lmax/disruptor/3.3.2 and mvn:org.ops4j.pax.logging/pax-logging-log4j2-extra/1.11.4 libraries
 #log4j2.rootLogger.type = asyncRoot
-#log4j2.rootLogger.includeLocation = false
-
+log4j2.rootLogger.includeLocation = false
 
 log4j2.rootLogger.appenderRef.PaxOsgi.ref = PaxOsgi
 log4j2.rootLogger.appenderRef.Console.ref = Console
@@ -70,8 +69,8 @@ log4j2.appender.console.layout.objectMessageAsJsonObject=true
 # Rolling file appender
 log4j2.appender.rolling.type = RollingRandomAccessFile
 log4j2.appender.rolling.name = TraceFile
-log4j2.appender.rolling.fileName = ${karaf.log}/karaf.log
-log4j2.appender.rolling.filePattern = ${karaf.log}/karaf.log.%i
+log4j2.appender.rolling.fileName = ${karaf.log}/trace.json
+log4j2.appender.rolling.filePattern = ${karaf.log}/trace.json.%i
 #log4j2.appender.rolling.immediateFlush = false
 log4j2.appender.rolling.append = true
 log4j2.appender.rolling.policies.type = Policies

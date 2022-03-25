@@ -10,7 +10,6 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.RouteDefinition;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsName;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import javax.ws.rs.GET;
@@ -22,11 +21,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-@Path("/camel")
 @Slf4j
 @JaxrsResource
-@JaxrsName("camel")
-@Component(immediate = true)
+@Component(service = CamelResource.class, immediate = true)
+@Path("/camel")
 public class CamelResource {
 
   @Reference private volatile List<CamelContext> contexts;
@@ -34,19 +32,25 @@ public class CamelResource {
   @Path("/routeinfo")
   @Produces(MediaType.APPLICATION_JSON)
   @GET
-  public List<RouteInfo> doit() throws Exception {
-    List<RouteInfo> res = new LinkedList<>();
+  public Map<String, List<RouteInfo>> routeInfo() throws Exception {
+    Map<String, List<RouteInfo>> res = new LinkedHashMap<>();
     for (CamelContext context : contexts) {
-
-      List<RouteDefinition> routeDefinitions =
-          ((DefaultCamelContext) context).getRouteDefinitions();
-      for (RouteDefinition routeDefinition : routeDefinitions) {
-        ExtendedCamelContext ecc = context.adapt(ExtendedCamelContext.class);
+      List<RouteInfo> routeInfos = new LinkedList<>();
+      for (RouteDefinition def : ((DefaultCamelContext) context).getRouteDefinitions()) {
         String model =
-            ecc.getModelToXMLDumper().dumpModelAsXml(context, routeDefinition, true, true);
-
-        res.add(new RouteInfo(model, "foo"));
+            context
+                .adapt(ExtendedCamelContext.class)
+                .getModelToXMLDumper()
+                .dumpModelAsXml(context, def, true, true);
+        String stats =
+            context
+                .getExtension(ManagedCamelContext.class)
+                .getManagedRoute(def.getRouteId())
+                .dumpRouteStatsAsXml(true, true);
+        routeInfos.add(new RouteInfo(def.getRouteId(), model, stats));
       }
+
+      res.put(context.getName(), routeInfos);
     }
     return res;
   }
@@ -74,7 +78,8 @@ public class CamelResource {
   @Getter
   @AllArgsConstructor
   public static class RouteInfo {
-    String model;
-    String stats;
+    private String id;
+    public String model;
+    public String stats;
   }
 }
