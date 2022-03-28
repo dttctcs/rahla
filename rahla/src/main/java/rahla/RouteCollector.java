@@ -1,21 +1,8 @@
 package rahla;
 
 import com.codahale.metrics.Counter;
-import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import io.prometheus.client.Collector;
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.CounterMetricFamily;
-import io.prometheus.client.GaugeMetricFamily;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
+import io.prometheus.client.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
@@ -23,10 +10,14 @@ import org.apache.camel.ServiceStatus;
 import org.apache.camel.api.management.ManagedCamelContext;
 import org.apache.camel.api.management.mbean.ManagedRouteMBean;
 import org.apache.camel.component.metrics.routepolicy.MetricsRegistryService;
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 @Component
 @Slf4j
@@ -34,16 +25,25 @@ public class RouteCollector extends Collector {
 
   private final Map<String, GaugeMetricFamily> gauges = new LinkedHashMap<>();
   private final Map<String, CounterMetricFamily> counters = new LinkedHashMap<>();
+  private Gauge info;
   private Collector collector;
   @Reference private volatile List<CamelContext> contexts;
 
   @Activate
-  public void activate() {
+  public void activate(ComponentContext cc) {
     collector = this.register();
+    info =
+        Gauge.build()
+            .name("rahla_up")
+            .labelNames("version")
+            .help("Version of Rahla core.")
+            .register();
+    info.labels(cc.getBundleContext().getBundle().getVersion().toString()).set(1);
   }
 
   @Deactivate
   public void deactivate() {
+    CollectorRegistry.defaultRegistry.unregister(info);
     CollectorRegistry.defaultRegistry.unregister(collector);
   }
 
@@ -230,16 +230,24 @@ public class RouteCollector extends Collector {
 
         if (metricsRegistryService != null) {
           MetricRegistry metricsRegistry = metricsRegistryService.getMetricsRegistry();
-          for (Entry<String, Meter> e : metricsRegistry.getMeters().entrySet()) {
-            String metricName = e.getKey().toLowerCase(Locale.ROOT).replaceAll("[^a-z]", "_");
-            GaugeMetricFamily gaugeMetricFamily =
-                gauges.computeIfAbsent(
-                    metricName,
-                    s ->
-                        new GaugeMetricFamily(
-                            s, "Custom Camel Gauge", Collections.singletonList("context")));
-            gaugeMetricFamily.addMetric(
-                Collections.singletonList(contextName), e.getValue().getCount());
+          for (Entry<String, com.codahale.metrics.Gauge> e :
+              metricsRegistry.getGauges().entrySet()) {
+            try {
+              double v = 0.0d;
+              if (!String.valueOf(e.getValue().getValue()).isBlank()) {
+                v = Double.parseDouble(String.valueOf(e.getValue().getValue()));
+              }
+              String metricName = e.getKey().toLowerCase(Locale.ROOT).replaceAll("[^a-z]", "_");
+              GaugeMetricFamily gaugeMetricFamily =
+                  gauges.computeIfAbsent(
+                      metricName,
+                      s ->
+                          new GaugeMetricFamily(
+                              s, "Custom Camel Gauge", Collections.singletonList("context")));
+              gaugeMetricFamily.addMetric(Collections.singletonList(contextName), v);
+            } catch (Exception ex) {
+              log.warn("action=can not add gauge {}, reason={}", e.getKey(), ex.getMessage(), ex);
+            }
           }
           for (Entry<String, Counter> e : metricsRegistry.getCounters().entrySet()) {
             String metricName = e.getKey().toLowerCase(Locale.ROOT).replaceAll("[^a-z]", "_");

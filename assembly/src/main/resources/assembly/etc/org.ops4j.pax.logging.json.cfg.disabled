@@ -42,7 +42,7 @@ log4j2.rootLogger.appenderRef.Console.filter.threshold.type = ThresholdFilter
 log4j2.rootLogger.appenderRef.Console.filter.threshold.level = ${karaf.log.console:-OFF}
 
 
-log4j2.logger.trace.name=trace.msg
+log4j2.logger.trace.name=trace
 log4j2.logger.trace.level=INFO
 log4j2.logger.trace.appenderRef.console.ref = Console
 log4j2.logger.trace.appenderRef.file.ref = TraceFile

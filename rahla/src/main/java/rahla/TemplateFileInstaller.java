@@ -97,8 +97,8 @@ public class TemplateFileInstaller implements ArtifactInstaller {
     }
     Dictionary<String, Object> config = new Hashtable<>();
     config.put(TEMPLATE_ID, template.getTemplateId());
-    config.put(SHARED_CONFIG_COUNTER, template.getSharedConfigPid());
-    config.put(SHARED_CONFIG_PID, file.getAbsolutePath());
+    config.put(SHARED_CONFIG_PID, template.getSharedConfigPid());
+    config.put(TEMPLATEILE_INSTALL_PREFIX, file.getAbsolutePath());
     template
         .getRoutes()
         .forEach(
