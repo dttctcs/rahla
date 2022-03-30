@@ -31,6 +31,7 @@
       felix.fileinstall.active.level  = 80
       felix.fileinstall.log.level = 3
       felix.fileinstall.disableNio2 = true
+      felix.fileinstall.subdir.mode = recurse
     </config>
 
     <feature>camel-core</feature>
