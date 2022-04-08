@@ -51,7 +51,7 @@ import static rahla.OsgiRouteTemplateParameterSource.*;
 
 @Component(
     service = {ArtifactInstaller.class, ArtifactListener.class},
-    property = {"CompoundFileInstaller=true"},
+    property = {"TemplateFileInstaller=true"},
     immediate = true)
 @Slf4j
 public class TemplateFileInstaller implements ArtifactInstaller {

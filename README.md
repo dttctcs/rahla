@@ -9,7 +9,7 @@ services.
 | karaf     | 4.3.6   |
 | osgi      | 7.0.0   |
 | camel     | 3.14.2  |
-| groovy    | 3.0.8   |
+| groovy    | 3.0.9   |
 ## Usage
 
 You can run an example with:

@@ -27,7 +27,6 @@ public class SetCorrelationContextProcessor implements Processor {
 
   @Override
   public void process(Exchange exchange) {
-
     try {
       OpenTelemetrySpanAdapter camelSpan =
           (OpenTelemetrySpanAdapter) ActiveSpanManager.getSpan(exchange);

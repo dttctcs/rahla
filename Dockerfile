@@ -5,7 +5,7 @@
 #WORKDIR /build
 #RUN mvn $EXTRA_MAVEN -B -f pom.xml clean package
 
-FROM docker.io/openjdk:11-jdk-slim
+FROM docker.io/openjdk:11-jdk
 ENV KARAF_HOME /rahla
 ENV PATH $PATH:$KARAF_HOME/bin
 ENV KARAF_EXEC exec

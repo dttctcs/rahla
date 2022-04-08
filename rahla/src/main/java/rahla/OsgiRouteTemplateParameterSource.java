@@ -50,9 +50,11 @@ public class OsgiRouteTemplateParameterSource implements RouteTemplateParameterS
       String routeId = substring.substring(0, i);
       String parameterName = substring.substring(i + 1);
       routeIds.add(routeId);
-      parameters
-          .computeIfAbsent(routeId, s -> new HashMap<>())
-          .put(parameterName, properties.get(k));
+      Map<String, Object> parameter = parameters
+              .computeIfAbsent(routeId, s -> new HashMap<>());
+      parameter.put(parameterName, properties.get(k));
+      parameter.put("routeId", routeId);
+
     }
     if (sharedConfigPid != null) {
       try {

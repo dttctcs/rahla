@@ -17,7 +17,7 @@
 <features name="${project.artifactId}-${project.version}"
   xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
 
-  <feature description='${project.name}' name='${project.artifactId}' start-level="75"
+  <feature description='${project.name}' name='${project.artifactId}' start-level="80"
     version='${project.version}'>
     <config name="org.apache.aries.jax.rs.whiteboard.default">
       default.web=false
@@ -27,8 +27,7 @@
       felix.fileinstall.dir = ${env:RAHLA_DEPLOY_PATH:-/deploy/}
       felix.fileinstall.filter = .*
       felix.fileinstall.poll = 1000
-      felix.fileinstall.start.level = 80
-      felix.fileinstall.active.level = 80
+      felix.fileinstall.active.level = 100
       felix.fileinstall.log.level = 3
       felix.fileinstall.subdir.mode = recurse
     </config>
@@ -48,6 +47,7 @@
     <feature>camel-base64</feature>
     <feature>camel-groovy</feature>
     <feature>camel-csv</feature>
+    <feature>pax-jms-pool</feature>
     <bundle dependency='true'>wrap:mvn:io.minio/minio/8.2.2</bundle>
     <bundle dependency='true'>mvn:org.apache.commons/commons-compress/${minio-commons-compress-version}</bundle>
     <bundle dependency='true'>wrap:mvn:com.squareup.okhttp3/okhttp/${okclient-version}</bundle>

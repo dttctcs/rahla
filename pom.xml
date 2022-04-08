@@ -474,7 +474,7 @@
         <karaf.version>4.3.6</karaf.version>
         <osgi.version>7.0.0</osgi.version>
         <camel.version>3.14.2</camel.version>
-        <groovy.version>3.0.8</groovy.version>
+        <groovy.version>3.0.9</groovy.version>
         <slf4j-log4j12.version>1.7.29</slf4j-log4j12.version>
         <jackson2.version>2.12.5</jackson2.version>
         <commons-collections4.version>4.4</commons-collections4.version>
