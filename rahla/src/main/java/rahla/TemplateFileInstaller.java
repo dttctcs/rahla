@@ -87,7 +87,8 @@ public class TemplateFileInstaller implements ArtifactInstaller {
     }
   }
 
-  private void createConfig(File file) {
+  private void upsertConfig(File file) {
+    deleteConfig(file);
     Template template;
     try {
       template = fromYaml(file);
@@ -121,14 +122,13 @@ public class TemplateFileInstaller implements ArtifactInstaller {
   @Override
   public synchronized void install(File file) {
     log.info("action=install template {}", file.getAbsolutePath());
-    createConfig(file);
+    upsertConfig(file);
   }
 
   @Override
   public synchronized void update(File file) {
     log.info("action=update template {}", file.getAbsolutePath());
-    deleteConfig(file);
-    createConfig(file);
+    upsertConfig(file);
   }
 
   @Override
