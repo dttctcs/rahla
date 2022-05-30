@@ -93,7 +93,7 @@
     <artifactId>reactor</artifactId>
     <groupId>rahla</groupId>
     <relativePath>../pom.xml</relativePath>
-    <version>0.9.12</version>
+    <version>0.9.13-SNAPSHOT</version>
   </parent>
 
 </project>
