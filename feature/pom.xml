@@ -70,14 +70,15 @@
       <artifactId>jackson-module-jaxb-annotations</artifactId>
       <groupId>com.fasterxml.jackson.module</groupId>
     </dependency>
-    <dependency>
+   <!-- <dependency>
       <artifactId>simple-xml-safe</artifactId>
       <groupId>com.carrotsearch.thirdparty</groupId>
-    </dependency>
+    </dependency>-->
     <dependency>
       <artifactId>rahla</artifactId>
       <groupId>rahla</groupId>
     </dependency>
+
   </dependencies>
 
   <description />

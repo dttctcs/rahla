@@ -14,7 +14,8 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses />
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <artifactId>reactor</artifactId>
 
     <build>
@@ -133,12 +134,6 @@
                 <version>${javax.ws.rs-api.version}</version>
             </dependency>
             <dependency>
-                <artifactId>junit</artifactId>
-                <groupId>junit</groupId>
-                <scope>test</scope>
-                <version>${junit.version}</version>
-            </dependency>
-            <dependency>
                 <artifactId>lombok</artifactId>
                 <groupId>org.projectlombok</groupId>
                 <scope>provided</scope>
@@ -250,13 +245,6 @@
                 <artifactId>simpleclient_hotspot</artifactId>
                 <groupId>io.prometheus</groupId>
                 <version>${simpleclient_hotspot.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>org.apache.aries.jax.rs.features</artifactId>
-                <groupId>org.apache.aries.jax.rs</groupId>
-                <scope>runtime</scope>
-                <type>xml</type>
-                <version>${org.apache.aries.jax.rs.features.version}</version>
             </dependency>
             <dependency>
                 <artifactId>pax-logging-log4j2-extra</artifactId>
@@ -450,7 +438,7 @@
         </dependencies>
 
     </dependencyManagement>
-    <description />
+    <description/>
 
     <groupId>rahla</groupId>
     <modelVersion>4.0.0</modelVersion>
@@ -471,19 +459,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 
-        <karaf.version>4.3.6</karaf.version>
+        <karaf.version>4.3.7</karaf.version>
         <osgi.version>7.0.0</osgi.version>
-        <camel.version>3.14.2</camel.version>
-        <groovy.version>3.0.9</groovy.version>
+        <camel.version>3.14.3</camel.version>
+        <groovy.version>3.0.8</groovy.version>
         <slf4j-log4j12.version>1.7.29</slf4j-log4j12.version>
         <jackson2.version>2.12.5</jackson2.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <simpleclient_hotspot.version>0.9.0</simpleclient_hotspot.version>
         <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>
-        <pax-logging.version>2.0.14</pax-logging.version>
+        <pax-logging.version>2.0.16</pax-logging.version>
         <lombok.version>1.18.10</lombok.version>
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
-        <junit.version>4.12</junit.version>
         <org.apache.aries.jax.rs.features.version>1.0.6</org.apache.aries.jax.rs.features.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
         <asm.bundle.version>8.0.1</asm.bundle.version>
@@ -498,6 +485,7 @@
         <simple-xml-safe.version>2.7.1</simple-xml-safe.version>
         <okclient-version>3.14.9</okclient-version>
         <minio-commons-compress-version>1.21</minio-commons-compress-version>
+        <apache-cxf.version>3.4.7</apache-cxf.version>
     </properties>
 
     <scm>

@@ -92,14 +92,6 @@
     </dependency>
 
 
-    <dependency>
-      <artifactId>org.apache.aries.jax.rs.features</artifactId>
-      <groupId>org.apache.aries.jax.rs</groupId>
-      <scope>runtime</scope>
-      <type>xml</type>
-    </dependency>
-
-
     <!--    Needed for Json Logging-->
     <dependency>
       <artifactId>jackson-core</artifactId>
@@ -171,11 +163,10 @@
             <feature>log</feature>
             <feature>package</feature>
             <feature>service</feature>
+            <feature>webconsole</feature>
             <feature>system</feature>
             <feature>scr</feature>
             <feature>jolokia</feature>
-            <feature>aries-jax-rs-whiteboard</feature>
-            <feature>aries-jax-rs-whiteboard-jackson</feature>
             <feature>rahla</feature>
           </bootFeatures>
           <installedFeatures>

@@ -11,6 +11,7 @@ import org.apache.camel.model.RouteDefinition;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
+import rahla.auth.ApiKeySecured;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -23,8 +24,10 @@ import java.util.Map;
 
 @Slf4j
 @JaxrsResource
+
 @Component(service = CamelResource.class, immediate = true)
 @Path("/camel")
+@ApiKeySecured
 public class CamelResource {
 
   @Reference private volatile List<CamelContext> contexts;
