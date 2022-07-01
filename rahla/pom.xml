@@ -270,11 +270,6 @@
       <groupId>io.opentelemetry</groupId>
       <artifactId>opentelemetry-exporter-otlp</artifactId>
     </dependency>
-    <dependency>
-      <artifactId>org.apache.servicemix.bundles.okio</artifactId>
-      <groupId>org.apache.servicemix.bundles</groupId>
-      <version>1.15.0_1</version>
-    </dependency>
       <dependency>
           <groupId>com.fasterxml.jackson.dataformat</groupId>
           <artifactId>jackson-dataformat-yaml</artifactId>

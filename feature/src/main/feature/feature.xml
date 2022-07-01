@@ -16,7 +16,7 @@
 
 <features name="${project.artifactId}-${project.version}"
           xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
-   <!-- <repository>mvn:org.apache.cxf.karaf/apache-cxf/${apache-cxf.version}/xml/features</repository>-->
+    <!-- <repository>mvn:org.apache.cxf.karaf/apache-cxf/${apache-cxf.version}/xml/features</repository>-->
     <repository>
         mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/${org.apache.aries.jax.rs.features.version}/xml
     </repository>
@@ -63,18 +63,23 @@
 
 
         <bundle dependency='true'>wrap:mvn:io.minio/minio/8.2.2</bundle>
-        <bundle dependency='true'>mvn:org.apache.commons/commons-compress/${minio-commons-compress-version}</bundle>
-        <bundle dependency='true'>wrap:mvn:com.squareup.okhttp3/okhttp/${okclient-version}</bundle>
-
+        <bundle dependency='true'>
+            mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okhttp/${okhttp.version}
+        </bundle>
+        <bundle dependency='true'>
+            mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okio/${okio.version}
+        </bundle>
         <bundle>mvn:org.apache.camel/camel-minio/${camel.version}</bundle>
-      <!--  <bundle dependency="true">
-            mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.2/2.9.0
-        </bundle>-->
-        <bundle dependency="true">
-            mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/2.9.0
+        <bundle dependency='true'>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
+        <bundle dependency='true'>
+            wrap:mvn:com.carrotsearch.thirdparty/simple-xml-safe/${simple-xml-safe.version}
         </bundle>
 
-        <!--<bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jaxrs_2.1_spec/1.1</bundle>-->
+
+        <bundle dependency="true">
+            mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/${saaj-api-1.3.version}
+        </bundle>
+
     </feature>
 
 
