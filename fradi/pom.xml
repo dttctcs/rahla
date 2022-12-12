@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>reactor</artifactId>
+    <groupId>rahla</groupId>
+    <relativePath>../pom.xml</relativePath>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>fradi</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Camel fradi Component</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Camel BOM -->
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-bom</artifactId>
+        <version>${camel.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <!-- camel -->
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-support</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    
+
+    <!-- testing -->
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-jdbc</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <artifactId>siddhi-core</artifactId>
+      <groupId>io.siddhi</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>siddhi-query-api</artifactId>
+      <groupId>io.siddhi</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>siddhi-query-compiler</artifactId>
+      <groupId>io.siddhi</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>siddhi-annotations</artifactId>
+      <groupId>io.siddhi</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>siddhi-execution-string</artifactId>
+      <groupId>io.siddhi.extension.execution.string</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>siddhi-execution-unique</artifactId>
+      <groupId>io.siddhi.extension.execution.unique</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>siddhi-execution-regex</artifactId>
+      <groupId>io.siddhi.extension.execution.regex</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>siddhi-store-rdbms</artifactId>
+      <groupId>io.siddhi.extension.store.rdbms</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>disruptor</artifactId>
+      <groupId>com.lmax</groupId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <artifactId>lombok</artifactId>
+      <groupId>org.projectlombok</groupId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <defaultGoal>install</defaultGoal>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <configuration>
+            <archive>
+              <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+            </archive>
+          </configuration>
+          <executions>
+            <execution>
+              <id>bundle-jar</id>
+              <phase>package</phase>
+            </execution>
+          </executions>
+          <!--          <configuration>-->
+          <!--            <archive combine.self="override">-->
+          <!--              <manifestFile />-->
+          <!--              <manifest>-->
+          <!--                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>-->
+          <!--                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
+          <!--              </manifest>-->
+          <!--            </archive>-->
+          <!--          </configuration>-->
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>11</source>
+          <target>11</target>
+        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <configuration>
+          <encoding>UTF-8</encoding>
+        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Bundle-Version>${project.version}</Bundle-Version>
+            <Export-Package>rahla.components.fradi.*;version=${project.version}</Export-Package>
+            <Export-Service>org.apache.camel.spi.ComponentResolver;component=fradi</Export-Service>
+            <Import-Package>*</Import-Package>
+          </instructions>
+        </configuration>
+        <executions>
+          <execution>
+            <configuration>
+              <versions>
+                <camel.osgi.version.clean>${project.version}</camel.osgi.version.clean>
+              </versions>
+            </configuration>
+            <goals>
+              <goal>cleanVersions</goal>
+            </goals>
+            <id>versions</id>
+            <phase>validate</phase>
+          </execution>
+          <execution>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+            <id>bundle-manifest</id>
+            <phase>prepare-package</phase>
+          </execution>
+        </executions>
+        <extensions>true</extensions>
+        <groupId>org.apache.felix</groupId>
+      </plugin>
+
+
+      <plugin>
+        <artifactId>camel-package-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-components</goal>
+            </goals>
+            <id>prepare</id>
+            <phase>generate-resources</phase>
+          </execution>
+          <execution>
+            <goals>
+              <goal>validate-components</goal>
+            </goals>
+            <id>validate</id>
+            <phase>prepare-package</phase>
+          </execution>
+        </executions>
+        <groupId>org.apache.camel</groupId>
+      </plugin>
+
+
+
+
+
+    </plugins>
+  </build>
+
+</project>

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C)  2020 Matthias Leinweber - datatactics
+  ~
+  ~ This code is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License, version 3,
+  ~ as published by the Free Software Foundation.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License, version 3,
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses />
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <artifactId>rahla</artifactId>
+
+  <groupId>rahla.assembly</groupId>
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>rahla.assembly Assembly</name>
+
+  <packaging>karaf-assembly</packaging>
+  <description>
+    Enterprise Service Platform Integrator
+  </description>
+
+
+  <parent>
+    <artifactId>reactor</artifactId>
+    <groupId>rahla</groupId>
+    <relativePath>../pom.xml</relativePath>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.karaf.features</groupId>
+      <artifactId>framework</artifactId>
+      <type>kar</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.features</groupId>
+      <artifactId>framework</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.features</groupId>
+      <artifactId>standard</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.features</groupId>
+      <artifactId>spring</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.features</groupId>
+      <artifactId>enterprise</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <artifactId>apache-camel</artifactId>
+      <classifier>features</classifier>
+      <groupId>org.apache.camel.karaf</groupId>
+      <scope>runtime</scope>
+      <type>xml</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.karaf.features</groupId>
+      <artifactId>specs</artifactId>
+      <classifier>features</classifier>
+      <type>xml</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <artifactId>rahla</artifactId>
+      <classifier>features</classifier>
+      <groupId>rahla.feature</groupId>
+      <scope>runtime</scope>
+      <type>xml</type>
+    </dependency>
+
+
+    <!--    Needed for Json Logging-->
+    <dependency>
+      <artifactId>jackson-core</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <artifactId>jackson-databind</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <artifactId>jackson-annotations</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <scope>compile</scope>
+    </dependency>
+   <dependency>
+      <artifactId>pax-logging-log4j2-extra</artifactId>
+      <groupId>org.ops4j.pax.logging</groupId>
+      <scope>compile</scope>
+    </dependency>
+
+  </dependencies>
+
+    <!--    Next Pax Logging Version should support this-->
+    <!--    <dependency>-->
+    <!--      <groupId>org.apache.logging.log4j</groupId>-->
+    <!--      <artifactId>log4j-layout-template-json</artifactId>-->
+    <!--      <version>${javax.ws.rs-api.version}4.0</version>-->
+    <!--      <scope>compile</scope>-->
+    <!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>org.apache.felix</groupId>-->
+<!--      <artifactId>org.apache.felix.fileinstall</artifactId>-->
+<!--      <scope>compile</scope>-->
+<!--    </dependency>-->
+
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-install-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>karaf-maven-plugin</artifactId>
+        <configuration>
+          <archiveTarGz>false</archiveTarGz>
+          <archiveZip>false</archiveZip>
+          <bootFeatures>
+            <feature>wrap</feature>
+            <feature>shell</feature>
+            <feature>feature</feature>
+            <feature>jaas</feature>
+            <feature>ssh</feature>
+            <feature>management</feature>
+            <feature>bundle</feature>
+            <feature>config</feature>
+            <feature>deployer</feature>
+            <feature>diagnostic</feature>
+            <feature>feature</feature>
+            <feature>instance</feature>
+            <feature>kar</feature>
+            <feature>log</feature>
+            <feature>spifly</feature>
+            <feature>package</feature>
+            <feature>service</feature>
+            <feature>webconsole</feature>
+            <feature>system</feature>
+            <feature>scr</feature>
+            <feature>jolokia</feature>
+            <feature>rahla</feature>
+          </bootFeatures>
+          <installedFeatures>
+            <feature>aries-blueprint</feature>
+            <feature>shell-compat</feature>
+          </installedFeatures>
+          <javase>11</javase>
+         <!-- <framework>
+            framework-logback
+          </framework>-->
+
+          <blacklistedRepositories>
+            <repository>mvn:org.apache.karaf.features/framework/[2,${karaf.version})/xml/features
+            </repository>
+            <repository>mvn:org.apache.karaf.features/standard/[2,${karaf.version})/xml/features
+            </repository>
+            <repository>mvn:org.apache.karaf.features/enterprise/[2,${karaf.version})/xml/features
+            </repository>
+            <repository>
+              mvn:org.apache.karaf.features/enterprise-legacy/[2,${karaf.version})/xml/features
+            </repository>
+            <repository>mvn:org.apache.karaf.features/spring/[2,${karaf.version})/xml/features
+            </repository>
+            <repository>
+              mvn:org.apache.karaf.features/spring-legacy/[2,${karaf.version})/xml/features
+            </repository>
+
+            <repository>mvn:org.apache.karaf.features/framework/(${karaf.version},5)/xml/features
+            </repository>
+            <repository>mvn:org.apache.karaf.features/standard/(${karaf.version},5)/xml/features
+            </repository>
+            <repository>mvn:org.apache.karaf.features/enterprise/(${karaf.version},5)/xml/features
+            </repository>
+            <repository>
+              mvn:org.apache.karaf.features/enterprise-legacy/(${karaf.version},5)/xml/features
+            </repository>
+            <repository>mvn:org.apache.karaf.features/spring/(${karaf.version},5)/xml/features
+            </repository>
+            <repository>
+              mvn:org.apache.karaf.features/spring-legacy/(${karaf.version},5)/xml/features
+            </repository>
+          </blacklistedRepositories>
+          <libraries />
+          <startupFeatures>
+            <feature>eventadmin</feature>
+          </startupFeatures>
+        </configuration>
+        <!--        <extensions>true</extensions>-->
+        <groupId>org.apache.karaf.tooling</groupId>
+      </plugin>
+    </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/filtered-resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+</project>

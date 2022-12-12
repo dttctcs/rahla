@@ -1,0 +1,73 @@
+<!--
+  ~ Copyright (C)  2020 Matthias Leinweber - datatactics
+  ~
+  ~ This code is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License, version 3,
+  ~ as published by the Free Software Foundation.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILIT  Y or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License, version 3,
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>
+  -->
+
+<features name="${project.artifactId}-${project.version}"
+          xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
+    <!-- <repository>mvn:org.apache.cxf.karaf/apache-cxf/${apache-cxf.version}/xml/features</repository>-->
+    <repository>
+        mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/${org.apache.aries.jax.rs.features.version}/xml
+    </repository>
+    <feature description='${project.name}' name='${project.artifactId}' start-level="80"
+             version='${project.version}'>
+        <config name="org.apache.aries.jax.rs.whiteboard.default">
+            application.base.prefix=/
+            enabled=true
+        </config>
+        <config name="org.apache.cxf.osgi">
+            org.apache.cxf.servlet.context=${env:CXF_BASE_PATH:-/cxf}
+        </config>
+        <config name="org.apache.felix.fileinstall-camel">
+            felix.fileinstall.dir = ${env:RAHLA_DEPLOY_PATH:-/deploy/}
+            felix.fileinstall.filter = .*
+            felix.fileinstall.poll = 1000
+            felix.fileinstall.active.level = 100
+            felix.fileinstall.log.level = 3
+        </config>
+
+
+        <!--<feature>cxf</feature>
+        <feature>cxf-sse</feature>-->
+
+        <feature>aries-jax-rs-whiteboard</feature>
+        <feature>aries-jax-rs-whiteboard-jackson</feature>
+
+        <feature>camel-core</feature>
+        <feature>camel-quartz</feature>
+        <feature>camel-blueprint</feature>
+        <feature>camel-metrics</feature>
+
+        <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.4/${saaj-api.version}</bundle>
+
+        <bundle>wrap:mvn:io.minio/minio/8.2.2</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okhttp/${okhttp.version}</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okio/${okio.version}</bundle>
+        <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
+        <bundle>wrap:mvn:com.carrotsearch.thirdparty/simple-xml-safe/${simple-xml-safe.version}</bundle>
+        <!--
+        <bundle>wrap:mvn:io.minio/minio/8.4.5</bundle>
+        <bundle>mvn:org.jetbrains.kotlin/kotlin-osgi-bundle/1.7.20</bundle>
+        <bundle>mvn:commons-io/commons-io/2.1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okio/2.10.0_1_dtacs</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okhttp/4.10.0_dtacs</bundle>
+        <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
+        -->
+
+        <bundle>mvn:org.apache.camel/camel-minio/${camel.version}</bundle>
+
+    </feature>
+
+
+</features>
