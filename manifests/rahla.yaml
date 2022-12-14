@@ -1,126 +1,123 @@
-  ---
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    name: rahla
-    labels:
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rahla
+  labels:
+    app: rahla
+spec:
+  selector:
+    matchLabels:
       app: rahla
-  spec:
-    selector:
-      matchLabels:
+  replicas: 1
+  template:
+    metadata:
+      labels:
         app: rahla
-    replicas: 1
-    template:
-      metadata:
-        labels:
-          app: rahla
-        annotations:
-          prometheus.io/path: /metrics
-          prometheus.io/port: "8181"
-          prometheus.io/scrape: "true"
-          loki.io/parser: log4j2loggerName
-      spec:
-        containers:
-        - name: rahla
-          image: datatactics/rahla:4e1f5d2
-          resources:
-            limits:
-              cpu: 1
-              memory: 768Mi
-            requests:
-              cpu: 100m
-              memory: 768Mi
-          readinessProbe:
-              httpGet:
-                path: /healthy
-                port: 8181
-              initialDelaySeconds: 60
-              timeoutSeconds: 30
-              failureThreshold: 3
-              successThreshold: 1
-          livenessProbe:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8181"
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+      - name: rahla
+        image: datatactics/rahla:4e1f5d2
+        resources:
+          limits:
+            cpu: 1
+            memory: 768Mi
+          requests:
+            cpu: 100m
+            memory: 768Mi
+        readinessProbe:
             httpGet:
               path: /healthy
               port: 8181
-            initialDelaySeconds: 65
+            initialDelaySeconds: 60
             timeoutSeconds: 30
             failureThreshold: 3
             successThreshold: 1
-          env:
-            - name: POD_IP
-              valueFrom:
-                fieldRef:
-                  apiVersion: v1
-                  fieldPath: status.podIP
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  apiVersion: v1
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  apiVersion: v1
-                  fieldPath: metadata.namespace
-            - name: LOG_FORMAT
-              value: json
-          ports:
-          - name: ssh
-            containerPort: 8101
-            protocol: TCP
-          - name: osgi
-            containerPort: 8181
-            protocol: TCP
-          volumeMounts:
-          - name: config-volume
-            mountPath: "/rahla/deploy/features.xml"
-            subPath: features.xml
-          - name: config-volume
-            mountPath: "/rahla/etc/org.apache.aries.jax.rs.whiteboard.default.cfg"
-            subPath: org.apache.aries.jax.rs.whiteboard.default.cfg
-          - name: data-cache
-            mountPath: "/rahla/data"
-        volumes:
+        livenessProbe:
+          httpGet:
+            path: /healthy
+            port: 8181
+          initialDelaySeconds: 65
+          timeoutSeconds: 30
+          failureThreshold: 3
+          successThreshold: 1
+        env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: LOG_FORMAT
+            value: json               
+        ports:
+        - name: ssh
+          containerPort: 8101
+          protocol: TCP
+        - name: osgi
+          containerPort: 8181
+          protocol: TCP
+        volumeMounts:
         - name: config-volume
-          configMap:
-            name: config-volume
+          mountPath: "/rahla/deploy/features.xml"
+          subPath: features.xml
+        - name: config-volume
+          mountPath: "/rahla/etc/org.apache.aries.jax.rs.whiteboard.default.cfg"
+          subPath: org.apache.aries.jax.rs.whiteboard.default.cfg
         - name: data-cache
-          emptyDir: {}
-  ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    name: rahla
-    labels:
-      app: rahla
-  spec:
-    ports:
-    - name: osgi
-      port: 8181
-      protocol: TCP
-      targetPort: osgi
-    - name: ssh
-      port: 8101
-      protocol: TCP
-      targetPort: ssh
-    selector:
-      app: rahla
-    type: ClusterIP
-  ---
-  apiVersion: v1
-  data:
-    features.xml: |
-      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      <features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="runtime">
-
-          <feature name="autoinstall" version="0" install="auto">
-          </feature>
-
-      </features>
-    org.apache.aries.jax.rs.whiteboard.default.cfg: |
-      default.web=false
-      application.base.prefix=/
-  kind: ConfigMap
-  metadata:
-    name: config-volume
-  ---
+          mountPath: "/rahla/data"
+      volumes:
+      - name: config-volume
+        configMap:
+          name: config-volume
+      - name: data-cache
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rahla
+  labels:
+    app: rahla
+spec:
+  ports:
+  - name: osgi
+    port: 8181
+    protocol: TCP
+    targetPort: osgi
+  - name: ssh
+    port: 8101
+    protocol: TCP
+    targetPort: ssh
+  selector:
+    app: rahla
+  type: ClusterIP
+---
+apiVersion: v1
+data:
+  features.xml: |
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="runtime">
+        <feature name="autoinstall" version="0" install="auto">
+        </feature>
+    </features>
+  org.apache.aries.jax.rs.whiteboard.default.cfg: |
+    default.web=false
+    application.base.prefix=/
+kind: ConfigMap
+metadata:
+  name: config-volume
+---
