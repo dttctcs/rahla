@@ -1100,9 +1100,9 @@
     <scm>
         <connection>scm:git:ssh://git@github.com/dttctcs/rahla.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/dttctcs/rahla.git</developerConnection>
-        <tag>1.0.0</tag>
+        <tag>HEAD</tag>
         <url>https://github.com/dttctcs/rahla</url>
     </scm>
 
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
 </project>
