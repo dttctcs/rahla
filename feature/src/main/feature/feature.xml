@@ -22,24 +22,7 @@
     </repository>
     <feature description='${project.name}' name='${project.artifactId}' start-level="80"
              version='${project.version}'>
-        <config name="org.apache.aries.jax.rs.whiteboard.default">
-            application.base.prefix=/
-            enabled=true
-        </config>
-        <config name="org.apache.cxf.osgi">
-            org.apache.cxf.servlet.context=${env:CXF_BASE_PATH:-/cxf}
-        </config>
-        <config name="org.apache.felix.fileinstall-camel">
-            felix.fileinstall.dir = ${env:RAHLA_DEPLOY_PATH:-/deploy/}
-            felix.fileinstall.filter = .*
-            felix.fileinstall.poll = 1000
-            felix.fileinstall.active.level = 100
-            felix.fileinstall.log.level = 3
-        </config>
 
-
-        <!--<feature>cxf</feature>
-        <feature>cxf-sse</feature>-->
 
         <feature>aries-jax-rs-whiteboard</feature>
         <feature>aries-jax-rs-whiteboard-jackson</feature>

@@ -33,15 +33,16 @@ spec:
             httpGet:
               path: /healthy
               port: 8181
-            initialDelaySeconds: 60
+            initialDelaySeconds: 15
+            periodSeconds: 15
             timeoutSeconds: 30
-            failureThreshold: 3
+            failureThreshold: 6
             successThreshold: 1
         livenessProbe:
           httpGet:
             path: /healthy
             port: 8181
-          initialDelaySeconds: 65
+          initialDelaySeconds: 180
           timeoutSeconds: 30
           failureThreshold: 3
           successThreshold: 1
@@ -62,7 +63,7 @@ spec:
                 apiVersion: v1
                 fieldPath: metadata.namespace
           - name: LOG_FORMAT
-            value: json               
+            value: json
         ports:
         - name: ssh
           containerPort: 8101
@@ -71,12 +72,6 @@ spec:
           containerPort: 8181
           protocol: TCP
         volumeMounts:
-        - name: config-volume
-          mountPath: "/rahla/deploy/features.xml"
-          subPath: features.xml
-        - name: config-volume
-          mountPath: "/rahla/etc/org.apache.aries.jax.rs.whiteboard.default.cfg"
-          subPath: org.apache.aries.jax.rs.whiteboard.default.cfg
         - name: data-cache
           mountPath: "/rahla/data"
       volumes:
@@ -105,19 +100,3 @@ spec:
   selector:
     app: rahla
   type: ClusterIP
----
-apiVersion: v1
-data:
-  features.xml: |
-    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-    <features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="runtime">
-        <feature name="autoinstall" version="0" install="auto">
-        </feature>
-    </features>
-  org.apache.aries.jax.rs.whiteboard.default.cfg: |
-    default.web=false
-    application.base.prefix=/
-kind: ConfigMap
-metadata:
-  name: config-volume
----
