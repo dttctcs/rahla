@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownServiceException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -30,9 +31,10 @@ public abstract class SmartURLConnection extends URLConnection {
 
   public abstract void duplicate(URL url);
 
+  public abstract InputStream getInputStream() throws IOException;
 
   public InputStream getGZInputStream() throws IOException {
-    return new GZIPInputStream(super.getInputStream());
+    return new GZIPInputStream(getInputStream());
   }
 
   public OutputStream getGZOutputStream() throws IOException {
@@ -40,11 +42,11 @@ public abstract class SmartURLConnection extends URLConnection {
   }
 
     public InputStream getSnappyInputStream() throws IOException {
-    return new SnappyInputStream(super.getInputStream());
+    return new SnappyInputStream(getInputStream());
   }
 
   public OutputStream getSnappyOutputStream() throws IOException {
-    return new SnappyOutputStream(super.getOutputStream());
+    return new SnappyOutputStream(getOutputStream());
   }
 
 }
