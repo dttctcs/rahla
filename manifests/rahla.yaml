@@ -75,9 +75,6 @@ spec:
         - name: data-cache
           mountPath: "/rahla/data"
       volumes:
-      - name: config-volume
-        configMap:
-          name: config-volume
       - name: data-cache
         emptyDir: {}
 ---
