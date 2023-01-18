@@ -1070,7 +1070,7 @@
         <gremlin-driver-bundle.version>3.6.1_1</gremlin-driver-bundle.version>
         <commons-configuration2.version>2.8.0</commons-configuration2.version>
         <snappy-java.version>1.1.8.4</snappy-java.version>
-        <minio.version>8.2.2</minio.version>
+        <minio.version>8.5.1</minio.version>
 
         <jedis.version>4.2.3</jedis.version>
         <okhttp.version>3.14.1_1</okhttp.version>

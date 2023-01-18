@@ -34,19 +34,17 @@
 
         <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.4/${saaj-api.version}</bundle>
 
-        <bundle>wrap:mvn:io.minio/minio/8.2.2</bundle>
+       <!-- <bundle>wrap:mvn:io.minio/minio/8.2.2</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okhttp/${okhttp.version}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okio/${okio.version}</bundle>
         <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
-        <bundle>wrap:mvn:com.carrotsearch.thirdparty/simple-xml-safe/${simple-xml-safe.version}</bundle>
-        <!--
-        <bundle>wrap:mvn:io.minio/minio/8.4.5</bundle>
+        <bundle>wrap:mvn:com.carrotsearch.thirdparty/simple-xml-safe/${simple-xml-safe.version}</bundle>-->
+
         <bundle>mvn:org.jetbrains.kotlin/kotlin-osgi-bundle/1.7.20</bundle>
         <bundle>mvn:commons-io/commons-io/2.1</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okio/2.10.0_1_dtacs</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okhttp/4.10.0_dtacs</bundle>
         <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
-        -->
 
         <bundle>mvn:org.apache.camel/camel-minio/${camel.version}</bundle>
 
