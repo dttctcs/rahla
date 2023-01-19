@@ -52,7 +52,7 @@ public class FradiEngine {
             "eToLong", SQLDateToLongFunctionExtension.class);
     siddhiManager.setExtension("formatDate", FormatDateFunctionExtension.class);
     if (!siddhiManager.getExtensions().containsKey("store:rdbms"))
-      throw new RuntimeException(siddhiAppRuntime.getName() + ": Extension store:rdbms is missing!");
+      throw new RuntimeException("Extension store:rdbms is missing!");
   }
 
 

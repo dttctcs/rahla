@@ -21,9 +21,13 @@ public class GroovyBeanFactoryImpl implements GroovyBeanFactory {
   private GroovyClassLoader groovyClassLoader;
   private BundleContext bundleContext;
 
-  public static final String RESOURCE = "resource:file:";
+  public static final String RESOURCE_FILE = "resource:file:";
+  public static final String RESOURCE_DEPLOY = "resource:deploy:";
+  private String deploy_path = System.getenv("RAHLA_DEPLOY_PATH");
 
   public GroovyBeanFactoryImpl() {
+    if (!deploy_path.endsWith("/"))
+      deploy_path += "/";
   }
 
   @Activate
@@ -33,15 +37,22 @@ public class GroovyBeanFactoryImpl implements GroovyBeanFactory {
   }
 
 
-
   @Override
   public Object createBean(String resource) {
 
 
     try {
       Class clazz;
-      if (resource.startsWith(RESOURCE)) {
-        String fileName = resource.substring(RESOURCE.length());
+      if (resource.startsWith(RESOURCE_FILE)) {
+        String fileName = resource.substring(RESOURCE_FILE.length());
+        File file = new File(fileName);
+        clazz = groovyClassLoader.parseClass(file);
+      } else if (resource.startsWith(RESOURCE_DEPLOY)) {
+        String fileName = resource.substring(RESOURCE_DEPLOY.length());
+        if(fileName.startsWith("/")){
+          fileName = fileName.substring(1);
+        }
+        fileName = deploy_path + fileName;
         File file = new File(fileName);
         clazz = groovyClassLoader.parseClass(file);
       } else {

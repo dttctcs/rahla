@@ -21,9 +21,13 @@ public class FradiComponent extends DefaultComponent {
   public static final String FRADI_TIMESTAMP_HEADER = "timestamp";
   public static final String FRADI_HEADER_FOR_EVENTS = "headerForEvents";
 
-  public static final String RESOURCE = "resource:file:";
+  public static final String RESOURCE_FILE = "resource:file:";
+  public static final String RESOURCE_DEPLOY = "resource:deploy:";
+  private String deploy_path = System.getenv("RAHLA_DEPLOY_PATH");
 
   public FradiComponent() {
+    if (!deploy_path.endsWith("/"))
+      deploy_path += "/";
     fradiEngine = new FradiEngine();
   }
 
@@ -44,8 +48,20 @@ public class FradiComponent extends DefaultComponent {
   }
 
   public void setPlan(String plan) {
-    if (plan.startsWith(RESOURCE)) {
-      String fileName = plan.substring(RESOURCE.length());
+    if (plan.startsWith(RESOURCE_FILE)) {
+      String fileName = plan.substring(RESOURCE_FILE.length());
+      Path path = Path.of(fileName);
+      try {
+        plan = Files.readString(path, StandardCharsets.UTF_8);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    } else if (plan.startsWith(RESOURCE_DEPLOY)) {
+      String fileName = plan.substring(RESOURCE_DEPLOY.length());
+      if (fileName.startsWith("/")) {
+        fileName = fileName.substring(1);
+      }
+      fileName = deploy_path + fileName;
       Path path = Path.of(fileName);
       try {
         plan = Files.readString(path, StandardCharsets.UTF_8);
