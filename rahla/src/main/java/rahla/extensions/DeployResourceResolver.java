@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 @ResourceResolver(DeployResourceResolver.SCHEME)
 public class DeployResourceResolver extends ResourceResolverSupport {
   public static final String SCHEME = "deploy";
-  private String deploy_path = System.getenv("RAHLA_DEPLOY_PATH");
+  private String deploy_path = System.getenv().getOrDefault("RAHLA_DEPLOY_PATH" , "/deploy");
 
   public DeployResourceResolver() {
     super(SCHEME);

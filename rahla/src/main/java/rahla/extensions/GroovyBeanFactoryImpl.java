@@ -23,7 +23,7 @@ public class GroovyBeanFactoryImpl implements GroovyBeanFactory {
 
   public static final String RESOURCE_FILE = "resource:file:";
   public static final String RESOURCE_DEPLOY = "resource:deploy:";
-  private String deploy_path = System.getenv("RAHLA_DEPLOY_PATH");
+  private String deploy_path = System.getenv().getOrDefault("RAHLA_DEPLOY_PATH" , "/deploy");
 
   public GroovyBeanFactoryImpl() {
     if (!deploy_path.endsWith("/"))
