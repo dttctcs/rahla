@@ -1,7 +1,5 @@
 package rahla.components.fradi;
 
-import io.siddhi.core.stream.input.InputHandler;
-import io.siddhi.query.api.definition.StreamDefinition;
 import lombok.extern.log4j.Log4j2;
 import org.apache.camel.Category;
 import org.apache.camel.Consumer;
@@ -29,6 +27,9 @@ public class FradiEndpoint extends DefaultEndpoint {
   private String streamId;
   @UriParam(defaultValue = "true")
   private boolean eventsAsMaps = true;
+
+  @UriParam(defaultValue = "false")
+  private boolean async = false;
 
   @UriParam(defaultValue = "")
   private String headerForEvents = null;
@@ -64,12 +65,26 @@ public class FradiEndpoint extends DefaultEndpoint {
     return streamId;
   }
 
+  public boolean isAsync() {
+    return async;
+  }
+
+  /**
+   * Controls if the events should be sent async to the input handler.
+   *
+   * @param async
+   */
+  public void setAsync(boolean async) {
+    this.async = async;
+  }
+
   public boolean isEventsAsMaps() {
     return eventsAsMaps;
   }
 
   /**
    * Controls if the endpoint should handle in and output data as maps
+   *
    * @param eventsAsMaps
    */
   public void setEventsAsMaps(boolean eventsAsMaps) {
@@ -83,6 +98,7 @@ public class FradiEndpoint extends DefaultEndpoint {
 
   /**
    * if header name is set in/output events are used from header
+   *
    * @param headerForEvents
    */
   public void setHeaderForEvents(String headerForEvents) {

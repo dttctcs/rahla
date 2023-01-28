@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static rahla.components.fradi.FradiComponent.FRADI_TIMESTAMP_HEADER;
 
@@ -27,7 +28,11 @@ public class FradiProducer extends DefaultProducer {
     this.endpoint = endpoint;
     this.fradiEngine = fradiEngine;
     this.streamId = streamId;
-    this.inputHandler = fradiEngine.getInputHandler(streamId);
+    if (streamId != null && !streamId.isBlank() && !"*".equals(streamId)) {
+      this.inputHandler = fradiEngine.getInputHandler(streamId);
+    } else {
+      inputHandler = null;
+    }
   }
 
   private Object convertValue(Attribute attribute, Object val) {
@@ -132,9 +137,8 @@ public class FradiProducer extends DefaultProducer {
     }
     if (timestamp == null) {
       timestamp = exchange.getMessage().getMessageTimestamp();
-
     }
-
+    final long ts = timestamp;
     String headerForEvents = endpoint.getHeaderForEvents();
 
     Object data;
@@ -144,6 +148,37 @@ public class FradiProducer extends DefaultProducer {
       data = exchange.getMessage().getBody();
     }
 
+    if (inputHandler != null) {
+      doProcess(timestamp, data, inputHandler);
+    } else {
+      Map<String, Object> multiEvent = (Map<String, Object>) data;
+      for (String streamName : multiEvent.keySet()) {
+        if (fradiEngine.hasInputHandler(streamName)) {
+          throw new RuntimeException("Stream name: " + streamName + " does not exist in fradi engine: " + fradiEngine.getName());
+        }
+      }
+
+      for (Map.Entry<String, Object> namedStream : multiEvent.entrySet()) {
+        doProcess(timestamp, namedStream.getValue(), fradiEngine.getInputHandler(namedStream.getKey()));
+      }
+    }
+  }
+
+  private void doProcess(final Long timestamp, final Object data, final InputHandler inputHandler) throws InterruptedException {
+    if (endpoint.isAsync()) {
+      CompletableFuture.runAsync(() -> {
+        try {
+          processData(timestamp, data, inputHandler);
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+      });
+    } else {
+      processData(timestamp, data, inputHandler);
+    }
+  }
+
+  private void processData(Long timestamp, Object data, InputHandler inputHandler) throws InterruptedException {
     Event[] objects;
     if (endpoint.isEventsAsMaps()) {
       objects = generateEventsFromMaps(timestamp, data).toArray(new Event[]{});
@@ -156,8 +191,6 @@ public class FradiProducer extends DefaultProducer {
     } else if (objects.length > 1) {
       inputHandler.send(objects);
     }
-
-
   }
 
 }
