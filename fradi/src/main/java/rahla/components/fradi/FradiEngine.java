@@ -73,10 +73,6 @@ public class FradiEngine {
     return siddhiAppRuntime.getInputHandler(streamId);
   }
 
-  public boolean hasInputHandler(String streamId) {
-    return siddhiAppRuntime.getStreamDefinitionMap().containsKey(streamId);
-  }
-
 
   public StreamDefinition getStreamDefinition(String streamId) {
     if (!siddhiAppRuntime.getStreamDefinitionMap().containsKey(streamId)) {
@@ -96,11 +92,4 @@ public class FradiEngine {
     siddhiAppRuntime.removeCallback(cb);
   }
 
-  public String getName() {
-    if (siddhiAppRuntime != null) {
-      return siddhiAppRuntime.getName();
-    } else {
-      return "Not initialized app.";
-    }
-  }
 }
