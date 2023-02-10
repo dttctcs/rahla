@@ -66,7 +66,7 @@ public class FradiProducer extends DefaultProducer {
       Attribute attribute = attributeList.get(i);
       String attibuteName = attribute.getName();
       Attribute.Type type = attribute.getType();
-      if (mapEvent.containsKey(attribute)){
+      if (!mapEvent.containsKey(attibuteName)){
         throw  new RuntimeException("Attribute " + attibuteName + " is missing in input Event");
       }
       eventData[i] = convertValue(attribute, mapEvent.get(attibuteName));
