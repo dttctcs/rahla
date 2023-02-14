@@ -23,9 +23,6 @@ spec:
       - name: rahla
         image: datatactics/rahla:4e1f5d2
         resources:
-          limits:
-            cpu: 1
-            memory: 768Mi
           requests:
             cpu: 100m
             memory: 768Mi
