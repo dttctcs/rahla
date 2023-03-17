@@ -27,6 +27,7 @@ public class FradiEngine {
     siddhiAppRuntime.handleExceptionWith(new LogExceptionHandler(siddhiAppRuntime.getName()));
     siddhiAppRuntime.handleRuntimeExceptionWith(e -> {
       log.error("app={}, action=fradi process, reason={}", siddhiAppRuntime.getName(), e.getMessage(), e);
+      throw new FradiException(e);
     });
     log.info("siddhiAppRuntime_created={}", siddhiAppRuntime.getName());
   }
