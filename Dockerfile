@@ -9,10 +9,10 @@ FROM docker.io/eclipse-temurin:17
 ENV KARAF_HOME /rahla
 ENV PATH $PATH:$KARAF_HOME/bin
 ENV KARAF_EXEC exec
+ENV EXTRA_JAVA_OPTS "$EXTRA_JAVA_OPTS -Dkaraf.log.console=ALL"
 #COPY --from=compile /build/assembly/target/assembly $KARAF_HOME
 COPY assembly/target/assembly $KARAF_HOME
 COPY docker/docker-entrypoint.sh /
 #ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.9.1/opentelemetry-javaagent.jar /
 EXPOSE 8101 1099 44444 8181 8182
-ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["karaf", "run"]
