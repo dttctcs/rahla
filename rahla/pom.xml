@@ -423,6 +423,7 @@
         <dependency>
             <artifactId>minio</artifactId>
             <groupId>io.minio</groupId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

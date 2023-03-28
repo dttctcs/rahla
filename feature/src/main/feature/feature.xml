@@ -33,27 +33,11 @@
         <feature>camel-metrics</feature>
 
         <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.4/${saaj-api.version}</bundle>
-
-
         <bundle>wrap:mvn:com.carrotsearch.thirdparty/simple-xml-safe/${simple-xml-safe.version}</bundle>
-        <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
 
-<!--        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okhttp/${okhttp.version}</bundle>-->
-<!--        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okio/${okio.version}</bundle>-->
 
         <bundle>mvn:org.jetbrains.kotlin/kotlin-osgi-bundle/1.7.20</bundle>
-        <bundle>mvn:commons-io/commons-io/2.1</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okio/2.7.0_1</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.okhttp/4.8.1_dtacs</bundle>
 
-<!--        <bundle>mvn:com.squareup.okio/okio-jvm/3.0.0</bundle>-->
-<!--        <dependency>-->
-<!--            <groupId>com.squareup.okio</groupId>-->
-<!--            <artifactId>okio-jvm</artifactId>-->
-<!--            <version>3.3.0</version>-->
-<!--        </dependency>-->
-
-        <bundle>mvn:org.apache.camel/camel-minio/${camel.version}</bundle>
 
     </feature>
 
