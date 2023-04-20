@@ -16,7 +16,6 @@
 
 <features name="${project.artifactId}-${project.version}"
           xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
-    <!-- <repository>mvn:org.apache.cxf.karaf/apache-cxf/${apache-cxf.version}/xml/features</repository>-->
     <repository>
         mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/${org.apache.aries.jax.rs.features.version}/xml
     </repository>

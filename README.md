@@ -6,10 +6,8 @@ services.
 
 | Component | Version |
 |-----------|---------|
-| karaf     | 4.4.1   |
-| osgi      | 7.0.0   |
-| camel     | 3.14.5  |
-| groovy    | 3.0.9   |
+| karaf     | 4.4.3   |
+| camel     | 3.20.3  |
 ## Usage
 
 You can run an example with:

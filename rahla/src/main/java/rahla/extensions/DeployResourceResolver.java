@@ -27,7 +27,7 @@ public class DeployResourceResolver extends ResourceResolverSupport {
   public Resource createResource(String location, String remaining) {
     final File path = new File(tryDecodeUri(deploy_path + remaining));
 
-    return new ResourceSupport(location) {
+    return new ResourceSupport(SCHEME, location) {
       @Override
       public boolean exists() {
         return path.exists();
