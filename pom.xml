@@ -1002,6 +1002,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>${json.version}</version>
+            </dependency>
         </dependencies>
 
 
@@ -1056,10 +1061,11 @@
         <pax-logging.version>2.2.0</pax-logging.version>
         <lombok.version>1.18.22</lombok.version>
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
-        <org.apache.aries.jax.rs.features.version>1.0.6</org.apache.aries.jax.rs.features.version>
+        <org.apache.aries.jax.rs.features.version>2.0.2</org.apache.aries.jax.rs.features.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
         <opentelemetry.version>1.9.1</opentelemetry.version>
         <simple-xml-safe.version>2.7.1</simple-xml-safe.version>
+        <servicemix-spec.version>2.9.0</servicemix-spec.version>
 
         <siddhi-execution-regex.version>5.0.7</siddhi-execution-regex.version>
         <siddhi-execution-string.version>5.0.12</siddhi-execution-string.version>
@@ -1090,6 +1096,8 @@
 
         <org.apache.aries.component-dsl.component-dsl.version>1.2.2
         </org.apache.aries.component-dsl.component-dsl.version>
+        <json.version>20220320</json.version>
+
     </properties>
 
     <repositories>
