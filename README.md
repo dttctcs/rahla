@@ -7,7 +7,7 @@ services.
 | Component | Version |
 |-----------|---------|
 | karaf     | 4.4.3   |
-| camel     | 3.20.4  |
+| camel     | 3.20.5  |
 ## Usage
 
 You can run an example with:
