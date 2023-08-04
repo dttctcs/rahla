@@ -354,11 +354,6 @@
                 <version>${pax-logging.version}</version>
             </dependency>
             <dependency>
-                <artifactId>simple-xml-safe</artifactId>
-                <groupId>com.carrotsearch.thirdparty</groupId>
-                <version>${simple-xml-safe.version}</version>
-            </dependency>
-            <dependency>
                 <artifactId>jackson-dataformat-yaml</artifactId>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <version>${jackson2.version}</version>
@@ -1005,36 +1000,33 @@
         <karaf.version>4.4.3</karaf.version>
         <osgi.version>8.0.0</osgi.version>
         <org.osgi.service.cm.version>1.6.1</org.osgi.service.cm.version>
-        <org.osgi.service.component.version>1.5.0</org.osgi.service.component.version>
-        <org.osgi.service.component.annotations.version>1.5.0</org.osgi.service.component.annotations.version>
+        <org.osgi.service.component.version>1.5.1</org.osgi.service.component.version>
+        <org.osgi.service.component.annotations.version>1.5.1</org.osgi.service.component.annotations.version>
         <org.osgi.service.event.version>1.4.1</org.osgi.service.event.version>
         <org.osgi.service.http.version>1.2.2</org.osgi.service.http.version>
-        <org.osgi.service.jdbc.version>1.0.1</org.osgi.service.jdbc.version>
-        <org.osgi.service.jpa.version>1.0.0</org.osgi.service.jpa.version>
+        <org.osgi.service.jdbc.version>1.1.0</org.osgi.service.jdbc.version>
+        <org.osgi.service.jpa.version>1.1.1</org.osgi.service.jpa.version>
         <org.osgi.service.log.version>1.5.0</org.osgi.service.log.version>
         <org.osgi.service.metatype.version>1.4.1</org.osgi.service.metatype.version>
         <org.osgi.service.namespace.version>1.0.0</org.osgi.service.namespace.version>
         <org.osgi.service.repository.version>1.1.0</org.osgi.service.repository.version>
         <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
         <org.osgi.util.function.version>1.2.0</org.osgi.util.function.version>
-        <org.osgi.util.promise.version>1.2.0</org.osgi.util.promise.version>
+        <org.osgi.util.promise.version>1.3.0</org.osgi.util.promise.version>
 
 
-        <camel.version>3.20.5</camel.version>
-        <groovy.version>3.0.17</groovy.version>
-        <slf4j-log4j12.version>1.7.36</slf4j-log4j12.version>
-        <jackson2.version>2.14.3</jackson2.version>
+        <camel.version>3.20.6</camel.version>
+        <groovy.version>3.0.18</groovy.version>
+        <jackson2.version>2.14.2</jackson2.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <prometheus.version>0.15.0</prometheus.version>
         <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>
-        <pax-logging.version>2.2.0</pax-logging.version>
-        <lombok.version>1.18.22</lombok.version>
+        <pax-logging.version>2.2.2</pax-logging.version>
+        <lombok.version>1.18.28</lombok.version>
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
         <org.apache.aries.jax.rs.features.version>2.0.2</org.apache.aries.jax.rs.features.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
         <opentelemetry.version>1.9.1</opentelemetry.version>
-        <simple-xml-safe.version>2.7.1</simple-xml-safe.version>
-        <servicemix-spec.version>2.9.0</servicemix-spec.version>
 
         <siddhi-execution-regex.version>5.0.7</siddhi-execution-regex.version>
         <siddhi-execution-string.version>5.0.12</siddhi-execution-string.version>
@@ -1051,7 +1043,7 @@
         <snappy-java.version>1.1.8.4</snappy-java.version>
         <minio.version>8.4.6</minio.version>
         <kotlin-osgi-bundle.version>1.7.20</kotlin-osgi-bundle.version>
-        <jedis.version>4.3.2</jedis.version>
+        <jedis.version>4.4.3</jedis.version>
 
         <guava.version>23.6.1-jre</guava.version>
         <saaj-api.version>1.4_2</saaj-api.version>
@@ -1065,7 +1057,7 @@
 
         <org.apache.aries.component-dsl.component-dsl.version>1.2.2
         </org.apache.aries.component-dsl.component-dsl.version>
-        <json.version>20220320</json.version>
+        <json.version>20230227</json.version>
 
     </properties>
 
