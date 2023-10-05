@@ -23,72 +23,73 @@ public class FradiComponent extends DefaultComponent {
 
   public static final String RESOURCE_FILE = "resource:file:";
   public static final String RESOURCE_DEPLOY = "resource:deploy:";
-  private String deploy_path = System.getenv().getOrDefault("RAHLA_DEPLOY_PATH" , "/deploy");
+  private String deploy_path = System.getenv().getOrDefault("RAHLA_DEPLOY_PATH", "/deploy");
 
   public FradiComponent() {
-    if (!deploy_path.endsWith("/"))
-      deploy_path += "/";
-    fradiEngine = new FradiEngine();
-  }
-
-  protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
-    if (plan == null) {
-      throw new IllegalArgumentException("No Fradi Plan configured, default creation not possible");
+      if (!deploy_path.endsWith("/"))
+        deploy_path += "/";
+      fradiEngine = new FradiEngine();
     }
-    Endpoint endpoint = new FradiEndpoint(uri, remaining, this, fradiEngine);
-    setProperties(endpoint, parameters);
-    return endpoint;
-  }
 
-  /**
-   * To use the {@link String} plan.
-   */
-  public String getPlan() {
-    return plan;
-  }
-
-  public void setPlan(String plan) {
-    if (plan.startsWith(RESOURCE_FILE)) {
-      String fileName = plan.substring(RESOURCE_FILE.length());
-      Path path = Path.of(fileName);
-      try {
-        plan = Files.readString(path, StandardCharsets.UTF_8);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
+    protected Endpoint createEndpoint (String uri, String remaining, Map < String, Object > parameters) throws Exception
+    {
+      if (plan == null) {
+        throw new IllegalArgumentException("No Fradi Plan configured, default creation not possible");
       }
-    } else if (plan.startsWith(RESOURCE_DEPLOY)) {
-      String fileName = plan.substring(RESOURCE_DEPLOY.length());
-      if (fileName.startsWith("/")) {
-        fileName = fileName.substring(1);
-      }
-      fileName = deploy_path + fileName;
-      Path path = Path.of(fileName);
-      try {
-        plan = Files.readString(path, StandardCharsets.UTF_8);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+      Endpoint endpoint = new FradiEndpoint(uri, remaining, this, fradiEngine);
+      setProperties(endpoint, parameters);
+      return endpoint;
     }
-    this.plan = plan;
-    fradiEngine.init(this.plan);
-  }
 
-  @Override
-  protected void doStart() throws Exception {
-    if (plan == null) {
-      throw new IllegalArgumentException("No Fradi Plan configured, start not possible");
+    /**
+     * To use the {@link String} plan.
+     */
+    public String getPlan () {
+      return plan;
     }
-    super.doStart();
-    fradiEngine.start();
-  }
 
-  @Override
-  protected void doStop() throws Exception {
-    super.doStop();
-    fradiEngine.shutdown();
-  }
+    public void setPlan (String plan){
+      if (plan.startsWith(RESOURCE_FILE)) {
+        String fileName = plan.substring(RESOURCE_FILE.length());
+        Path path = Path.of(fileName);
+        try {
+          plan = Files.readString(path, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      } else if (plan.startsWith(RESOURCE_DEPLOY)) {
+        String fileName = plan.substring(RESOURCE_DEPLOY.length());
+        if (fileName.startsWith("/")) {
+          fileName = fileName.substring(1);
+        }
+        fileName = deploy_path + fileName;
+        Path path = Path.of(fileName);
+        try {
+          plan = Files.readString(path, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
+      this.plan = plan;
+      fradiEngine.init(this.plan);
+    }
 
-  public FradiEngine getFradiEngine() {
-    return fradiEngine;
+    @Override
+    protected void doStart () throws Exception {
+      if (plan == null) {
+        throw new IllegalArgumentException("No Fradi Plan configured, start not possible");
+      }
+      super.doStart();
+      fradiEngine.start();
+    }
+
+    @Override
+    protected void doStop () throws Exception {
+      super.doStop();
+      fradiEngine.shutdown();
+    }
+
+    public FradiEngine getFradiEngine () {
+      return fradiEngine;
+    }
   }
-}

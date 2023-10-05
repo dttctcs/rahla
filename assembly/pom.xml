@@ -189,7 +189,7 @@
             <feature>aries-blueprint</feature>
             <feature>shell-compat</feature>
           </installedFeatures>
-          <javase>11</javase>
+          <javase>17</javase>
          <!-- <framework>
             framework-logback
           </framework>-->

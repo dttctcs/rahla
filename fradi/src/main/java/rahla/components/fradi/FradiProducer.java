@@ -66,8 +66,8 @@ public class FradiProducer extends DefaultProducer {
       Attribute attribute = attributeList.get(i);
       String attibuteName = attribute.getName();
       Attribute.Type type = attribute.getType();
-      if (!mapEvent.containsKey(attibuteName)){
-        throw  new RuntimeException("Attribute " + attibuteName + " is missing in input Event");
+      if (!mapEvent.containsKey(attibuteName)) {
+        throw new RuntimeException("Attribute " + attibuteName + " is missing in input Event");
       }
       eventData[i] = convertValue(attribute, mapEvent.get(attibuteName));
     }
@@ -86,7 +86,7 @@ public class FradiProducer extends DefaultProducer {
         res.add(new Event(timestamp, buildEventData(mapEvent)));
       }
     } else {
-      throw new RuntimeException("Invalid Exchange data for event maps!");
+      throw new RuntimeException("Exchange body for generateEventsFromMaps must be map or iterable of maps, but is: " + body.toString());
     }
     return res;
   }
