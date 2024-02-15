@@ -70,7 +70,7 @@ public class FradiConsumer extends DefaultConsumer {
             exchange.setException(e);
           } finally {
             if (exchange.getException() != null) {
-              getExceptionHandler().handleException("Error processing exchange", exchange, exchange.getException());
+              getExceptionHandler().handleException("Error processing exchange: ", exchange, exchange.getException());
             }
             releaseExchange(exchange, false);
           }
