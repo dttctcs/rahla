@@ -15,9 +15,10 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses />
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <artifactId>rahla</artifactId>
+    <artifactId>fradi</artifactId>
     <build>
         <pluginManagement>
             <plugins>
@@ -39,7 +40,7 @@
                     <includeTransitiveDependency>true</includeTransitiveDependency>
                     <logDependencyChanges>false</logDependencyChanges>
                     <overwriteChangedDependencies>false</overwriteChangedDependencies>
-                    
+
                 </configuration>
                 <extensions>true</extensions>
                 <groupId>org.apache.karaf.tooling</groupId>
@@ -82,9 +83,53 @@
             <artifactId>fradi</artifactId>
             <groupId>rahla</groupId>
         </dependency>
+        <dependency>
+            <artifactId>loki-appender</artifactId>
+            <groupId>rahla</groupId>
+        </dependency>
+
+
+ <!--       <dependency>
+            <groupId>io.siddhi.distribution</groupId>
+            <artifactId>io.siddhi.distribution.editor.core</artifactId>
+            <version>5.1.3-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.wso2.org.ops4j.pax.logging</groupId>
+                    <artifactId>pax-logging-log4j2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.siddhi.distribution</groupId>
+            <artifactId>io.siddhi.distribution.editor.log.appender</artifactId>
+            <version>5.1.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.siddhi.distribution</groupId>
+            <artifactId>io.siddhi.distribution.event.simulator.core</artifactId>
+            <version>5.1.3-SNAPSHOT</version>
+        </dependency>
+-->
     </dependencies>
 
-    <description />
+    <description/>
 
     <groupId>rahla.feature</groupId>
     <modelVersion>4.0.0</modelVersion>
@@ -96,7 +141,7 @@
     <parent>
         <artifactId>reactor</artifactId>
         <groupId>rahla</groupId>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
         <version>1.0.14-SNAPSHOT</version>
     </parent>
 

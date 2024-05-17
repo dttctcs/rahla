@@ -99,6 +99,14 @@
       <type>xml</type>
     </dependency>
 
+    <dependency>
+      <artifactId>fradi</artifactId>
+      <classifier>features</classifier>
+      <groupId>rahla.feature</groupId>
+      <scope>runtime</scope>
+      <type>xml</type>
+    </dependency>
+
 
     <!--    Needed for Json Logging-->
     <dependency>
@@ -123,6 +131,7 @@
       <groupId>org.ops4j.pax.logging</groupId>
       <scope>compile</scope>
     </dependency>
+
 
   </dependencies>
 

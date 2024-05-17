@@ -18,7 +18,7 @@ public class FradiComponent extends DefaultComponent {
 
   private FradiEngine fradiEngine = null;
 
-  public static final String FRADI_TIMESTAMP_HEADER = "timestamp";
+  public static final String FRADI_TIMESTAMP_HEADER = "fradi.timestamp";
   public static final String FRADI_HEADER_FOR_EVENTS = "headerForEvents";
 
   public static final String RESOURCE_FILE = "resource:file:";
@@ -72,6 +72,7 @@ public class FradiComponent extends DefaultComponent {
       }
       this.plan = plan;
       fradiEngine.init(this.plan);
+      fradiEngine.start();
     }
 
     @Override
@@ -80,7 +81,6 @@ public class FradiComponent extends DefaultComponent {
         throw new IllegalArgumentException("No Fradi Plan configured, start not possible");
       }
       super.doStart();
-      fradiEngine.start();
     }
 
     @Override

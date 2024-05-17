@@ -7,10 +7,6 @@ import io.siddhi.core.stream.output.StreamCallback;
 import io.siddhi.core.table.Table;
 import io.siddhi.query.api.definition.StreamDefinition;
 import lombok.extern.log4j.Log4j2;
-import rahla.components.fradi.extension.FormatDateFunctionExtension;
-import rahla.components.fradi.extension.LongToSQLDateFunctionExtension;
-import rahla.components.fradi.extension.SHA256FunctionExtension;
-import rahla.components.fradi.extension.SQLDateToLongFunctionExtension;
 
 @Log4j2
 public class FradiEngine {
@@ -47,11 +43,6 @@ public class FradiEngine {
   private void initShiddhiManager() {
     siddhiManager = new SiddhiManager();
     siddhiManager.setErrorStore(new LogErrorStore());
-    siddhiManager.setExtension("longToSQLDate", LongToSQLDateFunctionExtension.class);
-    siddhiManager.setExtension("hexsha256", SHA256FunctionExtension.class);
-    siddhiManager.setExtension("sqlDat" +
-            "eToLong", SQLDateToLongFunctionExtension.class);
-    siddhiManager.setExtension("formatDate", FormatDateFunctionExtension.class);
     if (!siddhiManager.getExtensions().containsKey("store:rdbms"))
       throw new RuntimeException("Extension store:rdbms is missing!");
   }

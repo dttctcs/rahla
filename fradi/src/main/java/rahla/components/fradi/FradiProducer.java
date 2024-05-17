@@ -135,6 +135,7 @@ public class FradiProducer extends DefaultProducer {
     }
     if (timestamp == null) {
       timestamp = exchange.getMessage().getMessageTimestamp();
+      //IF null update to system current millils
 
     }
 

@@ -26,7 +26,7 @@
         <feature>aries-jax-rs-whiteboard</feature>
         <feature>aries-jax-rs-whiteboard-jackson</feature>
         <feature>camel-core</feature>
-        <feature>camel-quartz</feature>
+        <feature>camel-opentelemetry</feature>
         <feature>camel-blueprint</feature>
         <feature>camel-metrics</feature>
         <feature>camel-minio</feature>

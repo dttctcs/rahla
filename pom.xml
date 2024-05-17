@@ -50,7 +50,8 @@
                     <configuration>
                         <maxmem>1024M</maxmem>
                         <source>17</source>
-                        <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                       <!-- <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
+
                         <target>17</target>
                     </configuration>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -107,7 +108,20 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <artifactId>loki-appender</artifactId>
+                <groupId>rahla</groupId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <artifactId>rahla</artifactId>
+                <classifier>features</classifier>
+                <groupId>rahla.feature</groupId>
+                <scope>runtime</scope>
+                <type>xml</type>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <artifactId>fradi</artifactId>
                 <classifier>features</classifier>
                 <groupId>rahla.feature</groupId>
                 <scope>runtime</scope>
@@ -349,6 +363,12 @@
             </dependency>
             <dependency>
                 <artifactId>pax-logging-log4j2-extra</artifactId>
+                <groupId>org.ops4j.pax.logging</groupId>
+                <scope>provided</scope>
+                <version>${pax-logging.version}</version>
+            </dependency>
+            <dependency>
+                <artifactId>pax-logging-log4j2</artifactId>
                 <groupId>org.ops4j.pax.logging</groupId>
                 <scope>provided</scope>
                 <version>${pax-logging.version}</version>
@@ -858,6 +878,12 @@
                 <scope>provided</scope>
                 <version>${log4j2.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <scope>provided</scope>
+                <version>${log4j2.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.aries.component-dsl</groupId>
@@ -971,6 +997,25 @@
                 <artifactId>json</artifactId>
                 <version>${json.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>pl.tkowalcz.tjahzi</groupId>
+                <artifactId>log4j2-appender</artifactId>
+                <version>0.9.32</version>
+            </dependency>
+
+            <dependency>
+                <groupId>pl.tkowalcz.tjahzi</groupId>
+                <artifactId>log4j2-appender-nodep</artifactId>
+                <version>0.9.32</version>
+            </dependency>
+
+            <dependency>
+                <groupId>pl.tkowalcz.tjahzi</groupId>
+                <artifactId>core</artifactId>
+                <version>0.9.32</version>
+                <scope>compile</scope>
+            </dependency>
         </dependencies>
 
 
@@ -982,8 +1027,10 @@
 
     <modules>
         <module>rahla</module>
+        <module>loki-appender</module>
         <module>fradi</module>
-        <module>feature</module>
+        <module>features/rahla</module>
+        <module>features/fradi</module>
         <module>assembly</module>
     </modules>
 
@@ -992,12 +1039,13 @@
 
     <packaging>pom</packaging>
     <properties>
+        <java.version>21</java.version>
         <dependency.locations.enabled>false</dependency.locations.enabled>
         <getRevisionOnce>false</getRevisionOnce>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 
-        <karaf.version>4.4.5</karaf.version>
+        <karaf.version>4.4.6</karaf.version>
         <osgi.version>8.0.0</osgi.version>
         <org.osgi.service.cm.version>1.6.1</org.osgi.service.cm.version>
         <org.osgi.service.component.version>1.5.1</org.osgi.service.component.version>
@@ -1016,13 +1064,13 @@
 
 
 
-        <camel.version>3.21.3</camel.version>
+        <camel.version>3.22.2</camel.version>
         <groovy.version>3.0.19</groovy.version>
         <jackson2.version>2.15.2</jackson2.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <prometheus.version>0.15.0</prometheus.version>
         <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>
-        <pax-logging.version>2.2.6</pax-logging.version>
+        <pax-logging.version>2.2.7</pax-logging.version>
         <lombok.version>1.18.28</lombok.version>
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
         <org.apache.aries.jax.rs.features.version>2.0.2</org.apache.aries.jax.rs.features.version>
@@ -1033,7 +1081,7 @@
         <siddhi-execution-string.version>5.0.12</siddhi-execution-string.version>
         <siddhi-execution-unique.version>5.0.5</siddhi-execution-unique.version>
         <siddhi-store-rdbms.version>7.0.16-dtacs</siddhi-store-rdbms.version>
-        <siddhi.version>5.1.24-dtacs</siddhi.version>
+        <siddhi.version>5.1.24-dt</siddhi.version>
         <disruptor.version>3.4.2</disruptor.version>
         <log4j2.version>2.18.0</log4j2.version>
 

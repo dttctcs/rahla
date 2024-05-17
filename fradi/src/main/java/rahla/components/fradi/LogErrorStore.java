@@ -18,7 +18,7 @@ class LogErrorStore extends ErrorStore {
 
   @Override
   protected void saveEntry(long timestamp, String siddhiAppName, String streamName, byte[] eventAsBytes, String cause, byte[] stackTraceAsBytes, byte[] originalPayloadAsBytes, String errorOccurrence, String eventType, String errorType) throws ErrorStoreException {
-    log.error("timestamp={}, siddhiAppName={}, streamName={}, cause={}, errorOccurrence={}", new Date(timestamp), siddhiAppName, streamName, cause, errorOccurrence);
+    log.error("ErrorStore: timestamp={}, siddhiAppName={}, streamName={}, cause={}, errorOccurrence={}", new Date(timestamp), siddhiAppName, streamName, cause, errorOccurrence);
   }
 
   @Override
