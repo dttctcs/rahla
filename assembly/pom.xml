@@ -197,6 +197,7 @@
           <installedFeatures>
             <feature>aries-blueprint</feature>
             <feature>shell-compat</feature>
+            <feature>fradi</feature>
           </installedFeatures>
           <javase>17</javase>
          <!-- <framework>

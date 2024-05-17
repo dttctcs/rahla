@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration packages="org.ops4j.pax.logging">
+       <!-- Root Logger Configuration -->
+    <Loggers>
+        <Root level="${karaf.log.level:-INFO}" includeLocation="false">
+            <AppenderRef ref="PaxOsgi"/>
+            <AppenderRef ref="Console">
+            </AppenderRef>
+        </Root>
+
+        <Logger name="trace" level="TRACE" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <Logger name="org.apache.sshd" level="WARN"/>
+        <Logger name="org.apache.aries.spifly" level="WARN"/>
+    </Loggers>
+
+    <Appenders>
+        <Console name="Console" direct="${karaf.log.console.direct:-false}">
+            <JsonLayout compact="true" eventEol="true" complete="false" properties="true"
+                        includeStacktrace="true" stacktraceAsString="true" objectMessageAsJsonObject="true"/>
+        </Console>
+
+        <PaxOsgi name="PaxOsgi" filter="*"/>
+    </Appenders>
+</Configuration>
