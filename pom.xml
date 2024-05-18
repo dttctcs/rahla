@@ -209,19 +209,6 @@
                 <scope>provided</scope>
             </dependency>
 
-
-            <dependency>
-                <artifactId>osgi.annotation</artifactId>
-                <groupId>org.osgi</groupId>
-                <scope>provided</scope>
-                <version>${osgi.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>javax.ws.rs-api</artifactId>
-                <groupId>javax.ws.rs</groupId>
-                <scope>provided</scope>
-                <version>${javax.ws.rs-api.version}</version>
-            </dependency>
             <dependency>
                 <artifactId>lombok</artifactId>
                 <groupId>org.projectlombok</groupId>
@@ -239,12 +226,6 @@
                 <artifactId>org.apache.karaf.features.core</artifactId>
                 <version>${karaf.version}</version>
                 <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <artifactId>javax.servlet-api</artifactId>
-                <groupId>javax.servlet</groupId>
-                <scope>provided</scope>
-                <version>${javax.servlet-api.version}</version>
             </dependency>
             <dependency>
                 <artifactId>framework</artifactId>
@@ -272,6 +253,13 @@
             <dependency>
                 <groupId>org.apache.karaf.features</groupId>
                 <artifactId>spring</artifactId>
+                <type>xml</type>
+                <classifier>features</classifier>
+                <version>${karaf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.karaf.features</groupId>
+                <artifactId>spring-legacy</artifactId>
                 <type>xml</type>
                 <classifier>features</classifier>
                 <version>${karaf.version}</version>
@@ -328,38 +316,6 @@
                 <artifactId>org.apache.karaf.log.core</artifactId>
                 <scope>provided</scope>
                 <version>${karaf.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>simpleclient</artifactId>
-                <groupId>io.prometheus</groupId>
-                <version>${prometheus.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>simpleclient_servlet</artifactId>
-                <groupId>io.prometheus</groupId>
-                <version>${prometheus.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-reload4j</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <artifactId>simpleclient_servlet_common</artifactId>
-                <groupId>io.prometheus</groupId>
-                <version>${prometheus.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-reload4j</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <artifactId>simpleclient_hotspot</artifactId>
-                <groupId>io.prometheus</groupId>
-                <version>${prometheus.version}</version>
             </dependency>
             <dependency>
                 <artifactId>pax-logging-log4j2-extra</artifactId>
@@ -511,26 +467,6 @@
                 <classifier>indy</classifier>
                 <groupId>org.codehaus.groovy</groupId>
                 <version>${groovy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-api</artifactId>
-                <version>${opentelemetry.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-sdk</artifactId>
-                <version>${opentelemetry.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
-                <version>${opentelemetry.version}-alpha</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-exporter-otlp</artifactId>
-                <version>${opentelemetry.version}</version>
             </dependency>
             <dependency>
                 <artifactId>pax-logging-api</artifactId>
@@ -897,17 +833,6 @@
                 </exclusions>
             </dependency>
 
-            <!--<dependency>
-                <artifactId>org.apache.servicemix.bundles.gremlin-driver</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>*</artifactId>
-                        <groupId>*</groupId>
-                    </exclusion>
-                </exclusions>
-                <groupId>org.apache.servicemix.bundles</groupId>
-                <version>${gremlin-driver-bundle.version}</version>
-            </dependency>-->
 
             <dependency>
                 <artifactId>janusgraph-driver</artifactId>
@@ -992,28 +917,17 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
-                <groupId>org.json</groupId>
-                <artifactId>json</artifactId>
-                <version>${json.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>pl.tkowalcz.tjahzi</groupId>
-                <artifactId>log4j2-appender</artifactId>
-                <version>0.9.32</version>
-            </dependency>
 
             <dependency>
                 <groupId>pl.tkowalcz.tjahzi</groupId>
                 <artifactId>log4j2-appender-nodep</artifactId>
-                <version>0.9.32</version>
+                <version>${log4j2-appender-loki.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>pl.tkowalcz.tjahzi</groupId>
                 <artifactId>core</artifactId>
-                <version>0.9.32</version>
+                <version>${log4j2-appender-loki.version}</version>
                 <scope>compile</scope>
             </dependency>
         </dependencies>
@@ -1045,7 +959,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 
-        <karaf.version>4.4.6</karaf.version>
+        <karaf.version>4.4.5</karaf.version>
         <osgi.version>8.0.0</osgi.version>
         <org.osgi.service.cm.version>1.6.1</org.osgi.service.cm.version>
         <org.osgi.service.component.version>1.5.1</org.osgi.service.component.version>
@@ -1068,7 +982,6 @@
         <groovy.version>3.0.19</groovy.version>
         <jackson2.version>2.15.2</jackson2.version>
         <commons-collections4.version>4.4</commons-collections4.version>
-        <prometheus.version>0.15.0</prometheus.version>
         <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>
         <pax-logging.version>2.2.7</pax-logging.version>
         <lombok.version>1.18.28</lombok.version>
@@ -1108,6 +1021,7 @@
         </org.apache.aries.component-dsl.component-dsl.version>
         <json.version>20230227</json.version>
 
+        <log4j2-appender-loki.version>0.9.32</log4j2-appender-loki.version>
     </properties>
 
     <repositories>

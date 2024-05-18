@@ -27,8 +27,6 @@ All rahla specific settings can be set via environment variables
 | Name                        | value  | description                                                                      |
 |-----------------------------|--------|----------------------------------------------------------------------------------|
 | ADMIN_PASS                  | string | Set the admin pass                                                               |
-| HEALTH_MODE                 | string | strict mode let the heahtlc check fail if a bundle is not active, default: empty |                                 
-| LOG_FORMAT                  | string | json set the log output to json, default: empty                                  |         
 | RAHLA_DEPLOY_PATH           | string | sets the rahla deploy path, default: /deploy                                     |
 ## Concepts 
 Rahla extends default karaf and camel runtime with 

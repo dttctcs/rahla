@@ -71,7 +71,7 @@
                                 <artifactItem>
                                     <groupId>pl.tkowalcz.tjahzi</groupId>
                                     <artifactId>log4j2-appender</artifactId>
-                                    <version>0.9.32</version>
+                                    <version>${log4j2-appender-loki.version}</version>
                                     <outputDirectory>${project.build.directory}/classes/META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat</outputDirectory>
                                     <includes>**\/Log4j2Plugins.dat</includes>
                                 </artifactItem>
