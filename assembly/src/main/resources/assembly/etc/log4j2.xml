@@ -20,6 +20,9 @@
         <Console name="Console" direct="${karaf.log.console.direct:-false}">
             <JsonLayout compact="true" eventEol="true" complete="false" properties="true"
                         includeStacktrace="true" stacktraceAsString="true" objectMessageAsJsonObject="true"/>
+            <!--<PatternLayout>
+                <pattern>%d %highlight{%p} %style{%C{1.} [%t] %m}{bold,green}%n</pattern>
+            </PatternLayout>-->
         </Console>
 
         <PaxOsgi name="PaxOsgi" filter="*"/>

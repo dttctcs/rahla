@@ -38,7 +38,6 @@
                         <Import-Package>
                             org.apache.camel.catalog,
                             org.apache.karaf.shell*;version="[4,5)",
-                            io.prometheus.*,
                             org.apache.commons.configuration2.*,
                             *
                             !COM.newmonics,
@@ -80,22 +79,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <artifactId>simpleclient</artifactId>
-            <groupId>io.prometheus</groupId>
-        </dependency>
-        <dependency>
-            <artifactId>simpleclient_servlet</artifactId>
-            <groupId>io.prometheus</groupId>
-        </dependency>
-        <dependency>
-            <artifactId>simpleclient_servlet_common</artifactId>
-            <groupId>io.prometheus</groupId>
-        </dependency>
-        <dependency>
-            <artifactId>simpleclient_hotspot</artifactId>
-            <groupId>io.prometheus</groupId>
-        </dependency>
+
         <!--
         <dependency>
             <artifactId>slf4j-log4j12</artifactId>
@@ -170,34 +154,39 @@
             <artifactId>org.osgi.util.promise</artifactId>
             <scope>provided</scope>
         </dependency>
-
+<!--
         <dependency>
             <artifactId>javax.ws.rs-api</artifactId>
             <groupId>javax.ws.rs</groupId>
-        </dependency>
+        </dependency>-->
         <dependency>
             <artifactId>lombok</artifactId>
             <groupId>org.projectlombok</groupId>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
+    <!--    <dependency>
             <artifactId>javax.servlet-api</artifactId>
             <groupId>javax.servlet</groupId>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-core</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-management</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>org.apache.karaf.features.core</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -206,14 +195,17 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-metrics</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.fileinstall</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <artifactId>groovy-dateutil</artifactId>
@@ -260,45 +252,17 @@
         <dependency>
             <artifactId>pax-logging-api</artifactId>
             <groupId>org.ops4j.pax.logging</groupId>
+            <scope>provided</scope>
         </dependency>
 
 
-        <!--    <dependency>-->
-        <!--      <groupId>org.codehaus.groovy</groupId>-->
-        <!--      <artifactId>groovy-docgenerator</artifactId>-->
-        <!--      <version>2.5.13</version>-->
-        <!--    </dependency>-->
-        <!--    <dependency>-->
-        <!--      <wrap:groupId>org.codehaus.groovy</groupId>-->
-        <!--      <artifactId>groovy-groovydoc</artifactId>-->
-        <!--      <version>2.5.13</version>-->
-        <!--    </dependency>-->
-        <!--   <dependency>
-             <artifactId>groovy-groovysh</artifactId>
-             <classifier>indy</classifier>
-             <groupId>org.codehaus.groovy</groupId>
-           </dependency>
-           <dependency>
-             <artifactId>groovy-jmx</artifactId>
-             <classifier>indy</classifier>
-             <groupId>org.codehaus.groovy</groupId>
-           </dependency>-->
+
         <dependency>
             <artifactId>groovy-json</artifactId>
             <classifier>indy</classifier>
-            <!--      <scope>provided</scope>-->
             <groupId>org.codehaus.groovy</groupId>
         </dependency>
-        <!--    <dependency>-->
-        <!--      <groupId>org.apache.aries.spifly</groupId>-->
-        <!--      <artifactId>org.apache.aries.spifly.dynamic.bundle</artifactId>-->
-        <!--      <version>1.3.5</version>-->
-        <!--    </dependency>-->
-        <!--<dependency>
-          <artifactId>groovy-jsr223</artifactId>
-          <classifier>indy</classifier>
-          <groupId>org.codehaus.groovy</groupId>
-        </dependency>-->
+
         <dependency>
             <artifactId>groovy-macro</artifactId>
             <classifier>indy</classifier>
@@ -329,30 +293,11 @@
             <classifier>indy</classifier>
             <groupId>org.codehaus.groovy</groupId>
         </dependency>
-<!--
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-sdk</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-exporter-otlp</artifactId>
-        </dependency>
--->
+
         <dependency>
             <groupId>org.apache.aries.component-dsl</groupId>
             <artifactId>org.apache.aries.component-dsl.component-dsl</artifactId>
-
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <artifactId>jackson-dataformat-yaml</artifactId>
@@ -361,11 +306,12 @@
         <dependency>
             <artifactId>jackson-jaxrs-base</artifactId>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
-
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
@@ -374,17 +320,8 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
+            <scope>provided</scope>
         </dependency>
-        <!--    <dependency>-->
-        <!--      <artifactId>simple-xml-safe</artifactId>-->
-        <!--      <groupId>com.carrotsearch.thirdparty</groupId>-->
-        <!--    </dependency>-->
-
-
-        <!--<dependency>
-          <artifactId>org.apache.servicemix.bundles.gremlin-driver</artifactId>
-          <groupId>org.apache.servicemix.bundles</groupId>
-        </dependency>-->
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -420,6 +357,7 @@
             <artifactId>snappy-java</artifactId>
             <groupId>org.xerial.snappy</groupId>
         </dependency>
+
         <dependency>
             <artifactId>minio</artifactId>
             <groupId>io.minio</groupId>
@@ -430,16 +368,18 @@
             <artifactId>jedis</artifactId>
             <groupId>redis.clients</groupId>
         </dependency>
+
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>4.10.0</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
+
+      <!--  <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-        </dependency>
+        </dependency>-->
     </dependencies>
 
     <description />
