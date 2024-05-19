@@ -15,7 +15,8 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses />
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <artifactId>rahla</artifactId>
     <build>
@@ -32,7 +33,7 @@
                         <Bundle-Version>${project.version}</Bundle-Version>
                         <Export-Package>
                             rahla.*;version=${project.version},
-                           <!-- org.apache.tinkerpop.gremlin.*-->
+                            <!-- org.apache.tinkerpop.gremlin.*-->
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Import-Package>
@@ -154,20 +155,20 @@
             <artifactId>org.osgi.util.promise</artifactId>
             <scope>provided</scope>
         </dependency>
-<!--
-        <dependency>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <groupId>javax.ws.rs</groupId>
-        </dependency>-->
+        <!--
+                <dependency>
+                    <artifactId>javax.ws.rs-api</artifactId>
+                    <groupId>javax.ws.rs</groupId>
+                </dependency>-->
         <dependency>
             <artifactId>lombok</artifactId>
             <groupId>org.projectlombok</groupId>
             <scope>provided</scope>
         </dependency>
-    <!--    <dependency>
-            <artifactId>javax.servlet-api</artifactId>
-            <groupId>javax.servlet</groupId>
-        </dependency>-->
+        <!--    <dependency>
+                <artifactId>javax.servlet-api</artifactId>
+                <groupId>javax.servlet</groupId>
+            </dependency>-->
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-core</artifactId>
@@ -254,7 +255,6 @@
             <groupId>org.ops4j.pax.logging</groupId>
             <scope>provided</scope>
         </dependency>
-
 
 
         <dependency>
@@ -376,13 +376,20 @@
             <scope>provided</scope>
         </dependency>
 
-      <!--  <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-        </dependency>-->
+
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
+            <version>1.21.0-alpha</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--  <dependency>
+              <groupId>org.json</groupId>
+              <artifactId>json</artifactId>
+          </dependency>-->
     </dependencies>
 
-    <description />
+    <description/>
 
     <modelVersion>4.0.0</modelVersion>
 

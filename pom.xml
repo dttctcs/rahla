@@ -988,7 +988,7 @@
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
         <org.apache.aries.jax.rs.features.version>2.0.2</org.apache.aries.jax.rs.features.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
-        <opentelemetry.version>1.9.1</opentelemetry.version>
+        <opentelemetry.version>1.21.0</opentelemetry.version>
 
         <siddhi-execution-regex.version>5.0.7</siddhi-execution-regex.version>
         <siddhi-execution-string.version>5.0.12</siddhi-execution-string.version>

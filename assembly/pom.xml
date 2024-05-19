@@ -15,7 +15,8 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses />
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <artifactId>rahla</artifactId>
 
@@ -126,7 +127,7 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <scope>compile</scope>
     </dependency>
-   <dependency>
+    <dependency>
       <artifactId>pax-logging-log4j2-extra</artifactId>
       <groupId>org.ops4j.pax.logging</groupId>
       <scope>compile</scope>
@@ -135,18 +136,18 @@
 
   </dependencies>
 
-    <!--    Next Pax Logging Version should support this-->
-    <!--    <dependency>-->
-    <!--      <groupId>org.apache.logging.log4j</groupId>-->
-    <!--      <artifactId>log4j-layout-template-json</artifactId>-->
-    <!--      <version>${javax.ws.rs-api.version}4.0</version>-->
-    <!--      <scope>compile</scope>-->
-    <!--    </dependency>-->
-<!--    <dependency>-->
-<!--      <groupId>org.apache.felix</groupId>-->
-<!--      <artifactId>org.apache.felix.fileinstall</artifactId>-->
-<!--      <scope>compile</scope>-->
-<!--    </dependency>-->
+  <!--    Next Pax Logging Version should support this-->
+  <!--    <dependency>-->
+  <!--      <groupId>org.apache.logging.log4j</groupId>-->
+  <!--      <artifactId>log4j-layout-template-json</artifactId>-->
+  <!--      <version>${javax.ws.rs-api.version}4.0</version>-->
+  <!--      <scope>compile</scope>-->
+  <!--    </dependency>-->
+  <!--    <dependency>-->
+  <!--      <groupId>org.apache.felix</groupId>-->
+  <!--      <artifactId>org.apache.felix.fileinstall</artifactId>-->
+  <!--      <scope>compile</scope>-->
+  <!--    </dependency>-->
 
 
   <build>
@@ -433,10 +434,15 @@
 
             -->
           </installedFeatures>
+
+          <libraries>
+            <library>mvn:io.prometheus.jmx/jmx_prometheus_javaagent/1.0.0</library>
+            <library>mvn:io.opentelemetry.javaagent/opentelemetry-javaagent/2.4.0</library>
+          </libraries>
           <javase>17</javase>
-         <!-- <framework>
-            framework-logback
-          </framework>-->
+          <!-- <framework>
+             framework-logback
+           </framework>-->
 
           <blacklistedRepositories>
             <repository>mvn:org.apache.karaf.features/framework/[2,${karaf.version})/xml/features
@@ -469,7 +475,6 @@
               mvn:org.apache.karaf.features/spring-legacy/(${karaf.version},5)/xml/features
             </repository>
           </blacklistedRepositories>
-          <libraries />
           <startupFeatures>
             <feature>eventadmin</feature>
           </startupFeatures>
