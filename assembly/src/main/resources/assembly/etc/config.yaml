@@ -8,42 +8,42 @@ includeObjectNames:
 rules:
   # Route level
   - pattern: 'org.apache.camel<context=.+-([^,]+), type=routes, name=\"([^,]+)\"><>ExchangesCompleted'
-    name: camel_route_exchanges_completed_total
+    name: camel_route_exchanges_completed
     help: Exchanges Completed
     type: COUNTER
     labels:
       context: $1
       route: $2
   - pattern: 'org.apache.camel<context=.+-([^,]+), type=routes, name=\"([^,]+)\"><>ExchangesFailed'
-    name: camel_route_exchanges_failed_total
+    name: camel_route_exchanges_failed
     help: Exchanges Failed
     type: COUNTER
     labels:
       context: $1
       route: $2
   - pattern: 'org.apache.camel<context=.+-([^,]+), type=routes, name=\"([^,]+)\"><>ExchangesInflight'
-    name: camel_route_exchanges_inflight_total
+    name: camel_route_exchanges_inflight
     help: Exchanges Inflight
     type: GAUGE
     labels:
       context: $1
       route: $2
   - pattern: 'org.apache.camel<context=.+-([^,]+), type=routes, name=\"([^,]+)\"><>ExchangesTotal'
-    name: camel_route_exchanges_total
+    name: camel_route_exchanges
     help: Exchanges Total
     type: COUNTER
     labels:
       context: $1
       route: $2
   - pattern: 'org.apache.camel<context=.+-([^,]+), type=routes, name=\"([^,]+)\"><>FailuresHandled'
-    name: camel_route_failures_handled_total
+    name: camel_route_failures_handled
     help: Failures Handled
     labels:
       context: $1
       route: $2
     type: COUNTER
   - pattern: 'org.apache.camel<context=.+-([^,]+), type=routes, name=\"([^,]+)\"><>ExternalRedeliveries'
-    name: camel_route_external_redeliveries_total
+    name: camel_route_external_redeliveries
     help: External Redeliveries
     labels:
       context: $1
@@ -85,14 +85,14 @@ rules:
       route: $2
     type: GAUGE
   - pattern: 'org.apache.camel<context=.+-([^,]+), type=routes, name=\"([^,]+)\"><>Redeliveries'
-    name: camel_route_external_redeliveries_total
+    name: camel_route_redeliveries
     help: Redeliveries
     labels:
       context: $1
       route: $2
     type: COUNTER
   - pattern: 'org.apache.camel<context=.+-([^,]+), type=routes, name=\"([^,]+)\"><>TotalProcessingTime'
-    name: camel_route_total_processing_time_total
+    name: camel_route_processing_time
     help: Total Processing Time
     labels:
       context: $1
@@ -100,7 +100,7 @@ rules:
     type: GAUGE
 
   - pattern: 'org.apache.camel<context=.+-([^,]+), type=routes, name=\"([^,]+)\"><>InflightExchanges'
-    name: camel_route_exchanges_inflight_total
+    name: camel_route_exchanges_inflight
     help: Inflight Exchanges
     labels:
       context: $1
@@ -147,7 +147,7 @@ rules:
     type: GAUGE
 
   - pattern: 'com.zaxxer.hikari<type=Pool \(([^,]+)\)><>TotalConnections'
-    name: hikari_cp_total_connections
+    name: hikari_cp_connections
     help: Hikari CP TotalConnections
     labels:
       pool: $1
