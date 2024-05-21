@@ -89,8 +89,9 @@
                         <Import-Package>
                             org.osgi.framework;version="[1.8,2.0)"
                         </Import-Package>
+                        <DynamicImport-Package>sun.nio.ch</DynamicImport-Package>
                         <Export-Package />
-                        <Private-Package>pl.tkowalcz.tjahzi*</Private-Package>
+                        <Private-Package>pl.tkowalcz.tjahzi*,org.agrona*</Private-Package>
                         <Fragment-Host>org.ops4j.pax.logging.pax-logging-log4j2</Fragment-Host>
                         <Include-Resource>
                             {maven-resources},
@@ -145,6 +146,7 @@
             <groupId>org.agrona</groupId>
             <artifactId>agrona</artifactId>
             <version>1.12.0</version>
+            <scope>provided</scope>
         </dependency>
         <!--<dependency>
             <groupId>com.aayushatharva.brotli4j</groupId>

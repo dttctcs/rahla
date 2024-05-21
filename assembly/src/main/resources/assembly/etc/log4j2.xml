@@ -1,30 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration packages="org.ops4j.pax.logging">
-       <!-- Root Logger Configuration -->
-    <Loggers>
-        <Root level="${karaf.log.level:-INFO}" includeLocation="false">
-            <AppenderRef ref="PaxOsgi"/>
-            <AppenderRef ref="Console">
-            </AppenderRef>
-        </Root>
+<!--<Configuration packages="pl.tkowalcz.tjahzi.log4j2">-->
+  <Configuration packages="pl.tkowalcz.tjahzi.log4j2">
+  <Appenders>
+    <Console name="Console" direct="${rahla.log.console.direct:-false}">
+      <JsonLayout compact="true" eventEol="true" complete="false" properties="true"
+                  includeStacktrace="true" stacktraceAsString="true" objectMessageAsJsonObject="true"/>
 
-        <Logger name="trace" level="TRACE" additivity="false">
-            <AppenderRef ref="Console"/>
-        </Logger>
 
-        <Logger name="org.apache.sshd" level="WARN"/>
-        <Logger name="org.apache.aries.spifly" level="WARN"/>
-    </Loggers>
+      <!--<PatternLayout>
+        <Pattern>%X{tid} [%t] %d{MM-dd HH:mm:ss.SSS} %5p %c{1} - %m%n%exception{full}</Pattern>
+      </PatternLayout>
+      -->
+    </Console>
 
-    <Appenders>
-        <Console name="Console" direct="${karaf.log.console.direct:-false}">
-            <JsonLayout compact="true" eventEol="true" complete="false" properties="true"
-                        includeStacktrace="true" stacktraceAsString="true" objectMessageAsJsonObject="true"/>
-            <!--<PatternLayout>
-                <pattern>%d %highlight{%p} %style{%C{1.} [%t] %m}{bold,green}%n</pattern>
-            </PatternLayout>-->
-        </Console>
+    <!--
+    <Loki name="Loki" bufferSizeMegabytes="64"
+          host="${rahla.log.loki.host:-localhost}"
+          port="${rahla.log.loki.port:-3100}">
+      <ThresholdFilter level="${rahla.log.loki.level:-OFF}"/>
+      <JsonLayout compact="true"
+                  eventEol="true"
+                  complete="false"
+                  properties="true"
+                  includeStacktrace="true"
+                  stacktraceAsString="true"
+                  objectMessageAsJsonObject="true"/>
 
-        <PaxOsgi name="PaxOsgi" filter="*"/>
-    </Appenders>
+      <Label name="app" value="rahla"/>
+      <Label name="log_name" pattern="%c"/>
+
+      <LogLevelLabel>logging_level</LogLevelLabel>
+    </Loki>
+    -->
+    <PaxOsgi name="PaxOsgi" filter="*"/>
+  </Appenders>
+
+  <Loggers>
+    <Root level="${rahla.log.level:-INFO}" includeLocation="false">
+      <AppenderRef ref="PaxOsgi"/>
+      <AppenderRef ref="Console"/>
+
+    </Root>
+
+    <Logger name="trace" level="TRACE" additivity="false">
+      <AppenderRef ref="Console"/>
+      <!--<AppenderRef ref="Loki"/>-->
+    </Logger>
+
+    <Logger name="org.apache.sshd" level="WARN"/>
+    <Logger name="org.apache.aries.spifly" level="WARN"/>
+  </Loggers>
 </Configuration>

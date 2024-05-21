@@ -17,17 +17,8 @@
 <features name="${project.artifactId}-${project.version}"
           xmlns="http://karaf.apache.org/xmlns/features/v1.6.0">
 
-    <feature description='${project.name}' name='${project.artifactId}' start-level="100"
+    <feature description='${project.name}' name='${project.artifactId}' start-level="80"
              version='${project.version}'>
-        <feature>camel</feature>
-        <config name="org.apache.felix.fileinstall-rahla" append="false">
-            felix.fileinstall.dir = ${env:RAHLA_DEPLOY_PATH:-/deploy/}
-            felix.fileinstall.filter = .*
-            felix.fileinstall.poll = 1000
-            felix.fileinstall.start.level = 80
-            felix.fileinstall.active.level = 80
-            felix.fileinstall.log.level = 3
-        </config>
 
 
     </feature>

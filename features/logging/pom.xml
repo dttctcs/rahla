@@ -17,7 +17,7 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <artifactId>rahla</artifactId>
+    <artifactId>rahla-logging</artifactId>
     <build>
         <pluginManagement>
             <plugins>
@@ -31,15 +31,14 @@
             <plugin>
                 <artifactId>karaf-maven-plugin</artifactId>
                 <configuration>
-                    <startLevel>80</startLevel>
-                    <aggregateFeatures>true</aggregateFeatures>
+                    <startLevel>7</startLevel>
+                    <aggregateFeatures>false</aggregateFeatures>
                     <checkDependencyChange>false</checkDependencyChange>
                     <enableGeneration>true</enableGeneration>
                     <failOnDependencyChange>false</failOnDependencyChange>
-                    <includeTransitiveDependency>true</includeTransitiveDependency>
+                    <includeTransitiveDependency>false</includeTransitiveDependency>
                     <logDependencyChanges>false</logDependencyChanges>
-                    <overwriteChangedDependencies>false</overwriteChangedDependencies>
-
+                    <overwriteChangedDependencies>true</overwriteChangedDependencies>
                 </configuration>
                 <extensions>true</extensions>
                 <groupId>org.apache.karaf.tooling</groupId>
@@ -74,13 +73,36 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <artifactId>rahla</artifactId>
-            <groupId>rahla</groupId>
-        </dependency>
 
 
+            <dependency>
+              <artifactId>jackson-core</artifactId>
+              <groupId>com.fasterxml.jackson.core</groupId>
+              <scope>compile</scope>
+            </dependency>
 
+            <dependency>
+              <artifactId>jackson-databind</artifactId>
+              <groupId>com.fasterxml.jackson.core</groupId>
+              <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+              <artifactId>jackson-annotations</artifactId>
+              <groupId>com.fasterxml.jackson.core</groupId>
+              <scope>compile</scope>
+            </dependency>
+            <dependency>
+              <artifactId>pax-logging-log4j2-extra</artifactId>
+              <groupId>org.ops4j.pax.logging</groupId>
+              <scope>compile</scope>
+            </dependency>
+
+           <dependency>
+              <artifactId>loki-appender</artifactId>
+              <groupId>rahla</groupId>
+              <scope>compile</scope>
+            </dependency>
 
     </dependencies>
 

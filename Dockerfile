@@ -10,4 +10,5 @@ ENV OTEL_LOGS_EXPORTER none
 ENV OTEL_METRICS_EXPORTER none
 ENV OTEL_TRACES_EXPORTER none
 EXPOSE 8101 1099 44444 8181 8182
+RUN sed -i -e '/ rahla-logging.*/d' -i -e '/ framework.*/d'  /rahla/etc/org.apache.karaf.features.cfg # temporary workaround
 CMD ["karaf", "run"]

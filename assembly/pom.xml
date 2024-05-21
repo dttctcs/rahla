@@ -43,6 +43,7 @@
       <groupId>org.apache.karaf.features</groupId>
       <artifactId>framework</artifactId>
       <type>kar</type>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -58,6 +59,7 @@
       <artifactId>standard</artifactId>
       <classifier>features</classifier>
       <type>xml</type>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
@@ -109,45 +111,15 @@
     </dependency>
 
 
-    <!--    Needed for Json Logging-->
     <dependency>
-      <artifactId>jackson-core</artifactId>
-      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>rahla-logging</artifactId>
+      <classifier>features</classifier>
+      <groupId>rahla.feature</groupId>
       <scope>compile</scope>
+      <type>xml</type>
     </dependency>
-
-    <dependency>
-      <artifactId>jackson-databind</artifactId>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <artifactId>jackson-annotations</artifactId>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <artifactId>pax-logging-log4j2-extra</artifactId>
-      <groupId>org.ops4j.pax.logging</groupId>
-      <scope>compile</scope>
-    </dependency>
-
 
   </dependencies>
-
-  <!--    Next Pax Logging Version should support this-->
-  <!--    <dependency>-->
-  <!--      <groupId>org.apache.logging.log4j</groupId>-->
-  <!--      <artifactId>log4j-layout-template-json</artifactId>-->
-  <!--      <version>${javax.ws.rs-api.version}4.0</version>-->
-  <!--      <scope>compile</scope>-->
-  <!--    </dependency>-->
-  <!--    <dependency>-->
-  <!--      <groupId>org.apache.felix</groupId>-->
-  <!--      <artifactId>org.apache.felix.fileinstall</artifactId>-->
-  <!--      <scope>compile</scope>-->
-  <!--    </dependency>-->
 
 
   <build>
@@ -172,314 +144,20 @@
           <archiveTarGz>false</archiveTarGz>
           <archiveZip>false</archiveZip>
           <bootFeatures>
-            <feature>wrap</feature>
-            <feature>shell</feature>
-            <feature>feature</feature>
-            <feature>jaas</feature>
-            <feature>ssh</feature>
-            <feature>management</feature>
-            <feature>bundle</feature>
-            <feature>config</feature>
-            <feature>deployer</feature>
-            <feature>diagnostic</feature>
-            <feature>feature</feature>
-            <feature>instance</feature>
-            <feature>kar</feature>
-            <feature>log</feature>
-            <feature>spifly</feature>
-            <feature>package</feature>
-            <feature>service</feature>
-            <feature>system</feature>
+            <feature>standard</feature>
             <feature>scr</feature>
-            <feature>aries-blueprint</feature>
-            <feature>camel</feature>
+            <feature>spifly</feature>
             <feature>rahla</feature>
-
           </bootFeatures>
           <installedFeatures>
-
-            <feature>shell-compat</feature>
             <feature>fradi</feature>
-            <!--
-            <feature>xml-specs-api</feature>
-            <feature>camel</feature>
-            <feature>camel-core</feature>
-            <feature>camel-blueprint</feature>
-            <feature>camel-amqp</feature>
-            <feature>camel-any23</feature>
-            <feature>camel-arangodb</feature>
-            <feature>camel-as2</feature>
-            <feature>camel-asn1</feature>
-            <feature>camel-asterisk</feature>
-            <feature>camel-atom</feature>
-            <feature>camel-avro</feature>
-            <feature>camel-aws2-athena</feature>
-            <feature>camel-aws2-cw</feature>
-            <feature>camel-aws2-ddb</feature>
-            <feature>camel-aws2-ec2</feature>
-            <feature>camel-aws2-ecs</feature>
-            <feature>camel-aws2-eks</feature>
-            <feature>camel-aws2-eventbridge</feature>
-            <feature>camel-aws2-iam</feature>
-            <feature>camel-aws2-kinesis</feature>
-            <feature>camel-aws2-kms</feature>
-            <feature>camel-aws2-lambda</feature>
-            <feature>camel-aws2-mq</feature>
-            <feature>camel-aws2-msk</feature>
-            <feature>camel-aws2-s3</feature>
-            <feature>camel-aws2-ses</feature>
-            <feature>camel-aws2-sns</feature>
-            <feature>camel-aws2-sqs</feature>
-            <feature>camel-aws2-sts</feature>
-            <feature>camel-aws2-translate</feature>
-            <feature>camel-aws-secrets-manager</feature>
-            <feature>camel-aws-cloudtrail</feature>
-            <feature>camel-aws-xray</feature>
-            <feature>camel-azure-storage-blob</feature>
-            <feature>camel-azure-storage-datalake</feature>
-            <feature>camel-azure-storage-queue</feature>
-            <feature>camel-azure-eventhubs</feature>
-            <feature>camel-base64</feature>
-            <feature>camel-bean-validator</feature>
-            <feature>camel-barcode</feature>
-            <feature>camel-bindy</feature>
-            <feature>camel-box</feature>
-            <feature>camel-braintree</feature>
-            <feature>camel-caffeine</feature>
-            <feature>camel-caffeine-lrucache</feature>
-            <feature>camel-cassandraql</feature>
-            <feature>camel-cbor</feature>
-            <feature>camel-chatscript</feature>
-            <feature>camel-coap</feature>
-            <feature>camel-cometd</feature>co
-            <feature>camel-consul</feature>
-            <feature>camel-couchdb</feature>
-            <feature>camel-cron</feature>
-            <feature>camel-crypto</feature>
-            <feature>camel-csv</feature>
-            <feature>camel-cxf</feature>
-            <feature>camel-digitalocean</feature>
-            <feature>camel-disruptor</feature>
-            <feature>camel-djl</feature>
-            <feature>camel-dns</feature>
-            <feature>camel-docker</feature>
-            <feature>camel-drill</feature>
-            <feature>camel-dropbox</feature>
-            <feature>camel-ehcache</feature>
-            <feature>camel-elasticsearch</feature>
-            <feature>camel-elasticsearch-rest</feature>
-            <feature>camel-eventadmin</feature>
-            <feature>camel-exec</feature>
-            <feature>camel-facebook</feature>
-            <feature>camel-fastjson</feature>
-            <feature>camel-file-watch</feature>
-            <feature>camel-flatpack</feature>
-            <feature>camel-fop</feature>
-            <feature>camel-freemarker</feature>
-            <feature>camel-ftp</feature>
-            <feature>camel-git</feature>
-            <feature>camel-github</feature>
-            <feature>camel-google-bigquery</feature>
-            <feature>camel-google-pubsub</feature>
-            <feature>camel-grape</feature>
-            <feature>camel-graphql</feature>
-            <feature>camel-groovy</feature>
-            <feature>camel-grok</feature>
-            <feature>camel-grpc</feature>
-            <feature>camel-gson</feature>
-            <feature>camel-guava-eventbus</feature>
-            <feature>camel-hazelcast</feature>
-            <feature>camel-headersmap</feature>
-            <feature>camel-hl7</feature>
-            <feature>camel-http</feature>
-            <feature>camel-ical</feature>
-            <feature>camel-iec60870</feature>
-
-            <feature>camel-influxdb</feature>
-            <feature>camel-iota</feature>
-            <feature>camel-irc</feature>
-            <feature>camel-ironmq</feature>
-            <feature>camel-jackson</feature>
-            <feature>camel-jackson-avro</feature>
-            <feature>camel-jackson-protobuf</feature>
-            <feature>camel-jacksonxml</feature>
-            <feature>camel-jasypt</feature>
-            <feature>camel-jaxb</feature>
-            <feature>camel-jcache</feature>
-            <feature>camel-jcr</feature>
-            <feature>camel-jdbc</feature>
-            <feature>camel-jira</feature>
-            <feature>camel-jetty</feature>
-            <feature>camel-jmx</feature>
-            <feature>camel-jolt</feature>
-            <feature>camel-johnzon</feature>
-            <feature>camel-jpa</feature>
-            <feature>camel-jsch</feature>
-            <feature>camel-jslt</feature>
-            <feature>camel-jsonata</feature>
-            <feature>camel-json-validator</feature>
-            <feature>camel-json-api</feature>
-            <feature>camel-jsonb</feature>
-            <feature>camel-jsonpath</feature>
-            <feature>camel-jt400</feature>
-            <feature>camel-kafka</feature>
-            <feature>camel-kamelet</feature>
-            <feature>camel-kubernetes</feature>
-            <feature>camel-kudu</feature>
-            <feature>camel-kura</feature>
-            <feature>camel-ldap</feature>
-            <feature>camel-ldif</feature>
-            <feature>camel-leveldb</feature>
-            <feature>camel-leveldb-java</feature>
-            <feature>camel-lra</feature>
-            <feature>camel-lucene</feature>
-            <feature>camel-lumberjack</feature>
-            <feature>camel-lzf</feature>
-            <feature>camel-mail</feature>
-            <feature>camel-master</feature>
-            <feature>camel-metrics</feature>
-            <feature>camel-micrometer</feature>
-            <feature>camel-mina</feature>
-            <feature>camel-minio</feature>
-            <feature>camel-mllp</feature>
-            <feature>camel-mongodb</feature>
-            <feature>camel-mongodb-gridfs</feature>
-            <feature>camel-mustache</feature>
-            <feature>camel-mvel</feature>
-            <feature>camel-mybatis</feature>
-            <feature>camel-netty</feature>
-            <feature>camel-netty-http</feature>
-            <feature>camel-nitrite</feature>
-            <feature>camel-ognl</feature>
-            <feature>camel-olingo2</feature>
-            <feature>camel-olingo4</feature>
-            <feature>camel-opentracing</feature>
-            <feature>camel-opentelemetry</feature>
-            <feature>camel-paho</feature>
-            <feature>camel-paho-mqtt5</feature>
-            <feature>camel-paxlogging</feature>
-            <feature>camel-pdf</feature>
-            <feature>camel-pg-replication-slot</feature>
-            <feature>camel-pgevent</feature>
-            <feature>camel-printer</feature>
-            <feature>camel-protobuf</feature>
-            <feature>camel-pubnub</feature>
-            <feature>camel-python</feature>
-            <feature>camel-quartz</feature>
-            <feature>camel-quickfix</feature>
-            <feature>camel-rabbitmq</feature>
-            <feature>camel-reactive-streams</feature>
-            <feature>camel-reactor</feature>
-            <feature>camel-rest-openapi</feature>
-            <feature>camel-rest-swagger</feature>
-            <feature>camel-robotframework</feature>
-            <feature>camel-rss</feature>
-            <feature>camel-sap-netweaver</feature>
-            <feature>camel-salesforce</feature>
-            <feature>camel-saxon</feature>
-            <feature>camel-schematron</feature>
-            <feature>camel-service</feature>
-            <feature>camel-servicenow</feature>
-            <feature>camel-servlet</feature>
-            <feature>camel-shiro</feature>
-            <feature>camel-sjms</feature>
-            <feature>camel-sjms2</feature>
-            <feature>camel-slack</feature>
-            <feature>camel-smpp</feature>
-            <feature>camel-snakeyaml</feature>
-            <feature>camel-snmp</feature>
-            <feature>camel-soap</feature>
-            <feature>camel-solr</feature>
-            <feature>camel-splunk</feature>
-            <feature>camel-sql</feature>
-            <feature>camel-ssh</feature>
-            <feature>camel-stax</feature>
-            <feature>camel-stream</feature>
-            <feature>camel-stomp</feature>
-            <feature>camel-string-template</feature>
-            <feature>camel-swagger-java</feature>
-            <feature>camel-openapi-java</feature>
-            <feature>camel-syslog</feature>
-            <feature>camel-tarfile</feature>
-            <feature>camel-telegram</feature>
-            <feature>camel-test</feature>
-            <feature>camel-test-karaf</feature>
-            <feature>camel-thrift</feature>
-            <feature>camel-tracing</feature>
-            <feature>camel-twilio</feature>
-            <feature>camel-twitter</feature>
-            <feature>camel-univocity-parsers</feature>
-            <feature>camel-vertx</feature>
-            <feature>camel-velocity</feature>
-            <feature>camel-weather</feature>
-            <feature>camel-websocket</feature>
-            <feature>camel-websocket-jsr356</feature>
-            <feature>camel-web3j</feature>
-            <feature>camel-webhook</feature>
-            <feature>camel-wordpress</feature>
-            <feature>camel-workday</feature>
-            <feature>camel-xchange</feature>
-            <feature>camel-xj</feature>
-            <feature>camel-xmlsecurity</feature>
-            <feature>camel-xmpp</feature>
-            <feature>camel-xslt-saxon</feature>
-            <feature>camel-xstream</feature>
-            <feature>camel-yaml-dsl</feature>
-            <feature>camel-zendesk</feature>
-            <feature>camel-zip-deflater</feature>
-            <feature>camel-zipfile</feature>
-            <feature>camel-zipkin</feature>
-            <feature>camel-zookeeper</feature>
-            <feature>camel-zookeeper-master</feature>
-
-            -->
           </installedFeatures>
-
           <libraries>
             <library>mvn:io.prometheus.jmx/jmx_prometheus_javaagent/1.0.0</library>
             <library>mvn:io.opentelemetry.javaagent/opentelemetry-javaagent/2.4.0</library>
           </libraries>
           <javase>17</javase>
-          <!-- <framework>
-             framework-logback
-           </framework>-->
-
-          <blacklistedRepositories>
-            <repository>mvn:org.apache.karaf.features/framework/[2,${karaf.version})/xml/features
-            </repository>
-            <repository>mvn:org.apache.karaf.features/standard/[2,${karaf.version})/xml/features
-            </repository>
-            <repository>mvn:org.apache.karaf.features/enterprise/[2,${karaf.version})/xml/features
-            </repository>
-            <repository>
-              mvn:org.apache.karaf.features/enterprise-legacy/[2,${karaf.version})/xml/features
-            </repository>
-            <repository>mvn:org.apache.karaf.features/spring/[2,${karaf.version})/xml/features
-            </repository>
-            <repository>
-              mvn:org.apache.karaf.features/spring-legacy/[2,${karaf.version})/xml/features
-            </repository>
-
-            <repository>mvn:org.apache.karaf.features/framework/(${karaf.version},5)/xml/features
-            </repository>
-            <repository>mvn:org.apache.karaf.features/standard/(${karaf.version},5)/xml/features
-            </repository>
-            <repository>mvn:org.apache.karaf.features/enterprise/(${karaf.version},5)/xml/features
-            </repository>
-            <repository>
-              mvn:org.apache.karaf.features/enterprise-legacy/(${karaf.version},5)/xml/features
-            </repository>
-            <repository>mvn:org.apache.karaf.features/spring/(${karaf.version},5)/xml/features
-            </repository>
-            <repository>
-              mvn:org.apache.karaf.features/spring-legacy/(${karaf.version},5)/xml/features
-            </repository>
-          </blacklistedRepositories>
-          <startupFeatures>
-            <feature>eventadmin</feature>
-          </startupFeatures>
         </configuration>
-        <!--        <extensions>true</extensions>-->
         <groupId>org.apache.karaf.tooling</groupId>
       </plugin>
     </plugins>
@@ -501,3 +179,4 @@
     </resources>
   </build>
 </project>
+
