@@ -144,8 +144,6 @@
           <archiveZip>false</archiveZip>
           <bootFeatures>
             <feature>standard</feature>
-            <feature>scr</feature>
-            <feature>spifly</feature>
             <feature>rahla</feature>
           </bootFeatures>
           <installedFeatures>

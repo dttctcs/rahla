@@ -20,6 +20,10 @@
     <feature description='${project.name}' name='${project.artifactId}' start-level="100"
              version='${project.version}'>
         <feature>camel</feature>
+        <feature>scr</feature>
+        <feature>spifly</feature>
+        <feature>pax-web-http</feature>
+        <feature>jolokia</feature>
         <config name="org.apache.felix.fileinstall-rahla" append="false">
             felix.fileinstall.dir = ${env:RAHLA_DEPLOY_PATH:-/deploy/}
             felix.fileinstall.filter = .*
