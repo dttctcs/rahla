@@ -1,5 +1,5 @@
 FROM docker.io/eclipse-temurin:17
-RUN useradd -m -d /rahla -s /bin/bash rahla
+RUN useradd -m -N -d /rahla -s /bin/bash -u 101 rahla
 USER rahla
 WORKDIR /rahla
 COPY --chown=rahla:rahla assembly/target/assembly /rahla
