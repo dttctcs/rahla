@@ -978,7 +978,7 @@
         <org.osgi.service.jpa.version>1.1.1</org.osgi.service.jpa.version>
         <org.osgi.service.log.version>1.5.0</org.osgi.service.log.version>
         <org.osgi.service.metatype.version>1.4.1</org.osgi.service.metatype.version>
-        <org.osgi.service.namespace.version>1.0.0</org.osgi.service.namespace.version>
+        <org.osgi.service.namespace.version>${jmx_exporter.version}</org.osgi.service.namespace.version>
         <org.osgi.service.repository.version>1.1.0</org.osgi.service.repository.version>
         <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
         <org.osgi.util.function.version>1.2.0</org.osgi.util.function.version>
@@ -1030,6 +1030,8 @@
         <json.version>20230227</json.version>
 
         <log4j2-appender-loki.version>0.9.32</log4j2-appender-loki.version>
+        <jmx_exporter.version>1.0.1</jmx_exporter.version>
+        <opentelemetry_agent.version>2.4.0</opentelemetry_agent.version>
     </properties>
 
     <repositories>

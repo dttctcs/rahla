@@ -19,6 +19,7 @@
 
   <artifactId>rahla</artifactId>
 
+
   <groupId>rahla.assembly</groupId>
   <modelVersion>4.0.0</modelVersion>
 
@@ -150,8 +151,8 @@
             <feature>fradi</feature>
           </installedFeatures>
           <libraries>
-            <library>mvn:io.prometheus.jmx/jmx_prometheus_javaagent/1.0.0</library>
-            <library>mvn:io.opentelemetry.javaagent/opentelemetry-javaagent/2.4.0</library>
+            <library>mvn:io.prometheus.jmx/jmx_prometheus_javaagent/${jmx_exporter.version}</library>
+            <library>mvn:io.opentelemetry.javaagent/opentelemetry-javaagent/${opentelemetry_agent.version}</library>
           </libraries>
           <javase>17</javase>
         </configuration>
