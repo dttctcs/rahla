@@ -986,7 +986,7 @@
 
 
 
-        <camel.version>3.20.5</camel.version>
+        <camel.version>3.22.2</camel.version>
         <groovy.version>3.0.19</groovy.version>
         <jackson2.version>2.15.2</jackson2.version>
         <commons-collections4.version>4.4</commons-collections4.version>
