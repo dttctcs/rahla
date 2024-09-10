@@ -54,6 +54,17 @@ public class JedisServiceImpl implements JedisSource {
   private static final String DB_KEY = "db";
   private static final String PASS_KEY = "pass";
   private static final String USER_KEY = "user";
+  private static final String TIMEOUT = "timeout";
+  private static final String MAX_TOTAL = "maxTotal";
+  private static final String MAX_IDLE = "maxIdle";
+  private static final String MIN_IDLE = "minIdle";
+  private static final String TEST_ON_BURROW = "testOnBorrow";
+  private static final String TEST_ON_RETURN = "testOnReturn";
+  private static final String TEST_WHILE_IDLE = "testWhileIdle";
+  private static final String MIN_EVICTABLE_IDLE_TIME_SECONDS = "minEvictableIdleTimeSeconds";
+  private static final String TIME_BETWEEN_EVICTION_RUNS_SECONDS = "timeBetweenEvictionRunsSeconds";
+  private static final String NUM_TESTS_PER_EVICTION_RUN = "numTestsPerEvictionRun";
+  private static final String BLOCK_WHEN_EXHAUSTED = "blockWhenExhausted";
 
   private JedisPool jedisPool;
   private String host;
@@ -63,16 +74,16 @@ public class JedisServiceImpl implements JedisSource {
   private boolean shutdown = false;
   private String user;
 
-  private int maxTotal = 256;
-  private int maxIdle = 256;
-  private int minIdle = 16;
-  private boolean testOnBorrow = true;
-  private boolean testOnReturn = true;
-  private boolean testWhileIdle = true;
-  private int minEvictableIdleTimeSeconds = 60;
-  private int timeBetweenEvictionRunsSeconds = 30;
-  private int numTestsPerEvictionRun = 3;
-  private boolean blockWhenExhausted = true;
+  private int maxTotal;
+  private int maxIdle;
+  private int minIdle;
+  private boolean testOnBorrow;
+  private boolean testOnReturn;
+  private boolean testWhileIdle;
+  private int minEvictableIdleTimeSeconds;
+  private int timeBetweenEvictionRunsSeconds;
+  private int numTestsPerEvictionRun;
+  private boolean blockWhenExhausted;
 
 
   @Activate
@@ -85,7 +96,17 @@ public class JedisServiceImpl implements JedisSource {
     db = Integer.parseInt((String) properties.getOrDefault(DB_KEY, "0"));
     user = (String) properties.getOrDefault(USER_KEY, null);
     pass = (String) properties.getOrDefault(PASS_KEY, null);
-    //TODO Make pool config configuratble
+    timeout = Integer.parseInt((String) properties.getOrDefault(TIMEOUT, "2000"));
+    maxTotal = Integer.parseInt((String) properties.getOrDefault(MAX_TOTAL, "256"));
+    maxIdle = Integer.parseInt((String) properties.getOrDefault(MAX_IDLE, "256"));
+    minIdle = Integer.parseInt((String) properties.getOrDefault(MIN_IDLE, "16"));
+    testOnBorrow = properties.getOrDefault(TEST_ON_BURROW, "true").toBoolean();
+    testOnReturn = properties.getOrDefault(TEST_ON_RETURN, "true").toBoolean();
+    testWhileIdle = properties.getOrDefault(TEST_WHILE_IDLE, "true").toBoolean();
+    minEvictableIdleTimeSeconds = Integer.parseInt((String) properties.getOrDefault(MIN_EVICTABLE_IDLE_TIME_SECONDS, "60"));
+    timeBetweenEvictionRunsSeconds = Integer.parseInt((String) properties.getOrDefault(TIME_BETWEEN_EVICTION_RUNS_SECONDS, "30"));
+    numTestsPerEvictionRun = Integer.parseInt((String) properties.getOrDefault(NUM_TESTS_PER_EVICTION_RUN, "3"));
+    blockWhenExhausted = properties.getOrDefault(BLOCK_WHEN_EXHAUSTED, "true").toBoolean();
     init();
   }
 
@@ -98,7 +119,7 @@ public class JedisServiceImpl implements JedisSource {
         log.error("action=close jedis pool, reason={}", e.getMessage());
       }
     }
-    jedisPool = new JedisPool(buildPoolConfig(), host, port, 2000, user, pass, db);
+    jedisPool = new JedisPool(buildPoolConfig(), host, port, timeout, user, pass, db);
 
     for (int i = 0; i < 120; i++) {
       try (Jedis resource = jedisPool.getResource()) {
