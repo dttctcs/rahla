@@ -93,20 +93,17 @@ public class JedisServiceImpl implements JedisSource {
 
     host = (String) properties.getOrDefault(HOST_KEY, "65536");
     port = Integer.parseInt((String) properties.getOrDefault(PORT_KEY, "6379"));
-    db = Integer.parseInt((String) properties.getOrDefault(DB_KEY, "0"));
-    user = (String) properties.getOrDefault(USER_KEY, null);
-    pass = (String) properties.getOrDefault(PASS_KEY, null);
-    timeout = Integer.parseInt((String) properties.getOrDefault(TIMEOUT, "2000"));
+    db = Integer.parseInt((String) properties.getOrDef.toBoolean()tOrDefault(TIMEOUT, "2000"));
     maxTotal = Integer.parseInt((String) properties.getOrDefault(MAX_TOTAL, "256"));
     maxIdle = Integer.parseInt((String) properties.getOrDefault(MAX_IDLE, "256"));
     minIdle = Integer.parseInt((String) properties.getOrDefault(MIN_IDLE, "16"));
-    testOnBorrow = properties.getOrDefault(TEST_ON_BURROW, "true").toBoolean();
-    testOnReturn = properties.getOrDefault(TEST_ON_RETURN, "true").toBoolean();
-    testWhileIdle = properties.getOrDefault(TEST_WHILE_IDLE, "true").toBoolean();
+    testOnBorrow = Boolean.parseBoolean(properties.getOrDefault(TEST_ON_BURROW, "true"));
+    testOnReturn = Boolean.parseBoolean(properties.getOrDefault(TEST_ON_RETURN, "true"));
+    testWhileIdle = Boolean.parseBoolean(properties.getOrDefault(TEST_WHILE_IDLE, "true"));
     minEvictableIdleTimeSeconds = Integer.parseInt((String) properties.getOrDefault(MIN_EVICTABLE_IDLE_TIME_SECONDS, "60"));
     timeBetweenEvictionRunsSeconds = Integer.parseInt((String) properties.getOrDefault(TIME_BETWEEN_EVICTION_RUNS_SECONDS, "30"));
     numTestsPerEvictionRun = Integer.parseInt((String) properties.getOrDefault(NUM_TESTS_PER_EVICTION_RUN, "3"));
-    blockWhenExhausted = properties.getOrDefault(BLOCK_WHEN_EXHAUSTED, "true").toBoolean();
+    blockWhenExhausted = Boolean.parseBoolean(properties.getOrDefault(BLOCK_WHEN_EXHAUSTED, "true"));
     init();
   }
 
