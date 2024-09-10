@@ -73,6 +73,7 @@ public class JedisServiceImpl implements JedisSource {
   private String pass;
   private boolean shutdown = false;
   private String user;
+  private int timeout;
 
   private int maxTotal;
   private int maxIdle;
@@ -100,13 +101,13 @@ public class JedisServiceImpl implements JedisSource {
     maxTotal = Integer.parseInt((String) properties.getOrDefault(MAX_TOTAL, "256"));
     maxIdle = Integer.parseInt((String) properties.getOrDefault(MAX_IDLE, "256"));
     minIdle = Integer.parseInt((String) properties.getOrDefault(MIN_IDLE, "16"));
-    testOnBorrow = Boolean.parseBoolean(properties.getOrDefault(TEST_ON_BURROW, "true"));
-    testOnReturn = Boolean.parseBoolean(properties.getOrDefault(TEST_ON_RETURN, "true"));
-    testWhileIdle = Boolean.parseBoolean(properties.getOrDefault(TEST_WHILE_IDLE, "true"));
+    testOnBorrow = Boolean.parseBoolean((String) properties.getOrDefault(TEST_ON_BURROW, "true"));
+    testOnReturn = Boolean.parseBoolean((String) properties.getOrDefault(TEST_ON_RETURN, "true"));
+    testWhileIdle = Boolean.parseBoolean((String) properties.getOrDefault(TEST_WHILE_IDLE, "true"));
     minEvictableIdleTimeSeconds = Integer.parseInt((String) properties.getOrDefault(MIN_EVICTABLE_IDLE_TIME_SECONDS, "60"));
     timeBetweenEvictionRunsSeconds = Integer.parseInt((String) properties.getOrDefault(TIME_BETWEEN_EVICTION_RUNS_SECONDS, "30"));
     numTestsPerEvictionRun = Integer.parseInt((String) properties.getOrDefault(NUM_TESTS_PER_EVICTION_RUN, "3"));
-    blockWhenExhausted = Boolean.parseBoolean(properties.getOrDefault(BLOCK_WHEN_EXHAUSTED, "true"));
+    blockWhenExhausted = Boolean.parseBoolean((String) properties.getOrDefault(BLOCK_WHEN_EXHAUSTED, "true"));
     init();
   }
 
