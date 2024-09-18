@@ -1,8 +1,8 @@
-# Changelog
+# 1.0.21 (2024-XX-XX)
 
-## Version - Date - Changes
 
-**1.0.21 - 2024-10 - Minor Update**
-- Added documentaiton
-- Version based on Camel: 3.22.2
-- Version based on Karf: 4.4.6
+### Changes
+
+* Added documentaiton
+* Camel Version : 3.22.2
+* Karf Version: 4.4.6
