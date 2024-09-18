@@ -139,6 +139,10 @@
             <library>mvn:io.prometheus.jmx/jmx_prometheus_javaagent/${jmx_exporter.version}</library>
             <library>mvn:io.opentelemetry.javaagent/opentelemetry-javaagent/${opentelemetry_agent.version}</library>
           </libraries>
+          <blacklistedBundles>
+            <bundle>mvn:org.codehaus.woodstox/stax2-api/4.2.1</bundle>
+            <bundle>mvn:org.codehaus.woodstox/woodstox-core-asl/4.4.1</bundle>
+          </blacklistedBundles>
           <javase>17</javase>
         </configuration>
         <groupId>org.apache.karaf.tooling</groupId>
