@@ -142,6 +142,7 @@
           <blacklistedBundles>
             <bundle>mvn:org.codehaus.woodstox/stax2-api/4.2.1</bundle>
             <bundle>mvn:org.codehaus.woodstox/woodstox-core-asl/4.4.1</bundle>
+            <bundle>mvn:org.yaml/snakeyaml/1.30</bundle>
           </blacklistedBundles>
           <javase>17</javase>
         </configuration>

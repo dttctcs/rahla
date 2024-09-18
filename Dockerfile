@@ -1,5 +1,6 @@
 FROM docker.io/eclipse-temurin:17
 RUN useradd -m -N -d /rahla -s /bin/bash -u 101 rahla
+RUN apt update && apt upgrade -y && apt clean
 USER rahla
 WORKDIR /rahla
 COPY --chown=rahla:rahla assembly/target/assembly /rahla
