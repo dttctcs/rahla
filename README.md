@@ -3,21 +3,35 @@
 [![Build Status](https://github.com/dttctcs/rahla/actions/workflows/build.yaml/badge.svg)](https://github.com/dttctcs/rahla/actions/workflows/build.yaml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green)](https://github.com/dttctcs/rahla/blob/main/LICENSE)
 
-Rahla is an open-source Apache Camel container meticulously crafted for deployment within Apache Karaf. It simplifies the process of building and deploying robust integration solutions leveraging the power of Camel's routing and mediation engine in an OSGi environment. 
+
+**Rahla** is an open-source Apache Camel container designed for easy deployment within Apache Karaf. It simplifies the process of building and deploying robust integration solutions by leveraging Camel’s powerful routing and mediation engine in an OSGi environment.
+
+## Key Features
+
+- **Containerized:** Rahla is packaged as a Docker container, making it easy to deploy and manage in various environments.
+- **OSGi-Enabled**: Leverages OSGi services for modularity and seamless integration with Apache Karaf.
+- **Dynamic Deployment**: Automatically detects and loads resources (jars, configurations, Camel contexts) on-the-fly from the specified deployment directory.
+- **Advanced Monitoring**: Built-in support for Prometheus and OpenTelemetry to monitor application performance.
+    * **SmartURL:**  Dynamically add URL handlers to files, MinIO, Redis, and other file-based structures.
+    * **Groovy Bean Factory:**  Compile and use Groovy beans in your Camel routes at runtime.
+    * **Template File Installer:**  Define reusable route templates in YAML files for easy configuration management.
+    * **GraphSource:**  Seamlessly interact with graph databases (e.g., JanusGraph) using Gremlin queries.
+    * **JedisSource:**  Simplify interactions with Redis databases using the Jedis library.
+    * **Siddhi Integration (Fradi Camel Component):**  Integrate Siddhi, a complex event processing engine, into your Camel routes for stream processing and SQL-like operations.
+* **Monitoring:** Rahla integrates Prometheus JMX Exporter and OpenTelemetry Agent for comprehensive monitoring and observability.
 
 
-
-## Installation and Configuration
+## Getting Started
 
 ### Prerequisites
 
-- **Container Runtime e.g. Docker:** Ensure you have basic knowledge about starting containers mounting files and directories
+- **Container Runtime (e.g., Docker)**: Basic knowledge of starting containers, mounting files, and managing directories.
 
 ### Steps to start Rahla with Docker
 
 1. **Start Rahla Distribution:**  ```mkdir deploy && docker run --rm -p 8101 -v ./deploy:/deploy datatactics/rahla:latest```
-2. **Deploy to Rahla** Deploy your jars, configs and camel context to your newly created deploy directory. Inside the container rahla watches ```/deploy``` for any changes and loads the resources dynamically. You can change this behaviour with the env variable ```RAHLA_DEPLOY_PATH``` to monitor a different directory. **Note:** this environment variable is also used for ```resource:deploy``` within camel contexts to relatively access resources.
-3. **Connect Rahla Console:** Connect to the Rahla console using SSH: ```ssh -p 8101 admin@localhost``` **Note:** Default password is ```admin``` and  can be changed via environment variable ```ADMIN_PASS```
+2. **Deploy to Rahla** Copy your jars, configs, and Camel contexts into the deploy directory. Rahla automatically monitors this directory for changes and dynamically loads new resources. To customize the deployment path, set the ```RAHLA_DEPLOY_PATH``` environment variable.
+3. **Access Rahla Console:** Connect to the Rahla console via SSH: ```ssh -p 8101 admin@localhost``` **Note:** Default password is ```admin``` and  can be changed via environment variable ```ADMIN_PASS```
 
 
 ### Kubernetes Deployment
@@ -88,11 +102,11 @@ spec:
 ```
 
 ### Build your own
-You can checkout the repo and do maven build of the project. Inside ```assembly/target/assembly/``` is the unpacked karaf application 
+You can checkout the repo and do maven ```mvn clean package``` of the project. Inside ```assembly/target/assembly/``` is the unpacked karaf application 
 
 
 ### JVM Configration
-Rahla relies on karaf so use  ```EXTRA_JAVA_OPTS``` to add additional parameters to the java virtual machine e.g. Truststore, Xmx and so on.
+Rahla relies on karaf so use  ```EXTRA_JAVA_OPTS``` to add additional parameters for the java virtual machine e.g. Truststore, Xmx and so on.
 
 ### Console
 After successfully connected to the Rahla (Karaf) Console. You have access to a standard karaf envorinment. We addeed one command ``log:logs`` in case you mount the ```log4j2.xml``` read-only.
