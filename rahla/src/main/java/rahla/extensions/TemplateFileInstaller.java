@@ -3,7 +3,6 @@ package rahla.extensions;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.apache.felix.fileinstall.ArtifactListener;
@@ -17,13 +16,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.apache.camel.spi.RouteTemplateParameterSource.TEMPLATE_ID;
-import static rahla.extensions.OsgiRouteTemplateParameterSource.*;
 
 @Component(
     service = {ArtifactInstaller.class, ArtifactListener.class},
@@ -31,10 +26,12 @@ import static rahla.extensions.OsgiRouteTemplateParameterSource.*;
     immediate = true)
 @Log4j2
 public class TemplateFileInstaller implements ArtifactInstaller {
-  public static final String TEMPLATEILE_INSTALL_PREFIX = "tmpltflnstllr::";
+  public static final String TEMPLATEILE_INSTALL_PREFIX = "rahla.extensions.TemplateFileInstaller";
+  public static final String SHARED_CONFIG_COUNTER = "shared.config.trigger.count";
   private final ObjectMapper mapper;
+  @Reference
+  private ConfigurationAdmin configurationAdmin;
 
-  @Reference private ConfigurationAdmin admin;
 
   public TemplateFileInstaller() {
     mapper = new ObjectMapper(new YAMLFactory());
@@ -43,17 +40,22 @@ public class TemplateFileInstaller implements ArtifactInstaller {
     mapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
   }
 
-  private Template fromYaml(File file) throws IOException {
+  private Templates templatesFromYaml(File file) throws IOException {
     String encoded = Files.readString(Paths.get(file.getAbsolutePath()));
-    return mapper.readValue(encoded, Template.class);
+    return mapper.readValue(encoded, Templates.class);
+  }
+
+  private Templates templateFromYaml(File file) throws IOException {
+    String encoded = Files.readString(Paths.get(file.getAbsolutePath()));
+    return mapper.readValue(encoded, Templates.class);
   }
 
   private void deleteConfig(File file) {
     String componentFilter =
         String.format("(%s=%s)", TEMPLATEILE_INSTALL_PREFIX, file.getAbsolutePath());
     try {
-      Configuration[] config = admin.listConfigurations(componentFilter);
-      if (config != null && config.length > 0) {
+      Configuration[] config = configurationAdmin.listConfigurations(componentFilter);
+      if (config != null) {
         for (Configuration configuration : config) {
           configuration.delete();
         }
@@ -65,33 +67,47 @@ public class TemplateFileInstaller implements ArtifactInstaller {
 
   private void upsertConfig(File file) {
     deleteConfig(file);
-    Template template;
+    String sharedConfigPid = null;
     try {
-      template = fromYaml(file);
-    } catch (IOException e) {
-      log.error("BUG(): {}", e.getMessage(), e);
-      return;
-    }
-    Dictionary<String, Object> config = new Hashtable<>();
-    config.put(TEMPLATE_ID, template.getTemplateId());
-    config.put(SHARED_CONFIG_PID, template.getSharedConfigPid());
-    config.put(TEMPLATEILE_INSTALL_PREFIX, file.getAbsolutePath());
-    template
-        .getRoutes()
-        .forEach(
-            routeConfig ->
-                routeConfig
-                    .getParameters()
-                    .forEach(
-                        (key, value) ->
-                            config.put(
-                                TEMPLATE_PREFIX + routeConfig.getId() + "." + key, value)));
+      Templates templatesFile = templatesFromYaml(file);
+      templateBuilder(templatesFile, file.getAbsolutePath());
+      sharedConfigPid = templatesFile.sharedConfigPid;
 
-    try {
-      Configuration factoryConfiguration = admin.createFactoryConfiguration("camel.route.template");
+    } catch (IOException ex) {
+      log.error("BUG(): {}", ex.getMessage(), ex);
+    }
+
+    if (sharedConfigPid != null) {
+      try {
+        updateSharedConfig(sharedConfigPid);
+      } catch (IOException ioException) {
+        log.error("action=update shared config, reason={}", ioException.getMessage(), ioException);
+      }
+    }
+  }
+
+  private Dictionary<String, Object> createConfig(String templateId, String id, List<Templates.Routes> routesConfigs) {
+    Dictionary<String, Object> config = new Hashtable<>();
+    config.put(TEMPLATE_ID, templateId);
+    config.put(TEMPLATEILE_INSTALL_PREFIX, id);
+    return config;
+  }
+
+
+  private void templateBuilder(Templates templatesFile, String id) throws IOException {
+    List<Dictionary<String, Object>> configs = new LinkedList<>();
+
+    if (templatesFile.templateId != null) {
+      configs.add(createConfig(templatesFile.templateId, id, templatesFile.routes));
+    }
+
+    for (Template template : templatesFile.routeTemplates) {
+      configs.add(createConfig(template.templateId, id, template.routes));
+    }
+
+    for (Dictionary<String, Object> config : configs) {
+      Configuration factoryConfiguration = configurationAdmin.createFactoryConfiguration("camel.route.template");
       factoryConfiguration.update(config);
-    } catch (IOException e) {
-      log.error("action=create config, reason={}", e.getMessage(), e);
     }
   }
 
@@ -117,7 +133,7 @@ public class TemplateFileInstaller implements ArtifactInstaller {
   public boolean canHandle(File file) {
     if (file.getName().toLowerCase().endsWith("yaml"))
       try {
-        fromYaml(file);
+        templatesFromYaml(file);
         return true;
       } catch (Exception e) {
         log.warn("action=parsing compound {}: {}", file.getName(), e.getMessage());
@@ -125,16 +141,37 @@ public class TemplateFileInstaller implements ArtifactInstaller {
     return false;
   }
 
-  @Getter
-  public static class Template {
-    private String templateId;
-    private String sharedConfigPid;
-    private List<RoutesConfig> routes;
+  private void updateSharedConfig(String sharedConfigPid) throws IOException {
+    Configuration configuration;
 
-    @Getter
-    public static class RoutesConfig {
-      private String id;
-      private Map<String, Object> parameters;
+    configuration = configurationAdmin.getConfiguration(sharedConfigPid, null);
+    Dictionary<String, Object> props = configuration.getProperties();
+    if (props == null) {
+      props = new Hashtable<>();
+    }
+    Object o = props.get(SHARED_CONFIG_COUNTER);
+    int newCnt = 0;
+    if (o != null) {
+      newCnt = ((int) o) + 1;
+    }
+    props.put(SHARED_CONFIG_COUNTER, newCnt);
+    configuration.update(props);
+  }
+
+  public static class Template {
+    String templateId;
+    List<Templates.Routes> routes;
+  }
+
+  public static class Templates extends Template{
+    String sharedConfigPid;
+    List<Template> routeTemplates;
+
+    public static class Routes {
+      String sharedConfigPid;
+      String id;
+      Map<String, Object> parameters;
     }
   }
 }
+

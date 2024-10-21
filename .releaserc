@@ -11,5 +11,7 @@
       ]
   ],
   "verifyConditions": [],
-  "publish": []
+  "publish": [],
+  "github": [],
+  "prepare": [],
 }
