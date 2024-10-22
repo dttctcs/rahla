@@ -385,7 +385,7 @@
     <artifactId>reactor</artifactId>
     <groupId>rahla</groupId>
     <relativePath>../pom.xml</relativePath>
-    <version>1.0.22</version>
+    <version>1.0.23-SNAPSHOT</version>
   </parent>
 
 </project>
