@@ -2,7 +2,6 @@ package rahla.components.fradi;
 
 import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.query.api.definition.StreamDefinition;
-import lombok.extern.log4j.Log4j2;
 import org.apache.camel.Category;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
@@ -12,6 +11,8 @@ import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
 import org.apache.camel.support.DefaultEndpoint;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ExecutorService;
 
@@ -20,8 +21,7 @@ import java.util.concurrent.ExecutorService;
  * <p>
  * TODO: Update one line description above what the component does.
  */
-@Log4j2
-@UriEndpoint(firstVersion = "1.0", scheme = "fradi", title = "fradi", syntax = "fradi:streamId", category = {Category.JAVA})
+@UriEndpoint(firstVersion = "1.0", scheme = "fradi", title = "fradi", syntax = "fradi:streamId", category = {Category.BIGDATA})
 public class FradiEndpoint extends DefaultEndpoint {
   private final FradiEngine fradiEngine;
   @UriPath
@@ -33,6 +33,7 @@ public class FradiEndpoint extends DefaultEndpoint {
   @UriParam(defaultValue = "")
   private String headerForEvents = null;
 
+  private static final Logger log = LogManager.getLogger();
 
   public FradiEndpoint(String uri, String streamId, FradiComponent component, FradiEngine fradiEngine) {
     super(uri, component);

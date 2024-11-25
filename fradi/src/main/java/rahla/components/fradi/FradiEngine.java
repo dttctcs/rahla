@@ -6,13 +6,14 @@ import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.core.stream.output.StreamCallback;
 import io.siddhi.core.table.Table;
 import io.siddhi.query.api.definition.StreamDefinition;
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@Log4j2
+
 public class FradiEngine {
   private SiddhiAppRuntime siddhiAppRuntime = null;
   private SiddhiManager siddhiManager;
-
+  private static final Logger log = LogManager.getLogger();
 
   public FradiEngine() {
     initShiddhiManager();

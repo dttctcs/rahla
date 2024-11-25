@@ -3,14 +3,16 @@ package rahla.components.fradi;
 import io.siddhi.core.util.error.handler.exception.ErrorStoreException;
 import io.siddhi.core.util.error.handler.model.ErrorEntry;
 import io.siddhi.core.util.error.handler.store.ErrorStore;
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-@Log4j2
 class LogErrorStore extends ErrorStore {
+  private static final Logger log = LogManager.getLogger();
+
   @Override
   public void setProperties(Map properties) {
 

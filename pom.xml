@@ -368,68 +368,53 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <artifactId>groovy-dateutil</artifactId>
-                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <groupId>org.apache.groovy</groupId>
                 <version>${groovy.version}</version>
+                <scope>provided</scope>
             </dependency>
-            <dependency>
-                <artifactId>groovy</artifactId>
-                <classifier>indy</classifier>
-                <groupId>org.codehaus.groovy</groupId>
-                <version>${groovy.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>groovy-cli-commons</artifactId>
-                <classifier>indy</classifier>
-                <groupId>org.codehaus.groovy</groupId>
-                <version>${groovy.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>groovy-cli-picocli</artifactId>
-                <classifier>indy</classifier>
-                <groupId>org.codehaus.groovy</groupId>
-                <version>${groovy.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>groovy-console</artifactId>
-                <classifier>indy</classifier>
-                <groupId>org.codehaus.groovy</groupId>
-                <version>${groovy.version}</version>
-            </dependency>
+
             <dependency>
                 <artifactId>groovy-datetime</artifactId>
-                <classifier>indy</classifier>
-                <groupId>org.codehaus.groovy</groupId>
+                <groupId>org.apache.groovy</groupId>
                 <version>${groovy.version}</version>
             </dependency>
+            <dependency>
+                <artifactId>groovy-dateutil</artifactId>
+                <groupId>org.apache.groovy</groupId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <artifactId>groovy-jmx</artifactId>
+                <groupId>org.apache.groovy</groupId>
+                <version>${groovy.version}</version>
+            </dependency>
+
             <dependency>
                 <artifactId>groovy-json</artifactId>
-                <classifier>indy</classifier>
-                <groupId>org.codehaus.groovy</groupId>
+                <groupId>org.apache.groovy</groupId>
                 <version>${groovy.version}</version>
             </dependency>
-            <dependency>
-                <artifactId>groovy-macro</artifactId>
-                <classifier>indy</classifier>
-                <groupId>org.codehaus.groovy</groupId>
-                <version>${groovy.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>groovy-nio</artifactId>
-                <classifier>indy</classifier>
-                <groupId>org.codehaus.groovy</groupId>
-                <version>${groovy.version}</version>
-            </dependency>
+
+
             <dependency>
                 <artifactId>groovy-sql</artifactId>
-                <classifier>indy</classifier>
-                <groupId>org.codehaus.groovy</groupId>
+                <groupId>org.apache.groovy</groupId>
                 <version>${groovy.version}</version>
             </dependency>
+
+
             <dependency>
-                <artifactId>groovy-swing</artifactId>
-                <classifier>indy</classifier>
-                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-yaml</artifactId>
+                <groupId>org.apache.groovy</groupId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <artifactId>groovy-xml</artifactId>
+                <groupId>org.apache.groovy</groupId>
                 <version>${groovy.version}</version>
             </dependency>
             <dependency>
@@ -970,13 +955,13 @@
 
 
 
-        <camel.version>3.22.2</camel.version>
-        <groovy.version>3.0.19</groovy.version>
-        <jackson2.version>2.17.2</jackson2.version>
+        <camel.version>4.8.1</camel.version>
+        <groovy.version>4.0.22</groovy.version>
+        <jackson2.version>2.18.1</jackson2.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>
         <pax-logging.version>2.2.7</pax-logging.version>
-        <lombok.version>1.18.28</lombok.version>
+        <lombok.version>1.18.36</lombok.version>
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
         <org.apache.aries.jax.rs.features.version>2.0.2</org.apache.aries.jax.rs.features.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>

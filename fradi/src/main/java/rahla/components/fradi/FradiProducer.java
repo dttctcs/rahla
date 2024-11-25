@@ -3,9 +3,10 @@ package rahla.components.fradi;
 import io.siddhi.core.event.Event;
 import io.siddhi.core.stream.input.InputHandler;
 import io.siddhi.query.api.definition.Attribute;
-import lombok.extern.log4j.Log4j2;
 import org.apache.camel.Exchange;
 import org.apache.camel.support.DefaultProducer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -14,13 +15,12 @@ import java.util.Map;
 
 import static rahla.components.fradi.FradiComponent.FRADI_TIMESTAMP_HEADER;
 
-@Log4j2
 public class FradiProducer extends DefaultProducer {
   private final String streamId;
   private final FradiEngine fradiEngine;
   private final InputHandler inputHandler;
   private FradiEndpoint endpoint;
-
+  private static final Logger log = LogManager.getLogger();
 
   public FradiProducer(FradiEndpoint endpoint, String streamId, FradiEngine fradiEngine) {
     super(endpoint);

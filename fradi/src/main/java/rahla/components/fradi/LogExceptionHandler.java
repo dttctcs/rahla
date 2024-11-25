@@ -1,12 +1,12 @@
 package rahla.components.fradi;
 
 import com.lmax.disruptor.ExceptionHandler;
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@Log4j2
 class LogExceptionHandler implements ExceptionHandler<Object> {
   private final String name;
-
+  private static final Logger log = LogManager.getLogger();
   public LogExceptionHandler(String name) {
     this.name = name;
   }

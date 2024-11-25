@@ -43,13 +43,13 @@
     </dependency>
     
 
-    <!-- testing -->
+    <!--
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-test</artifactId>
       <scope>test</scope>
     </dependency>
-
+testing -->
 
     <dependency>
       <groupId>org.apache.camel</groupId>

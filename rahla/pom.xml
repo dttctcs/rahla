@@ -50,12 +50,13 @@
   </build>
 
   <dependencies>
-    <dependency>
-      <groupId>org.apache.camel</groupId>
-      <artifactId>camel-opentracing</artifactId>
-      <version>${camel.version}</version>
-      <scope>provided</scope>
-    </dependency>
+    <!--  <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-opentracing</artifactId>
+        <version>${camel.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      -->
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-opentelemetry</artifactId>
@@ -191,36 +192,51 @@
       <artifactId>org.apache.felix.fileinstall</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <artifactId>groovy-dateutil</artifactId>
-      <groupId>org.codehaus.groovy</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>groovy</artifactId>
-      <classifier>indy</classifier>
-      <groupId>org.codehaus.groovy</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>groovy-cli-commons</artifactId>
-      <classifier>indy</classifier>
-      <groupId>org.codehaus.groovy</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>groovy-cli-picocli</artifactId>
-      <classifier>indy</classifier>
-      <groupId>org.codehaus.groovy</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>groovy-console</artifactId>
-      <classifier>indy</classifier>
-      <groupId>org.codehaus.groovy</groupId>
-    </dependency>
+
+  <!--  <dependency>
+      <artifactId>groovy-all</artifactId>
+      <groupId>org.apache.groovy</groupId>
+      <scope>provided</scope>
+    </dependency>-->
+
     <dependency>
       <artifactId>groovy-datetime</artifactId>
-      <classifier>indy</classifier>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
+      <version>${groovy.version}</version>
     </dependency>
 
+    <dependency>
+      <artifactId>groovy-dateutil</artifactId>
+      <groupId>org.apache.groovy</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>groovy-jmx</artifactId>
+      <groupId>org.apache.groovy</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>groovy-json</artifactId>
+      <groupId>org.apache.groovy</groupId>
+    </dependency>
+
+
+    <dependency>
+      <artifactId>groovy-sql</artifactId>
+      <groupId>org.apache.groovy</groupId>
+    </dependency>
+
+
+    <dependency>
+      <artifactId>groovy-yaml</artifactId>
+      <groupId>org.apache.groovy</groupId>
+    </dependency>
+
+
+    <dependency>
+      <artifactId>groovy-xml</artifactId>
+      <groupId>org.apache.groovy</groupId>
+    </dependency>
 
     <dependency>
       <artifactId>org.apache.karaf.shell.core</artifactId>
@@ -237,44 +253,6 @@
       <artifactId>pax-logging-api</artifactId>
       <groupId>org.ops4j.pax.logging</groupId>
       <scope>provided</scope>
-    </dependency>
-
-
-    <dependency>
-      <artifactId>groovy-json</artifactId>
-      <classifier>indy</classifier>
-      <groupId>org.codehaus.groovy</groupId>
-    </dependency>
-
-    <dependency>
-      <artifactId>groovy-macro</artifactId>
-      <classifier>indy</classifier>
-      <groupId>org.codehaus.groovy</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>groovy-nio</artifactId>
-      <classifier>indy</classifier>
-      <groupId>org.codehaus.groovy</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>groovy-sql</artifactId>
-      <classifier>indy</classifier>
-      <groupId>org.codehaus.groovy</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>groovy-swing</artifactId>
-      <classifier>indy</classifier>
-      <groupId>org.codehaus.groovy</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>groovy-templates</artifactId>
-      <classifier>indy</classifier>
-      <groupId>org.codehaus.groovy</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>groovy-xml</artifactId>
-      <classifier>indy</classifier>
-      <groupId>org.codehaus.groovy</groupId>
     </dependency>
 
     <dependency>
