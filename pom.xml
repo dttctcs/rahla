@@ -936,7 +936,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 
-        <karaf.version>4.4.6</karaf.version>
+        <karaf.version>4.4.7</karaf.version>
         <osgi.version>8.0.0</osgi.version>
         <org.osgi.service.cm.version>1.6.1</org.osgi.service.cm.version>
         <org.osgi.service.component.version>1.5.1</org.osgi.service.component.version>
@@ -957,10 +957,10 @@
 
         <camel.version>4.9.0</camel.version>
         <groovy.version>4.0.22</groovy.version>
-        <jackson2.version>2.18.1</jackson2.version>
+        <jackson2.version>2.18.2</jackson2.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>
-        <pax-logging.version>2.2.7</pax-logging.version>
+        <pax-logging.version>2.2.8</pax-logging.version>
         <lombok.version>1.18.36</lombok.version>
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
         <org.apache.aries.jax.rs.features.version>2.0.2</org.apache.aries.jax.rs.features.version>
