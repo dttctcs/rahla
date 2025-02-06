@@ -140,7 +140,7 @@
 
             <feature>pax-url-wrap</feature>
             <feature>shell</feature>
-
+            <feature>shel-compat</feature>
             <feature>feature</feature>
             <feature>jaas</feature>
             <feature>ssh</feature>
