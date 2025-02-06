@@ -955,7 +955,7 @@
 
 
 
-        <camel.version>4.8.1</camel.version>
+        <camel.version>4.9.0</camel.version>
         <groovy.version>4.0.22</groovy.version>
         <jackson2.version>2.18.1</jackson2.version>
         <commons-collections4.version>4.4</commons-collections4.version>
