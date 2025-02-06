@@ -1000,7 +1000,7 @@
 
         <log4j2-appender-loki.version>0.9.32</log4j2-appender-loki.version>
         <jmx_exporter.version>1.0.1</jmx_exporter.version>
-        <opentelemetry_agent.version>2.4.0</opentelemetry_agent.version>
+        <opentelemetry_agent.version>2.12.0</opentelemetry_agent.version>
     </properties>
 
     <repositories>

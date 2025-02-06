@@ -6,7 +6,7 @@ WORKDIR /rahla
 COPY --chown=rahla:rahla assembly/target/assembly /rahla
 ENV PATH $PATH:/rahla/bin
 ENV KARAF_EXEC exec
-ENV KARAF_SYSTEM_OPTS -javaagent:./lib/jmx_prometheus_javaagent-1.0.1.jar=9001:etc/config.yaml -javaagent:./lib/opentelemetry-javaagent-2.4.0.jar
+ENV KARAF_SYSTEM_OPTS -javaagent:./lib/jmx_prometheus_javaagent-1.0.1.jar=9001:etc/config.yaml -javaagent:./lib/opentelemetry-javaagent-2.12.0.jar
 ENV OTEL_LOGS_EXPORTER none
 ENV OTEL_METRICS_EXPORTER none
 ENV OTEL_TRACES_EXPORTER none
