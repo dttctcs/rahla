@@ -315,6 +315,12 @@
                 <version>${pax-logging.version}</version>
             </dependency>
             <dependency>
+                <artifactId>stax2-api</artifactId>
+                <groupId>org.codehaus.woodstox</groupId>
+                <scope>compile</scope>
+                <version>${stax2-api.version}</version>
+            </dependency>
+            <dependency>
                 <artifactId>pax-logging-log4j2</artifactId>
                 <groupId>org.ops4j.pax.logging</groupId>
                 <scope>provided</scope>
@@ -973,19 +979,16 @@
         <siddhi-store-rdbms.version>7.0.16-dtacs</siddhi-store-rdbms.version>
         <siddhi.version>5.1.24-dt</siddhi.version>
         <disruptor.version>3.4.2</disruptor.version>
-        <log4j2.version>2.18.0</log4j2.version>
+        <log4j2.version>2.24.3</log4j2.version>
 
         <janusgraph-driver.version>1.0.0</janusgraph-driver.version>
-        <gremlin-groovy.version>3.7.1</gremlin-groovy.version>
-        <gremlin-driver-bundle.version>3.6.5_1</gremlin-driver-bundle.version>
-        <commons-configuration2.version>2.9.0</commons-configuration2.version>
-        <snappy-java.version>1.1.8.4</snappy-java.version>
-        <minio.version>8.4.6</minio.version>
-        <kotlin-osgi-bundle.version>1.7.20</kotlin-osgi-bundle.version>
-        <jedis.version>4.4.3</jedis.version>
+        <gremlin-groovy.version>3.7.3</gremlin-groovy.version>
+        <commons-configuration2.version>2.11.0</commons-configuration2.version>
+        <snappy-java.version>1.1.10.7</snappy-java.version>
+        <minio.version>8.5.17</minio.version>
+        <jedis.version>5.2.0</jedis.version>
 
         <guava.version>23.6.1-jre</guava.version>
-        <saaj-api.version>1.4_2</saaj-api.version>
 
         <maven-bundle-plugin.version>5.1.8</maven-bundle-plugin.version>
         <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
@@ -996,11 +999,11 @@
 
         <org.apache.aries.component-dsl.component-dsl.version>1.2.2
         </org.apache.aries.component-dsl.component-dsl.version>
-        <json.version>20230227</json.version>
 
         <log4j2-appender-loki.version>0.9.32</log4j2-appender-loki.version>
         <jmx_exporter.version>1.0.1</jmx_exporter.version>
         <opentelemetry_agent.version>2.12.0</opentelemetry_agent.version>
+        <stax2-api.version>4.2.2</stax2-api.version>
     </properties>
 
     <repositories>
