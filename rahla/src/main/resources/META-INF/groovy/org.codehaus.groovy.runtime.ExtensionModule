@@ -1,3 +1,4 @@
+groovy
 moduleName=groovy-multi
 moduleVersion=4.0.25
 extensionClasses=org.apache.groovy.datetime.extensions.DateTimeExtensions,org.apache.groovy.dateutil.extensions.DateUtilExtensions,org.codehaus.groovy.jsr223.ScriptExtensions,org.apache.groovy.sql.extensions.SqlExtensions,org.apache.groovy.swing.extensions.SwingExtensions,org.apache.groovy.xml.extensions.XmlExtensions
