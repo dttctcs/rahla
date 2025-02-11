@@ -174,6 +174,7 @@
             <library>mvn:io.opentelemetry.javaagent/opentelemetry-javaagent/${opentelemetry_agent.version}</library>
           </libraries>
           <blacklistedBundles>
+            <bundle>mvn:org.apache.groovy/groovy/[4,5)</bundle>
             <!--<bundle>mvn:org.codehaus.woodstox/stax2-api/4.2.1</bundle>
             <bundle>mvn:org.codehaus.woodstox/woodstox-core-asl/4.4.1</bundle>
             <bundle>mvn:org.yaml/snakeyaml/1.30</bundle>-->

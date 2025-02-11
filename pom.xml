@@ -373,56 +373,140 @@
                 <version>${org.apache.felix.fileinstall.version}</version>
                 <scope>provided</scope>
             </dependency>
+
             <dependency>
-                <artifactId>groovy-all</artifactId>
                 <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-ant</artifactId>
                 <version>${groovy.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-ginq</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-cli-picocli</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-console</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-datetime</artifactId>
-                <groupId>org.apache.groovy</groupId>
                 <version>${groovy.version}</version>
             </dependency>
+
             <dependency>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-dateutil</artifactId>
-                <groupId>org.apache.groovy</groupId>
                 <version>${groovy.version}</version>
             </dependency>
 
             <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-docgenerator</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-groovydoc</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-groovysh</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-jmx</artifactId>
-                <groupId>org.apache.groovy</groupId>
                 <version>${groovy.version}</version>
             </dependency>
 
             <dependency>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-json</artifactId>
-                <groupId>org.apache.groovy</groupId>
                 <version>${groovy.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-jsr223</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
 
             <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-macro</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-nio</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-servlet</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-sql</artifactId>
-                <groupId>org.apache.groovy</groupId>
                 <version>${groovy.version}</version>
             </dependency>
 
-
             <dependency>
-                <artifactId>groovy-yaml</artifactId>
                 <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-swing</artifactId>
                 <version>${groovy.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-templates</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
 
             <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-test</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-test-junit5</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-xml</artifactId>
-                <groupId>org.apache.groovy</groupId>
                 <version>${groovy.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-yaml</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+
             <dependency>
                 <artifactId>jedis</artifactId>
                 <exclusions>
@@ -962,7 +1046,7 @@
 
 
         <camel.version>4.9.0</camel.version>
-        <groovy.version>4.0.22</groovy.version>
+        <groovy.version>4.0.25</groovy.version>
         <jackson2.version>2.18.2</jackson2.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <artifactId>rahla</artifactId>
   <build>
@@ -8,6 +9,39 @@
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-services-maven-plugin</artifactId>
       </plugin>
+
+<!--
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.apache.groovy</groupId>
+                  <artifactId>groovy-datetime</artifactId>
+                  <outputDirectory>${project.build.directory}/</outputDirectory>
+                  <includes>**/org.codehaus.groovy.runtime.ExtensionModule</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.groovy</groupId>
+                  <artifactId>groovy-dateutil</artifactId>
+                  <outputDirectory>${project.build.directory}/</outputDirectory>
+                  <includes>**/DateUtilExtensions.class,**/DateUtilStaticExtensions.class</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+-->
+
       <plugin>
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
@@ -16,6 +50,12 @@
             <Bundle-Version>${project.version}</Bundle-Version>
             <Export-Package>
               rahla.*;version=${project.version},
+              org.apache.groovy.*,
+              org.codehaus.groovy.*,
+              groovy.*,
+              groovyjarjarantlr4.*,
+              groovyjarjarasm.*,
+              groovyjarjarpicocli.*,
               <!-- org.apache.tinkerpop.gremlin.*-->
             </Export-Package>
             <DynamicImport-Package>*</DynamicImport-Package>
@@ -37,7 +77,20 @@
               org.javatuples*,
               org.yaml.snakeyaml*,
               io.netty.*,
+              org.apache.groovy.*,
+              org.codehaus.groovy.*,
+              groovy.*,
+              groovyjarjarantlr4.*,
+              groovyjarjarasm.*,
+              groovyjarjarpicocli.*,
             </Private-Package>
+    <!--        <Include-Resource>
+              {maven-resources},
+              org/apache/groovy/datetime/extensions/DateTimeExtensions.class=target/org/apache/groovy/datetime/extensions/DateTimeExtensions.class,
+              org/apache/groovy/datetime/extensions/DateTimeStaticExtensions.class=target/org/apache/groovy/datetime/extensions/DateTimeStaticExtensions.class,
+              org/apache/groovy/dateutil/extensions/DateUtilExtensions.class=target/org/apache/groovy/dateutil/extensions/DateUtilExtensions.class,
+              org/apache/groovy/dateutil/extensions/DateUtilStaticExtensions.class=target/org/apache/groovy/dateutil/extensions/DateUtilStaticExtensions.class,
+            </Include-Resource>-->
           </instructions>
         </configuration>
         <groupId>org.apache.felix</groupId>
@@ -193,49 +246,142 @@
       <scope>provided</scope>
     </dependency>
 
-  <!--  <dependency>
-      <artifactId>groovy-all</artifactId>
+    <!--  <dependency>
+        <artifactId>groovy-all</artifactId>
+        <groupId>org.apache.groovy</groupId>
+        <scope>provided</scope>
+      </dependency>-->
+
+    <dependency>
       <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-ant</artifactId>
       <scope>provided</scope>
-    </dependency>-->
+    </dependency>
 
     <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-ginq</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-cli-picocli</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-console</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-datetime</artifactId>
-      <groupId>org.apache.groovy</groupId>
-      <version>${groovy.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-dateutil</artifactId>
-      <groupId>org.apache.groovy</groupId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-docgenerator</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-groovydoc</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-groovysh</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-jmx</artifactId>
-      <groupId>org.apache.groovy</groupId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-json</artifactId>
-      <groupId>org.apache.groovy</groupId>
+      <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-jsr223</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-macro</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-nio</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-servlet</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-sql</artifactId>
-      <groupId>org.apache.groovy</groupId>
+      <scope>provided</scope>
     </dependency>
 
-
     <dependency>
-      <artifactId>groovy-yaml</artifactId>
       <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-swing</artifactId>
+      <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-templates</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-test</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-test-junit5</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-xml</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy-yaml</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -351,7 +497,7 @@
       </dependency>-->
   </dependencies>
 
-  <description />
+  <description/>
 
   <modelVersion>4.0.0</modelVersion>
 
