@@ -6,7 +6,7 @@
         <artifactId>reactor</artifactId>
         <groupId>rahla</groupId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.1.1-SNAPSHOT</version>
+        <version>1.1.1</version>
     </parent>
 
     <artifactId>loki-appender</artifactId>
