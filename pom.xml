@@ -376,6 +376,12 @@
 
             <dependency>
                 <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-ant</artifactId>
                 <version>${groovy.version}</version>
             </dependency>

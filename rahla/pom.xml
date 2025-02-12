@@ -10,7 +10,7 @@
         <artifactId>karaf-services-maven-plugin</artifactId>
       </plugin>
 
-<!--
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -25,22 +25,17 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.apache.groovy</groupId>
-                  <artifactId>groovy-datetime</artifactId>
-                  <outputDirectory>${project.build.directory}/</outputDirectory>
-                  <includes>**/org.codehaus.groovy.runtime.ExtensionModule</includes>
+                  <artifactId>groovy</artifactId>
+                  <outputDirectory>${project.build.directory}/unpack</outputDirectory>
+                  <includes>**/dgminfo</includes>
                 </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.groovy</groupId>
-                  <artifactId>groovy-dateutil</artifactId>
-                  <outputDirectory>${project.build.directory}/</outputDirectory>
-                  <includes>**/DateUtilExtensions.class,**/DateUtilStaticExtensions.class</includes>
-                </artifactItem>
+
               </artifactItems>
             </configuration>
           </execution>
         </executions>
       </plugin>
--->
+
 
       <plugin>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -84,13 +79,10 @@
               groovyjarjarasm.*,
               groovyjarjarpicocli.*,
             </Private-Package>
-    <!--        <Include-Resource>
+            <Include-Resource>
               {maven-resources},
-              org/apache/groovy/datetime/extensions/DateTimeExtensions.class=target/org/apache/groovy/datetime/extensions/DateTimeExtensions.class,
-              org/apache/groovy/datetime/extensions/DateTimeStaticExtensions.class=target/org/apache/groovy/datetime/extensions/DateTimeStaticExtensions.class,
-              org/apache/groovy/dateutil/extensions/DateUtilExtensions.class=target/org/apache/groovy/dateutil/extensions/DateUtilExtensions.class,
-              org/apache/groovy/dateutil/extensions/DateUtilStaticExtensions.class=target/org/apache/groovy/dateutil/extensions/DateUtilStaticExtensions.class,
-            </Include-Resource>-->
+              META-INF/dgminfo=target/unpack/META-INF/dgminfo
+            </Include-Resource>
           </instructions>
         </configuration>
         <groupId>org.apache.felix</groupId>
