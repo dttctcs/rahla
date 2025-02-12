@@ -1,3 +1,10 @@
+# 1.1.1 (2025-02-12)
+
+
+### Changes
+
+* Shaded Groovy Libs into Rahla bundle until groovy 4 is implemented as an fragment host
+
 # 1.1.0 (2025-02-07)
 
 
