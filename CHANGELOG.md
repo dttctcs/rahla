@@ -1,3 +1,11 @@
+# 1.1.2 (2025-02-26)
+
+
+### Bug Fix
+
+* Added Capabilities to handle SpiFly handling for ServiceLoader
+
+
 # 1.1.1 (2025-02-12)
 
 

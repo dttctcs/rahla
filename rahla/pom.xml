@@ -53,6 +53,18 @@
               <!-- org.apache.tinkerpop.gremlin.*-->
             </Export-Package>
             <DynamicImport-Package>*</DynamicImport-Package>
+            <Require-Capability>
+              osgi.extender;filter:="(osgi.extender=osgi.serviceloader.registrar)",
+              osgi.extender;filter:="(osgi.extender=osgi.serviceloader.processor)",
+              osgi.serviceloader;filter:="(osgi.serviceloader=org.apache.groovy.json.FastStringServiceFactory)";cardinality:=multiple,osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.8))",
+              osgi.serviceloader;filter:="(osgi.serviceloader=javax.script.ScriptEngineFactory)";cardinality:=multiple,osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.8))",
+              osgi.serviceloader;filter:="(osgi.serviceloader=org.codehaus.groovy.transform.ASTTransformation)";cardinality:=multiple,osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.8))",
+            </Require-Capability>
+            <Provide-Capability>
+              osgi.serviceloader;osgi.serviceloader="org.apache.groovy.json.FastStringServiceFactory",
+              osgi.serviceloader;osgi.serviceloader="javax.script.ScriptEngineFactory",
+              osgi.serviceloader;osgi.serviceloader="org.codehaus.groovy.transform.ASTTransformation",
+            </Provide-Capability>
             <Import-Package>
               org.apache.camel.catalog,
               org.apache.karaf.shell*;version="[4,5)",
@@ -94,13 +106,6 @@
   </build>
 
   <dependencies>
-    <!--  <dependency>
-        <groupId>org.apache.camel</groupId>
-        <artifactId>camel-opentracing</artifactId>
-        <version>${camel.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      -->
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-opentelemetry</artifactId>
@@ -108,17 +113,6 @@
       <scope>provided</scope>
     </dependency>
 
-
-    <!--
-    <dependency>
-        <artifactId>slf4j-log4j12</artifactId>
-        <groupId>org.slf4j</groupId>
-    </dependency>
-    -->
-    <!--<dependency>
-      <groupId>org.ops4j.pax.logging</groupId>
-      <artifactId>pax-logging-log4j2</artifactId>
-    </dependency>-->
     <dependency>
       <artifactId>osgi.core</artifactId>
       <groupId>org.osgi</groupId>
@@ -183,20 +177,11 @@
       <artifactId>org.osgi.util.promise</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!--
-            <dependency>
-                <artifactId>javax.ws.rs-api</artifactId>
-                <groupId>javax.ws.rs</groupId>
-            </dependency>-->
     <dependency>
       <artifactId>lombok</artifactId>
       <groupId>org.projectlombok</groupId>
       <scope>provided</scope>
     </dependency>
-    <!--    <dependency>
-            <artifactId>javax.servlet-api</artifactId>
-            <groupId>javax.servlet</groupId>
-        </dependency>-->
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-core</artifactId>
@@ -236,12 +221,6 @@
       <artifactId>org.apache.felix.fileinstall</artifactId>
       <scope>provided</scope>
     </dependency>
-
-    <!--  <dependency>
-        <artifactId>groovy-all</artifactId>
-        <groupId>org.apache.groovy</groupId>
-        <scope>provided</scope>
-      </dependency>-->
 
     <dependency>
       <groupId>org.apache.groovy</groupId>
@@ -504,3 +483,4 @@
   </parent>
 
 </project>
+
