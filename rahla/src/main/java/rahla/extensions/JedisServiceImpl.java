@@ -37,6 +37,7 @@ public class JedisServiceImpl implements JedisSource {
   private static final String TEST_ON_BURROW = "testOnBorrow";
   private static final String TEST_ON_RETURN = "testOnReturn";
   private static final String TEST_WHILE_IDLE = "testWhileIdle";
+  private static final String SSL = "ssl";
   private static final String MIN_EVICTABLE_IDLE_TIME_SECONDS = "minEvictableIdleTimeSeconds";
   private static final String TIME_BETWEEN_EVICTION_RUNS_SECONDS = "timeBetweenEvictionRunsSeconds";
   private static final String NUM_TESTS_PER_EVICTION_RUN = "numTestsPerEvictionRun";
@@ -57,6 +58,7 @@ public class JedisServiceImpl implements JedisSource {
   private boolean testOnBorrow;
   private boolean testOnReturn;
   private boolean testWhileIdle;
+  private boolean ssl;
   private int minEvictableIdleTimeSeconds;
   private int timeBetweenEvictionRunsSeconds;
   private int numTestsPerEvictionRun;
@@ -80,6 +82,7 @@ public class JedisServiceImpl implements JedisSource {
     testOnBorrow = Boolean.parseBoolean((String) properties.getOrDefault(TEST_ON_BURROW, "true"));
     testOnReturn = Boolean.parseBoolean((String) properties.getOrDefault(TEST_ON_RETURN, "true"));
     testWhileIdle = Boolean.parseBoolean((String) properties.getOrDefault(TEST_WHILE_IDLE, "true"));
+    ssl = Boolean.parseBoolean((String) properties.getOrDefault(SSL, "false"));
     minEvictableIdleTimeSeconds = Integer.parseInt((String) properties.getOrDefault(MIN_EVICTABLE_IDLE_TIME_SECONDS, "60"));
     timeBetweenEvictionRunsSeconds = Integer.parseInt((String) properties.getOrDefault(TIME_BETWEEN_EVICTION_RUNS_SECONDS, "30"));
     numTestsPerEvictionRun = Integer.parseInt((String) properties.getOrDefault(NUM_TESTS_PER_EVICTION_RUN, "3"));
@@ -96,7 +99,7 @@ public class JedisServiceImpl implements JedisSource {
         log.error("action=close jedis pool, reason={}", e.getMessage());
       }
     }
-    jedisPool = new JedisPool(buildPoolConfig(), host, port, timeout, user, pass, db);
+    jedisPool = new JedisPool(buildPoolConfig(), host, port, timeout, user, pass, db, ssl);
 
     for (int i = 0; i < 120; i++) {
       try (Jedis resource = jedisPool.getResource()) {
