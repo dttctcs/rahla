@@ -3,6 +3,8 @@
 
     <feature description='${project.name}' name='${project.artifactId}' start-level="100"
              version='${project.version}'>
+
+
     </feature>
 
 
