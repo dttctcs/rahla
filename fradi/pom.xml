@@ -73,6 +73,10 @@ testing -->
       <groupId>io.siddhi</groupId>
     </dependency>
     <dependency>
+      <artifactId>siddhi-execution-json</artifactId>
+      <groupId>io.siddhi.extension.execution.json</groupId>
+    </dependency>
+    <dependency>
       <artifactId>siddhi-execution-string</artifactId>
       <groupId>io.siddhi.extension.execution.string</groupId>
     </dependency>

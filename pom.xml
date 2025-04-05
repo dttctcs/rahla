@@ -703,6 +703,26 @@
                 <version>${siddhi.version}</version>
             </dependency>
             <dependency>
+                <artifactId>siddhi-execution-json</artifactId>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>log4j</artifactId>
+                        <groupId>org.apache.log4j.wso2</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-core</artifactId>
+                    </exclusion>
+
+                </exclusions>
+                <groupId>io.siddhi.extension.execution.json</groupId>
+                <version>${siddhi-execution-json.version}</version>
+            </dependency>
+            <dependency>
                 <artifactId>siddhi-execution-string</artifactId>
                 <exclusions>
                     <exclusion>
@@ -1064,6 +1084,7 @@
         <opentelemetry.version>1.21.0</opentelemetry.version>
 
         <siddhi-execution-regex.version>5.0.7</siddhi-execution-regex.version>
+        <siddhi-execution-json.version>2.0.5</siddhi-execution-json.version>
         <siddhi-execution-string.version>5.0.12</siddhi-execution-string.version>
         <siddhi-execution-unique.version>5.0.5</siddhi-execution-unique.version>
         <siddhi-store-rdbms.version>7.0.16-dtacs</siddhi-store-rdbms.version>
