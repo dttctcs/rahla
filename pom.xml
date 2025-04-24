@@ -1015,6 +1015,7 @@
         <module>rahla</module>
         <module>loki-appender</module>
         <module>fradi</module>
+        <module>janussource</module>
         <module>features/rahla</module>
         <module>features/logging</module>
         <module>features/fradi</module>
@@ -1026,7 +1027,7 @@
 
     <packaging>pom</packaging>
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
         <dependency.locations.enabled>false</dependency.locations.enabled>
         <getRevisionOnce>false</getRevisionOnce>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -1080,12 +1081,12 @@
 
         <guava.version>23.6.1-jre</guava.version>
 
-        <maven-bundle-plugin.version>5.1.8</maven-bundle-plugin.version>
+        <maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
         <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
         <maven-deploy-plugin.version>3.1.0</maven-deploy-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-install-plugin.version>3.1.0</maven-install-plugin.version>
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
 
         <org.apache.aries.component-dsl.component-dsl.version>1.2.2
         </org.apache.aries.component-dsl.component-dsl.version>
@@ -1094,6 +1095,7 @@
         <jmx_exporter.version>1.0.1</jmx_exporter.version>
         <opentelemetry_agent.version>2.12.0</opentelemetry_agent.version>
         <stax2-api.version>4.2.2</stax2-api.version>
+        <maven.compiler.proc>full</maven.compiler.proc>
     </properties>
 
     <repositories>

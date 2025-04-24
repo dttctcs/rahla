@@ -131,43 +131,21 @@
           <startupFeatures>
             <feature>rahla-logging</feature>
             <feature>wrap</feature>
-
-
-
           </startupFeatures>
           <bootFeatures>
-
-            <feature>pax-url-wrap</feature>
-            <feature>shell</feature>
-            <feature>shel-compat</feature>
-            <feature>feature</feature>
-            <feature>jaas</feature>
-            <feature>ssh</feature>
-            <feature>management</feature>
-            <feature>bundle</feature>
-            <feature>config</feature>
-            <feature>deployer</feature>
-            <feature>diagnostic</feature>
-            <feature>feature</feature>
-            <feature>instance</feature>
-            <feature>kar</feature>
-            <feature>log</feature>
-            <feature>package</feature>
-            <feature>service</feature>
-            <feature>system</feature>
+            <feature>standard</feature>
             <feature>scr</feature>
             <feature>spifly</feature>
             <feature>pax-web-http</feature>
             <feature>jolokia</feature>
-             <feature>camel</feature>
 
-            <feature>rahla</feature>
 
 
           </bootFeatures>
           <installedFeatures>
-
+            <feature>rahla</feature>
             <feature>fradi</feature>
+
           </installedFeatures>
           <libraries>
             <library>mvn:io.prometheus.jmx/jmx_prometheus_javaagent/${jmx_exporter.version}</library>
@@ -175,6 +153,7 @@
           </libraries>
           <blacklistedBundles>
             <bundle>mvn:org.apache.groovy/groovy/[4,5)</bundle>
+            <bundle>mvn:com.fasterxml.woodstox/woodstox-core/7.0.0</bundle>
             <!--<bundle>mvn:org.codehaus.woodstox/stax2-api/4.2.1</bundle>
             <bundle>mvn:org.codehaus.woodstox/woodstox-core-asl/4.4.1</bundle>
             <bundle>mvn:org.yaml/snakeyaml/1.30</bundle>-->

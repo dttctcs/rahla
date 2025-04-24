@@ -66,7 +66,7 @@
               osgi.serviceloader;osgi.serviceloader="org.codehaus.groovy.transform.ASTTransformation",
             </Provide-Capability>
             <Import-Package>
-              org.apache.camel.catalog,
+<!--              org.apache.camel.catalog,-->
               org.apache.karaf.shell*;version="[4,5)",
               org.apache.commons.configuration2.*,
               *
