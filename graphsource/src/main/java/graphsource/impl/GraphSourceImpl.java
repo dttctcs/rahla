@@ -1,8 +1,7 @@
-package janussource;
+package rahla.graphsource.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import janussource.api.JanusSource;
 import lombok.extern.log4j.Log4j2;
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Cluster;
@@ -15,8 +14,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
-;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +29,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalS
         configurationPid = "rahla.graphsource",
         configurationPolicy = ConfigurationPolicy.REQUIRE,
         immediate = true)
-public class JanusSourceImpl implements JanusSource<GraphTraversalSource, Client> {
+public class GraphSourceImpl implements rahla.graphsource.GraphSource<GraphTraversalSource, Client> {
 
   private static final String HOSTS_KEY = "hosts";
   private static final String PORT_KEY = "port";
@@ -82,6 +79,8 @@ public class JanusSourceImpl implements JanusSource<GraphTraversalSource, Client
 
     String hosts = (String) properties.get(HOSTS_KEY);
     String[] hostss = hosts.split(",");
+
+    log.info("Starting Janusgraph client...");
 
     String host = hostss[0];
 
@@ -148,18 +147,20 @@ public class JanusSourceImpl implements JanusSource<GraphTraversalSource, Client
     cluster = builder.create();
 
     client = cluster.connect();
+    log.info("Started Janusgraph client for: " + cluster.toString());
   }
 
   @Deactivate
   public synchronized void deactivate(ComponentContext cc) {
-    log.warn("action=deactivating gremlin driver");
+    log.info("Stopping Janusgraph client...");
     try {
       client.close();
       cluster.close();
     } catch (Exception e) {
       log.error("Error closing graph traversal source", e);
     }
-    log.warn("action=gremlin driver deactivated");
+    log.info("Stopped Janusgraph client for: " + cluster.toString());
+
   }
 
   @Override

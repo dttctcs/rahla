@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <artifactId>graphsource</artifactId>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-services-maven-plugin</artifactId>
+      </plugin>
+
+
+      <plugin>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Bundle-Version>${project.version}</Bundle-Version>
+            <Export-Package>
+              rahla.graphsource;version=${project.version},
+              rahla.graphsource.impl;version=${project.version},
+              org.apache.tinkerpop*,
+              org.javatuples*
+              <!-- org.apache.tinkerpop.gremlin.*-->
+            </Export-Package>
+            <DynamicImport-Package>*</DynamicImport-Package>
+            <Import-Package>
+              !COM.newmonics.PercClassLoader,
+              !android.os,
+              !com.github.benmanes.caffeine.cache*,
+              !com.google.common.base,
+              !com.aayushatharva.brotli4j*,
+              !com.barchart.udt*,
+              !com.fasterxml.aalto*,
+              !com.github.luben.zstd*,
+              !com.google.protobuf*
+              *
+            </Import-Package>
+            <Private-Package>
+              org.janusgraph*,
+              org.noggit*,
+              com.carrotsearch.hppc*,
+              com.jcabi*,
+              org.apache.tinkerpop*,
+              org.javatuples*,
+              io.netty.*,
+              <!-- org.yaml.snakeyaml*,-->
+            </Private-Package>
+          </instructions>
+        </configuration>
+        <groupId>org.apache.felix</groupId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-opentelemetry</artifactId>
+      <version>${camel.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <artifactId>osgi.core</artifactId>
+      <groupId>org.osgi</groupId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.cm</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.event</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.http</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.log</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.jaxrs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.metatype</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.namespace.service</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.repository</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.util.promise</artifactId>
+    </dependency>
+
+    <dependency>
+      <artifactId>lombok</artifactId>
+      <groupId>org.projectlombok</groupId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+<!--    <dependency>-->
+<!--      <groupId>com.fasterxml.jackson.dataformat</groupId>-->
+<!--      <artifactId>jackson-dataformat-xml</artifactId>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>org.apache.felix</groupId>-->
+<!--      <artifactId>org.apache.felix.fileinstall</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
+
+<!--    <dependency>-->
+<!--      <artifactId>jackson-dataformat-yaml</artifactId>-->
+<!--      <groupId>com.fasterxml.jackson.dataformat</groupId>-->
+<!--    </dependency>-->
+
+<!--    <dependency>-->
+<!--      <artifactId>jackson-module-jaxb-annotations</artifactId>-->
+<!--      <groupId>com.fasterxml.jackson.module</groupId>-->
+<!--    </dependency>-->
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-configuration2</artifactId>
+    </dependency>
+
+    <dependency>
+      <artifactId>janusgraph-driver</artifactId>
+      <groupId>org.janusgraph</groupId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <artifactId>gremlin-groovy</artifactId>
+      <groupId>org.apache.tinkerpop</groupId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <artifactId>gremlin-driver</artifactId>
+      <groupId>org.apache.tinkerpop</groupId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <artifactId>gremlin-core</artifactId>
+      <groupId>org.apache.tinkerpop</groupId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <artifactId>gremlin-shaded</artifactId>
+      <groupId>org.apache.tinkerpop</groupId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <description />
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>graphsource Bundle</name>
+
+  <packaging>bundle</packaging>
+
+  <parent>
+    <artifactId>reactor</artifactId>
+    <groupId>rahla</groupId>
+    <relativePath>../pom.xml</relativePath>
+    <version>1.1.3-SNAPSHOT</version>
+  </parent>
+
+</project>
+

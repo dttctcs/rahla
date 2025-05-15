@@ -68,12 +68,11 @@
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <scope>compile</scope>
     </dependency>
-    <!--<dependency>
+    <dependency>
        <artifactId>loki-appender</artifactId>
        <groupId>rahla</groupId>
        <scope>compile</scope>
      </dependency>
--->
   </dependencies>
 
   <description />
@@ -81,7 +80,7 @@
   <groupId>rahla.feature</groupId>
   <modelVersion>4.0.0</modelVersion>
 
-  <name>rahla.feature Feature</name>
+  <name>Loki Appender Feature</name>
 
   <packaging>feature</packaging>
 

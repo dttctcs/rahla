@@ -239,7 +239,7 @@ jedisSourceName=myJedisSource
 
 
 ```xml
-<reference id="myJedisSource" interface="rahla.api.JedisSource" filter="(jedisSourceName=myJedisSource)"/>
+<reference id="myJedisSource" interface="jedissource.api.JedisSource" filter="(jedisSourceName=myJedisSource)"/>
 ```
 
 With a simple interface for jedis

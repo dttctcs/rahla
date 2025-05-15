@@ -8,7 +8,7 @@
   <groupId>rahla.assembly</groupId>
   <modelVersion>4.0.0</modelVersion>
 
-  <name>rahla.assembly Assembly</name>
+  <name>Rahla Assembly</name>
 
   <packaging>karaf-assembly</packaging>
   <description>
@@ -95,7 +95,21 @@
       <type>xml</type>
     </dependency>
 
+    <dependency>
+      <artifactId>graphsource</artifactId>
+      <classifier>features</classifier>
+      <groupId>rahla.feature</groupId>
+      <scope>runtime</scope>
+      <type>xml</type>
+    </dependency>
 
+    <dependency>
+      <artifactId>jedissource</artifactId>
+      <classifier>features</classifier>
+      <groupId>rahla.feature</groupId>
+      <scope>runtime</scope>
+      <type>xml</type>
+    </dependency>
     <dependency>
       <artifactId>rahla-logging</artifactId>
       <classifier>features</classifier>
@@ -138,13 +152,17 @@
             <feature>spifly</feature>
             <feature>pax-web-http</feature>
             <feature>jolokia</feature>
-
+            <feature>rahla</feature>
+<!--            <feature>camel</feature>-->
 
 
           </bootFeatures>
           <installedFeatures>
+<!--            <feature>camel</feature>-->
             <feature>rahla</feature>
             <feature>fradi</feature>
+            <feature>graphsource</feature>
+            <feature>jedissource</feature>
 
           </installedFeatures>
           <libraries>

@@ -33,6 +33,7 @@ public class FradiComponent extends DefaultComponent {
   private static final Logger log = LogManager.getLogger();
 
   public FradiComponent() {
+      log.warn("Fradi Component is EOL and becomes removed in on of the next releases, due to inactivity on siddhi. We recommend to migrate towards camel-mybatis for database cruds.");
       if (!deploy_path.endsWith("/"))
         deploy_path += "/";
       fradiEngine = new FradiEngine();

@@ -68,21 +68,9 @@
             <Import-Package>
 <!--              org.apache.camel.catalog,-->
               org.apache.karaf.shell*;version="[4,5)",
-              org.apache.commons.configuration2.*,
-              *
-              !COM.newmonics,
+<!--              !COM.newmonics,-->
             </Import-Package>
             <Private-Package>
-              rahla.commands,
-              org.janusgraph.*,
-              org.noggit.*,
-              com.carrotsearch.hppc*,
-              com.jcabi.*,
-              org.apache.tinkerpop.gremlin.*,
-              org.apache.tinkerpop.shaded.*,
-              org.javatuples*,
-              org.yaml.snakeyaml*,
-              io.netty.*,
               org.apache.groovy.*,
               org.codehaus.groovy.*,
               groovy.*,
@@ -121,37 +109,30 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.cm</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.component</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.component.annotations</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.event</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.http</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.jdbc</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.log</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -160,62 +141,48 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.metatype</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.namespace.service</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.repository</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.util.promise</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <artifactId>lombok</artifactId>
       <groupId>org.projectlombok</groupId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-core</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-management</artifactId>
-      <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.karaf.features</groupId>
-      <artifactId>org.apache.karaf.features.core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-xml</artifactId>
-    </dependency>
+
+<!--    <dependency>-->
+<!--      <groupId>org.apache.karaf.features</groupId>-->
+<!--      <artifactId>org.apache.karaf.features.core</artifactId>-->
+<!--    </dependency>-->
+<!--    -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-collections4</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.camel</groupId>
-      <artifactId>camel-metrics</artifactId>
-      <scope>provided</scope>
-    </dependency>
+
+<!--    <dependency>-->
+<!--      <groupId>org.apache.camel</groupId>-->
+<!--      <artifactId>camel-metrics</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.fileinstall</artifactId>
@@ -359,6 +326,7 @@
       <groupId>org.apache.karaf.shell</groupId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.apache.karaf.log</groupId>
       <artifactId>org.apache.karaf.log.core</artifactId>
@@ -371,15 +339,26 @@
       <scope>provided</scope>
     </dependency>
 
+<!--    <dependency>-->
+<!--      <groupId>org.apache.aries.component-dsl</groupId>-->
+<!--      <artifactId>org.apache.aries.component-dsl.component-dsl</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
+
+
     <dependency>
-      <groupId>org.apache.aries.component-dsl</groupId>
-      <artifactId>org.apache.aries.component-dsl.component-dsl</artifactId>
-      <scope>provided</scope>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-xml</artifactId>
     </dependency>
     <dependency>
       <artifactId>jackson-dataformat-yaml</artifactId>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
     </dependency>
+
     <dependency>
       <artifactId>jackson-jaxrs-base</artifactId>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -393,65 +372,35 @@
     <dependency>
       <artifactId>jackson-module-jaxb-annotations</artifactId>
       <groupId>com.fasterxml.jackson.module</groupId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-configuration2</artifactId>
-    </dependency>
-    <dependency>
-      <artifactId>janusgraph-driver</artifactId>
-      <groupId>org.janusgraph</groupId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <artifactId>snappy-java</artifactId>-->
+<!--      <groupId>org.xerial.snappy</groupId>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <artifactId>gremlin-groovy</artifactId>
-      <groupId>org.apache.tinkerpop</groupId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <artifactId>gremlin-driver</artifactId>
-      <groupId>org.apache.tinkerpop</groupId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <artifactId>gremlin-core</artifactId>
-      <groupId>org.apache.tinkerpop</groupId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <artifactId>gremlin-shaded</artifactId>
-      <groupId>org.apache.tinkerpop</groupId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <artifactId>snappy-java</artifactId>
-      <groupId>org.xerial.snappy</groupId>
-    </dependency>
+<!--    <dependency>-->
+<!--      <artifactId>minio</artifactId>-->
+<!--      <groupId>io.minio</groupId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <artifactId>minio</artifactId>
-      <groupId>io.minio</groupId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <artifactId>jedis</artifactId>-->
+<!--      <groupId>redis.clients</groupId>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <artifactId>jedis</artifactId>
-      <groupId>redis.clients</groupId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.squareup.okhttp3</groupId>
-      <artifactId>okhttp</artifactId>
-      <version>4.10.0</version>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>com.squareup.okhttp3</groupId>-->
+<!--      <artifactId>okhttp</artifactId>-->
+<!--      <version>4.10.0</version>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
 
     <dependency>
@@ -471,7 +420,7 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>rahla Bundle</name>
+  <name>Rahla Bundle</name>
 
   <packaging>bundle</packaging>
 

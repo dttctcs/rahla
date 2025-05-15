@@ -33,10 +33,10 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
                         <maxmem>1024M</maxmem>
-                        <source>17</source>
+                        <source>21</source>
                        <!-- <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
 
-                        <target>17</target>
+                        <target>21</target>
                     </configuration>
                     <groupId>org.apache.maven.plugins</groupId>
                     <version>${maven-compiler-plugin.version}</version>
@@ -92,6 +92,16 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <artifactId>graphsource</artifactId>
+                <groupId>rahla</groupId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <artifactId>jedissource</artifactId>
+                <groupId>rahla</groupId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <artifactId>loki-appender</artifactId>
                 <groupId>rahla</groupId>
                 <version>${project.version}</version>
@@ -106,6 +116,22 @@
             </dependency>
             <dependency>
                 <artifactId>fradi</artifactId>
+                <classifier>features</classifier>
+                <groupId>rahla.feature</groupId>
+                <scope>runtime</scope>
+                <type>xml</type>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <artifactId>graphsource</artifactId>
+                <classifier>features</classifier>
+                <groupId>rahla.feature</groupId>
+                <scope>runtime</scope>
+                <type>xml</type>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <artifactId>jedissource</artifactId>
                 <classifier>features</classifier>
                 <groupId>rahla.feature</groupId>
                 <scope>runtime</scope>
@@ -1015,10 +1041,13 @@
         <module>rahla</module>
         <module>loki-appender</module>
         <module>fradi</module>
-        <module>janussource</module>
+        <module>graphsource</module>
+        <module>jedissource</module>
         <module>features/rahla</module>
         <module>features/logging</module>
         <module>features/fradi</module>
+        <module>features/jedissource</module>
+        <module>features/graphsource</module>
         <module>assembly</module>
     </modules>
 

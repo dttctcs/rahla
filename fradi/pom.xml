@@ -13,7 +13,7 @@
   <artifactId>fradi</artifactId>
   <packaging>jar</packaging>
 
-  <name>Camel fradi Component</name>
+  <name>Fradi (siddhi) Camel Component</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

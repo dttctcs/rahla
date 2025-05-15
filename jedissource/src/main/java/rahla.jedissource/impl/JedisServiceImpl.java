@@ -1,4 +1,4 @@
-package rahla.extensions;
+package rahla.jedissource.impl;
 
 import lombok.extern.log4j.Log4j2;
 import org.osgi.service.component.ComponentContext;
@@ -6,13 +6,12 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
-import rahla.api.JedisSource;
+import rahla.jedissource.JedisSource;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisException;
 
-import java.io.BufferedReader;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;

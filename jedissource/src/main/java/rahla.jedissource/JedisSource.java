@@ -1,4 +1,4 @@
-package rahla.api;
+package rahla.jedissource;
 
 import redis.clients.jedis.Jedis;
 

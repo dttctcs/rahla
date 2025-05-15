@@ -1,3 +1,14 @@
+# 1.2.0 (2025-05-20)
+
+
+### CHANGE
+
+* camel feature was removed from preinstalled features, so add <feature>camel</feature> to your features.xml
+* SmartUrl was removed without replacement
+* jedis and janusgraph sources have been moved into separate bundles and features <feature>graphsource</feature> <feature>jedissource</feature>
+* Their interfaces have been moved from rahla.api to rahla.jedissource and rahla.graphsource ...interface="rahla.graphsource.GraphSource"...
+* Base Dockerimage was set to java 21 on alpine
+
 # 1.1.2 (2025-02-26)
 
 

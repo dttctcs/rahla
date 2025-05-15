@@ -13,7 +13,7 @@
 
     <description />
     <modelVersion>4.0.0</modelVersion>
-    <name>rahla loki logger</name>
+    <name>Loki Appender Bundle</name>
 
     <packaging>bundle</packaging>
 

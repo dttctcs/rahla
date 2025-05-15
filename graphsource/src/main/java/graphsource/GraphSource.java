@@ -1,8 +1,8 @@
-package janussource.api;
+package rahla.graphsource;
 
 import java.util.List;
 
-public interface JanusSource<T, V> {
+public interface GraphSource<T, V> {
 
   List<String> getHosts();
 
