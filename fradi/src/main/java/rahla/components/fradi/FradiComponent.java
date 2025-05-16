@@ -74,7 +74,6 @@ public class FradiComponent extends DefaultComponent {
     }
 
     public void setPlan (String plan){
-      log.warn("setPlan is deprecated and will be removed in a future release! Use FradiComponent(String urlSpec) instead");
       if (plan.startsWith(RESOURCE_FILE)) {
         String fileName = plan.substring(RESOURCE_FILE.length());
         Path path = Path.of(fileName);
