@@ -153,17 +153,13 @@
             <feature>pax-web-http</feature>
             <feature>jolokia</feature>
             <feature>rahla</feature>
-<!--            <feature>camel</feature>-->
-
-
           </bootFeatures>
           <installedFeatures>
-<!--            <feature>camel</feature>-->
+            <feature>camel</feature>
             <feature>rahla</feature>
             <feature>fradi</feature>
             <feature>graphsource</feature>
             <feature>jedissource</feature>
-
           </installedFeatures>
           <libraries>
             <library>mvn:io.prometheus.jmx/jmx_prometheus_javaagent/${jmx_exporter.version}</library>
