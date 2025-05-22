@@ -19,10 +19,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Log4j2
-@Component(
-        configurationPid = "rahla.jedissource",
-        configurationPolicy = ConfigurationPolicy.REQUIRE,
-        immediate = true)
+@Component(configurationPid = "rahla.jedissource", configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true)
 public class JedisServiceImpl implements JedisSource {
   private static final String PORT_KEY = "port";
   private static final String HOST_KEY = "host";
@@ -36,6 +33,7 @@ public class JedisServiceImpl implements JedisSource {
   private static final String TEST_ON_BURROW = "testOnBorrow";
   private static final String TEST_ON_RETURN = "testOnReturn";
   private static final String TEST_WHILE_IDLE = "testWhileIdle";
+  private static final String SSL = "ssl";
   private static final String MIN_EVICTABLE_IDLE_TIME_SECONDS = "minEvictableIdleTimeSeconds";
   private static final String TIME_BETWEEN_EVICTION_RUNS_SECONDS = "timeBetweenEvictionRunsSeconds";
   private static final String NUM_TESTS_PER_EVICTION_RUN = "numTestsPerEvictionRun";
@@ -56,16 +54,16 @@ public class JedisServiceImpl implements JedisSource {
   private boolean testOnBorrow;
   private boolean testOnReturn;
   private boolean testWhileIdle;
+  private boolean ssl;
   private int minEvictableIdleTimeSeconds;
   private int timeBetweenEvictionRunsSeconds;
   private int numTestsPerEvictionRun;
   private boolean blockWhenExhausted;
 
-
   @Activate
   public void activate(ComponentContext cc) {
     Map<String, Object> properties = Collections.list(cc.getProperties().keys()).stream()
-            .collect(Collectors.toMap(Function.identity(), cc.getProperties()::get));
+        .collect(Collectors.toMap(Function.identity(), cc.getProperties()::get));
 
     host = (String) properties.getOrDefault(HOST_KEY, "65536");
     port = Integer.parseInt((String) properties.getOrDefault(PORT_KEY, "6379"));
@@ -79,8 +77,11 @@ public class JedisServiceImpl implements JedisSource {
     testOnBorrow = Boolean.parseBoolean((String) properties.getOrDefault(TEST_ON_BURROW, "true"));
     testOnReturn = Boolean.parseBoolean((String) properties.getOrDefault(TEST_ON_RETURN, "true"));
     testWhileIdle = Boolean.parseBoolean((String) properties.getOrDefault(TEST_WHILE_IDLE, "true"));
-    minEvictableIdleTimeSeconds = Integer.parseInt((String) properties.getOrDefault(MIN_EVICTABLE_IDLE_TIME_SECONDS, "60"));
-    timeBetweenEvictionRunsSeconds = Integer.parseInt((String) properties.getOrDefault(TIME_BETWEEN_EVICTION_RUNS_SECONDS, "30"));
+    ssl = Boolean.parseBoolean((String) properties.getOrDefault(SSL, "false"));
+    minEvictableIdleTimeSeconds = Integer
+        .parseInt((String) properties.getOrDefault(MIN_EVICTABLE_IDLE_TIME_SECONDS, "60"));
+    timeBetweenEvictionRunsSeconds = Integer
+        .parseInt((String) properties.getOrDefault(TIME_BETWEEN_EVICTION_RUNS_SECONDS, "30"));
     numTestsPerEvictionRun = Integer.parseInt((String) properties.getOrDefault(NUM_TESTS_PER_EVICTION_RUN, "3"));
     blockWhenExhausted = Boolean.parseBoolean((String) properties.getOrDefault(BLOCK_WHEN_EXHAUSTED, "true"));
     init();
@@ -95,7 +96,7 @@ public class JedisServiceImpl implements JedisSource {
         log.error("action=close jedis pool, reason={}", e.getMessage());
       }
     }
-    jedisPool = new JedisPool(buildPoolConfig(), host, port, timeout, user, pass, db);
+    jedisPool = new JedisPool(buildPoolConfig(), host, port, timeout, user, pass, db, ssl);
 
     for (int i = 0; i < 120; i++) {
       try (Jedis resource = jedisPool.getResource()) {
@@ -126,7 +127,6 @@ public class JedisServiceImpl implements JedisSource {
       }
     }
   }
-
 
   private JedisPoolConfig buildPoolConfig() {
     final JedisPoolConfig poolConfig = new JedisPoolConfig();
