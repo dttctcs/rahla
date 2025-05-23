@@ -16,13 +16,10 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Version>${project.version}</Bundle-Version>
             <Export-Package>
-              rahla.jedissource;version=${project.version},
+              rahla.jedissource*;version=${project.version},
             </Export-Package>
             <DynamicImport-Package>*</DynamicImport-Package>
             <Import-Package>
-<!--              org.apache.camel.catalog,-->
-<!--              org.apache.karaf.shell*;version="[4,5)",-->
-<!--              org.apache.commons.configuration2.*,-->
               *
             </Import-Package>
             <Private-Package>

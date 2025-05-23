@@ -91,7 +91,7 @@ public class GraphSourceImpl implements rahla.graphsource.GraphSource<GraphTrave
 
     Cluster.Builder builder = Cluster.build(host).port(port);
 
-    String serializerClassName = (String) properties.getOrDefault(SERIALIZER_KEY, "org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV3d0");
+    String serializerClassName = (String) properties.getOrDefault(SERIALIZER_KEY, "org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1");
 
     Class clazz =
             cc.getBundleContext()
@@ -157,7 +157,7 @@ public class GraphSourceImpl implements rahla.graphsource.GraphSource<GraphTrave
       client.close();
       cluster.close();
     } catch (Exception e) {
-      log.error("Error closing graph traversal source", e);
+      log.error("Error closing Janusgraph client", e);
     }
     log.info("Stopped Janusgraph client for: " + cluster.toString());
 

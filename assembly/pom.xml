@@ -155,8 +155,6 @@
             <feature>rahla</feature>
           </bootFeatures>
           <installedFeatures>
-            <feature>camel</feature>
-            <feature>rahla</feature>
             <feature>fradi</feature>
             <feature>graphsource</feature>
             <feature>jedissource</feature>

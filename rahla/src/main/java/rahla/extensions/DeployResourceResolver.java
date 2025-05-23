@@ -25,6 +25,7 @@ public class DeployResourceResolver extends ResourceResolverSupport {
 
   @Override
   public Resource createResource(String location, String remaining) {
+    log.warn("resource:deploy is deprecated. Use different ResourceResolver e.g. resource:file witl fully qualified path or relative to /rahla instead.");
     final File path = new File(tryDecodeUri(deploy_path + remaining));
 
     return new ResourceSupport(SCHEME, location) {

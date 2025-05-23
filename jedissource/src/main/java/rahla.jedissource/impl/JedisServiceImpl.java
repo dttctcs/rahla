@@ -64,6 +64,7 @@ public class JedisServiceImpl implements JedisSource {
 
   @Activate
   public void activate(ComponentContext cc) {
+    log.warn("JedisSource is EOL and becomes removed in on of the next releases. We recommend to migrate towards your own bean handling the connection pool.");
     Map<String, Object> properties = Collections.list(cc.getProperties().keys()).stream()
             .collect(Collectors.toMap(Function.identity(), cc.getProperties()::get));
 
@@ -103,7 +104,7 @@ public class JedisServiceImpl implements JedisSource {
           break;
         }
       } catch (Exception e) {
-        log.warn("action=init jedis waiting, reason={}", e.getMessage());
+        log.warn("Jedis connect is waiting, reason={}", e.getMessage());
       }
       if (shutdown) {
         break;

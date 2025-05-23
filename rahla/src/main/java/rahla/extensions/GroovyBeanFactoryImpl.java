@@ -45,12 +45,12 @@ public class GroovyBeanFactoryImpl implements GroovyBeanFactory {
     try {
       Class clazz;
       if (urlSpec.startsWith(RESOURCE_FILE)) {
-        log.warn("resource:file: is deprecated and will be removed in a future release! Use createBean(String urlSpec) instead");
+        log.warn("resource:file: is deprecated and will be removed in a future release! Use URLs (file://, http://, ...)");
         String fileName = urlSpec.substring(RESOURCE_FILE.length());
         File file = new File(fileName);
         clazz = groovyClassLoader.parseClass(file);
       } else if (urlSpec.startsWith(RESOURCE_DEPLOY)) {
-        log.warn("resource:deploy: is deprecated and will be removed in a future release! Use createBean(String urlSpec) instead");
+        log.warn("resource:deploy: is deprecated and will be removed in a future release! Use URLs (file:// http://, ...)");
         String fileName = urlSpec.substring(RESOURCE_DEPLOY.length());
         if(fileName.startsWith("/")){
           fileName = fileName.substring(1);
