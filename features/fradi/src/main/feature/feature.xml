@@ -4,7 +4,8 @@
     <feature description='${project.name}' name='${project.artifactId}' start-level="80"
              version='${project.version}'>
 
-        <feature>camel-quartz</feature>
+        <feature prerequisite="false">camel-quartz</feature>
+        <feature prerequisite="false">camel-metrics</feature>
 
     </feature>
 

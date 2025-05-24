@@ -33,7 +33,6 @@ public class FradiComponent extends DefaultComponent {
   private static final Logger log = LogManager.getLogger();
 
   public FradiComponent() {
-      log.warn("Fradi Component is EOL and becomes removed in on of the next releases, due to inactivity on siddhi. We recommend to migrate towards camel-mybatis for database cruds.");
       if (!deploy_path.endsWith("/"))
         deploy_path += "/";
       fradiEngine = new FradiEngine();
@@ -54,6 +53,7 @@ public class FradiComponent extends DefaultComponent {
   private void startEngine(){
     fradiEngine.init(this.plan);
     fradiEngine.start();
+    log.warn("Fradi Component is EOL and becomes removed in on of the next releases, due to inactivity on siddhi. We recommend to migrate towards camel-mybatis for database crud.");
   }
 
     protected Endpoint createEndpoint (String uri, String remaining, Map < String, Object > parameters) throws Exception
@@ -74,6 +74,7 @@ public class FradiComponent extends DefaultComponent {
     }
 
     public void setPlan (String plan){
+      log.warn("setPlan is deprecated Use argument constructor with URL (file://, http://, ...)");
       if (plan.startsWith(RESOURCE_FILE)) {
         String fileName = plan.substring(RESOURCE_FILE.length());
         Path path = Path.of(fileName);

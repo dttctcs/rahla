@@ -582,6 +582,30 @@
                 <artifactId>siddhi-core</artifactId>
                 <exclusions>
                     <exclusion>
+                        <groupId>jakarta.xml.bind</groupId>
+                        <artifactId>jakarta.xml.bind-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.checkerframework</groupId>
+                        <artifactId>checker-compat-qual</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.google.code.gson</groupId>
+                        <artifactId>gson</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.yaml</groupId>
+                        <artifactId>snakeyaml</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.mvel</groupId>
+                        <artifactId>mvel2</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.antlr</groupId>
+                        <artifactId>antlr4-runtime</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <artifactId>log4j</artifactId>
                         <groupId>org.apache.log4j.wso2</groupId>
                     </exclusion>
@@ -719,6 +743,10 @@
                         <groupId>org.apache.logging.log4j</groupId>
                         <artifactId>log4j-core</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.mvel</groupId>
+                        <artifactId>mvel2</artifactId>
+                    </exclusion>
                 </exclusions>
                 <groupId>io.siddhi</groupId>
                 <version>${siddhi.version}</version>
@@ -727,6 +755,12 @@
                 <artifactId>siddhi-annotations</artifactId>
                 <groupId>io.siddhi</groupId>
                 <version>${siddhi.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId> org.atteo.classindex</groupId>
+                        <artifactId>classindex</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <artifactId>siddhi-execution-string</artifactId>
@@ -993,6 +1027,11 @@
                 <version>${log4j2-appender-loki.version}</version>
                 <scope>compile</scope>
             </dependency>
+            <dependency>
+                <groupId>com.lmax</groupId>
+                <artifactId>disruptor</artifactId>
+                <version>3.4.4</version>
+            </dependency>
         </dependencies>
 
 
@@ -1069,7 +1108,7 @@
         <siddhi-execution-unique.version>5.0.5</siddhi-execution-unique.version>
         <siddhi-store-rdbms.version>7.0.16-dtacs</siddhi-store-rdbms.version>
         <siddhi.version>5.1.24-dt</siddhi.version>
-        <disruptor.version>3.4.2</disruptor.version>
+        <disruptor.version>3.4.4</disruptor.version>
 
         <maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
         <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
