@@ -1,0 +1,11 @@
+<features name="${project.artifactId}-${project.version}"
+          xmlns="http://karaf.apache.org/xmlns/features/v1.6.0">
+
+    <feature description='${project.name}' name='${project.artifactId}' start-level="80"
+             version='${project.version}'>
+
+
+    </feature>
+
+
+</features>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <artifactId>camel-route-templates</artifactId>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>karaf-maven-plugin</artifactId>
+                    <groupId>org.apache.karaf.tooling</groupId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <artifactId>karaf-maven-plugin</artifactId>
+                <configuration>
+                    <startLevel>80</startLevel>
+                    <aggregateFeatures>true</aggregateFeatures>
+                    <checkDependencyChange>false</checkDependencyChange>
+                    <enableGeneration>true</enableGeneration>
+                    <failOnDependencyChange>false</failOnDependencyChange>
+                    <includeTransitiveDependency>true</includeTransitiveDependency>
+                    <logDependencyChanges>false</logDependencyChanges>
+                    <overwriteChangedDependencies>false</overwriteChangedDependencies>
+
+                </configuration>
+                <extensions>true</extensions>
+                <groupId>org.apache.karaf.tooling</groupId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-install-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <artifactId>camel-osgi-route-templates</artifactId>
+            <groupId>rahla</groupId>
+        </dependency>
+    </dependencies>
+
+    <description />
+
+    <groupId>rahla.feature</groupId>
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>Fradi Feature</name>
+
+    <packaging>feature</packaging>
+
+    <parent>
+        <artifactId>reactor</artifactId>
+        <groupId>rahla</groupId>
+        <relativePath>../../pom.xml</relativePath>
+        <version>1.2.1-SNAPSHOT</version>
+    </parent>
+
+</project>

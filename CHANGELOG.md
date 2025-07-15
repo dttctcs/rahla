@@ -1,12 +1,20 @@
+# 1.2.1 (2025-07-15)
+
+
+### Changes 
+
+* Camel Osgi Route Templates have been moved into a separate feature `<feature>camel-route-templates</feature>`
+
+
 # 1.2.0 (2025-05-20)
 
 
 ### Changes (A lot breaking)
 
-* Camel feature was removed from preinstalled feature list, so add <feature>camel</feature> to your features.xml or install manually (Improves startup speed)
+* Camel feature was removed from preinstalled feature list, so add `<feature>camel</feature>` to your features.xml or install manually (Improves startup speed)
 * SmartUrl was removed without replacement
-* Jedis and Janusgraph sources have been moved into separate bundles and features <feature>graphsource</feature> <feature>jedissource</feature>
-* Interfaces GraphSource and JedisSource have been moved from rahla.api to rahla.jedissource and rahla.graphsource. For referencing: interface="rahla.graphsource.GraphSource"
+* Jedis and Janusgraph sources have been moved into separate bundles and features `<feature>graphsource</feature>` `<feature>jedissource</feature>`
+* Interfaces GraphSource and JedisSource have been moved from rahla.api to rahla.jedissource and rahla.graphsource. For referencing: `interface="rahla.graphsource.GraphSource"`
 * Base docker image was bumped to java temurin 21 on alpine 3
 * Updated to camel 4.10.3
 * Updated janusgraph client to 1.1.0

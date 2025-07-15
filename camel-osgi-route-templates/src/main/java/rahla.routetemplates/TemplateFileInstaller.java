@@ -1,4 +1,4 @@
-package rahla.extensions;
+package rahla.routetemplates;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static org.apache.camel.spi.RouteTemplateParameterSource.TEMPLATE_ID;
-import static rahla.extensions.OsgiRouteTemplateParameterSource.TEMPLATE_PREFIX;
+import static rahla.routetemplates.OsgiRouteTemplateParameterSource.TEMPLATE_PREFIX;
 
 @Component(service = {ArtifactInstaller.class, ArtifactListener.class}, property = {"TemplateFileInstaller=true"}, immediate = true)
 @Log4j2

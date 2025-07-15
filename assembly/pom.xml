@@ -111,6 +111,13 @@
       <type>xml</type>
     </dependency>
     <dependency>
+      <artifactId>camel-route-templates</artifactId>
+      <classifier>features</classifier>
+      <groupId>rahla.feature</groupId>
+      <scope>runtime</scope>
+      <type>xml</type>
+    </dependency>
+    <dependency>
       <artifactId>rahla-logging</artifactId>
       <classifier>features</classifier>
       <groupId>rahla.feature</groupId>
@@ -158,6 +165,7 @@
             <feature>fradi</feature>
             <feature>graphsource</feature>
             <feature>jedissource</feature>
+            <feature>camel-route-templates</feature>
           </installedFeatures>
           <libraries>
             <library>mvn:io.prometheus.jmx/jmx_prometheus_javaagent/${jmx_exporter.version}</library>

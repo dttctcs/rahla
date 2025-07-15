@@ -183,11 +183,11 @@
 <!--      <artifactId>camel-metrics</artifactId>-->
 <!--      <scope>provided</scope>-->
 <!--    </dependency>-->
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.fileinstall</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.felix</groupId>-->
+<!--      <artifactId>org.apache.felix.fileinstall</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
     <dependency>
       <groupId>org.apache.groovy</groupId>
@@ -403,12 +403,11 @@
 <!--    </dependency>-->
 
 
-    <dependency>
-      <groupId>io.opentelemetry</groupId>
-      <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
-      <version>1.21.0-alpha</version>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>io.opentelemetry</groupId>-->
+<!--      <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
     <!--  <dependency>
           <groupId>org.json</groupId>

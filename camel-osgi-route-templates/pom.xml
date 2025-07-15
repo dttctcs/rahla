@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <artifactId>jedissource</artifactId>
+  <artifactId>camel-osgi-route-templates</artifactId>
   <build>
     <plugins>
       <plugin>
@@ -16,15 +16,11 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Version>${project.version}</Bundle-Version>
             <Export-Package>
-              rahla.jedissource*;version=${project.version},
+              rahla.routetemplates;version=${project.version},
             </Export-Package>
-            <DynamicImport-Package>*</DynamicImport-Package>
             <Import-Package>
               *
             </Import-Package>
-            <Private-Package>
-
-            </Private-Package>
           </instructions>
         </configuration>
         <groupId>org.apache.felix</groupId>
@@ -100,8 +96,14 @@
     </dependency>
 
     <dependency>
-      <artifactId>jedis</artifactId>
-      <groupId>redis.clients</groupId>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.fileinstall</artifactId>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>
@@ -110,7 +112,7 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>Jedissource Bundle</name>
+  <name>Osgi Route Template Bundle</name>
 
   <packaging>bundle</packaging>
 

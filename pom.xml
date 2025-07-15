@@ -102,6 +102,11 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <artifactId>camel-osgi-route-templates</artifactId>
+                <groupId>rahla</groupId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <artifactId>loki-appender</artifactId>
                 <groupId>rahla</groupId>
                 <version>${project.version}</version>
@@ -132,6 +137,14 @@
             </dependency>
             <dependency>
                 <artifactId>jedissource</artifactId>
+                <classifier>features</classifier>
+                <groupId>rahla.feature</groupId>
+                <scope>runtime</scope>
+                <type>xml</type>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <artifactId>camel-route-templates</artifactId>
                 <classifier>features</classifier>
                 <groupId>rahla.feature</groupId>
                 <scope>runtime</scope>
@@ -1032,6 +1045,12 @@
                 <artifactId>disruptor</artifactId>
                 <version>3.4.4</version>
             </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
+                <version>${opentelemetry-sdk-extension-autoconfigure.version}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
 
 
@@ -1047,11 +1066,13 @@
         <module>fradi</module>
         <module>graphsource</module>
         <module>jedissource</module>
+        <module>camel-osgi-route-templates</module>
         <module>features/rahla</module>
         <module>features/logging</module>
         <module>features/fradi</module>
         <module>features/jedissource</module>
         <module>features/graphsource</module>
+        <module>features/camel-route-templates</module>
         <module>assembly</module>
     </modules>
 
@@ -1123,6 +1144,8 @@
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-install-plugin.version>3.1.0</maven-install-plugin.version>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+        <opentelemetry-sdk-extension-autoconfigure.version>1.21.0-alpha
+        </opentelemetry-sdk-extension-autoconfigure.version>
     </properties>
 
     <repositories>
