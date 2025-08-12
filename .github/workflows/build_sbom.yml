@@ -5,9 +5,11 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       packages: write
+
     steps:
       - uses: actions/checkout@v3
 
@@ -33,7 +35,7 @@ jobs:
             type=semver,pattern={{version}}
             type=sha,prefix=
 
-      - name: Compose combined tag 
+      - name: Compose combined tag
         id: combined-tag
         run: |
           TAGS="${{ steps.meta.outputs.tags }}"
@@ -68,7 +70,7 @@ jobs:
           context: .
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: datatactics/rahla:${{ steps.combined-tag.outputs.tag }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Workspace Notification
