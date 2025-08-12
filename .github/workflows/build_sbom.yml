@@ -62,7 +62,7 @@ jobs:
 
   vulnerability-scan:
     needs: build
-    runs-on: [ self-hosted ]
+    runs-on: ubuntu-latest
     env:
       DTRACK_URL: "https://dtrack.datatactics.dev/api/v1/bom"
       REGISTRY: "container.datatactics.services"
@@ -78,7 +78,7 @@ jobs:
           if [ -z "$TAGS" ]; then
             echo "TAG=latest" >> $GITHUB_ENV
           else
-            # Extract the latest tag from the tags string
+            # Ex
             for i in $(echo "$TAGS" | tr ',' '\n'); do
               tag=$(echo $i | cut -d ':' -f 2)
               if [[ "$tag" == "latest" ]]; then
