@@ -1,0 +1,113 @@
+name: Java CI
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Build with Maven
+        run: |
+          mvn --batch-mode --update-snapshots clean package 
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            datatactics/rahla
+          tags: |
+            type=raw,latest
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=sha,prefix=
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Dockerhub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASS }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      - name: Workspace Notification
+        uses: DTherHtun/google-chat-action@v0.9
+        if: always()
+        with:
+          project: ${{ github.repository }}
+          commit: "${{ github.event.head_commit.message }}"
+          branch: ${{ github.ref }}
+          status: ${{ job.status }}
+          actionid: ${{ github.repository }}/runs/${{ github.run_id }}
+          webhook: "${{ secrets.GOOGLE_NOTIFICATION_WEBHOOK }}"
+
+  vulnerability-scan:
+    needs: build
+    runs-on: [ self-hosted ]
+    env:
+      DTRACK_URL: "https://dtrack.datatactics.dev/api/v1/bom"
+      REGISTRY: "container.datatactics.services"
+      IMAGE: "rahla"
+      PARENTUUID: "e9376173-816a-4443-b971-8e9c5243b124"
+      FILENAME: sbom_rahla_latest.json
+    steps:
+      - name: Parse latest tag from tags string
+        id: parse-latest
+        run: |
+          TAGS="${{ needs.build.outputs.tags || steps.meta.outputs.tags }}"
+          # Fallback: if TAGS is empty, set TAG to 'latest'
+          if [ -z "$TAGS" ]; then
+            echo "TAG=latest" >> $GITHUB_ENV
+          else
+            # Extract the latest tag from the tags string
+            for i in $(echo "$TAGS" | tr ',' '\n'); do
+              tag=$(echo $i | cut -d ':' -f 2)
+              if [[ "$tag" == "latest" ]]; then
+                echo "TAG=latest" >> $GITHUB_ENV
+                break
+              fi
+            done
+          fi
+      - name: Scan image in a private registry
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ env.TAG }}
+          scan-type: image
+          format: 'cyclonedx'
+          output: ${{ env.FILENAME }}
+          severity: "MEDIUM,HIGH,CRITICAL"
+          scanners: "vuln"
+        env:
+          TRIVY_USERNAME: ${{ secrets.CONTAINER_USERNAME }}
+          TRIVY_PASSWORD: ${{ secrets.CONTAINER_PASSWORD }}
+
+      - name: Upload SBOM to Dependency Track
+        run: |
+          echo "Uploading SBOM to Dependency Track..."
+          curl -L -X POST ${DTRACK_URL} \
+            -H 'Content-Type: multipart/form-data' \
+            -H "X-API-Key:${{ secrets.DTRACK_API_TOKEN }}" \
+            -F "autoCreate=true" \
+            -F "projectName=${IMAGE}" \
+            -F "projectVersion=${TAG}" \
+            -F "parentUUID=${PARENTUUID}" \
+            -F "bom=@${FILENAME}"
