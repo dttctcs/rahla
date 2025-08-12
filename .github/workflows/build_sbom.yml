@@ -48,7 +48,7 @@ jobs:
           if [ -z "$VERSION" ]; then
             VERSION="latest"
           fi
-          COMBINED="${VERSION}:${SHA}"
+          COMBINED="${VERSION}-${SHA}"
           echo "tag=$COMBINED" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
