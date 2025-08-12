@@ -5,11 +5,11 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       packages: write
-
+    outputs:
+      tag: ${{ steps.compose-tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v3
 
@@ -20,8 +20,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: |
-          mvn --batch-mode --update-snapshots clean package 
+        run: mvn --batch-mode --update-snapshots clean package
 
       - name: Docker meta
         id: meta
@@ -36,7 +35,7 @@ jobs:
             type=sha,prefix=
 
       - name: Compose combined tag
-        id: combined-tag
+        id: compose-tag
         run: |
           TAGS="${{ steps.meta.outputs.tags }}"
           echo "Raw tags: $TAGS"
@@ -70,7 +69,7 @@ jobs:
           context: .
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: datatactics/rahla:${{ steps.combined-tag.outputs.tag }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Workspace Notification
@@ -93,29 +92,26 @@ jobs:
       IMAGE: "rahla"
       PARENTUUID: "e9376173-816a-4443-b971-8e9c5243b124"
       FILENAME: sbom_rahla_latest.json
+      TAG: ${{ needs.build.outputs.tag }}
     steps:
       - name: Docker Login to private registry
         run: echo "${{ secrets.CONTAINER_PASSWORD }}" | docker login ${{ env.REGISTRY }} -u "${{ secrets.CONTAINER_USERNAME }}" --password-stdin
-
-      - name: Set TAG from build output
-        run: echo "TAG=${{ needs.build.outputs.tag }}" >> $GITHUB_ENV
 
       - name: Scan image in a private registry
         uses: aquasecurity/trivy-action@0.28.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ env.TAG }}
           scan-type: image
-          format: 'cyclonedx'
+          format: cyclonedx
           output: ${{ env.FILENAME }}
-          severity: "MEDIUM,HIGH,CRITICAL"
-          scanners: "vuln"
+          severity: MEDIUM,HIGH,CRITICAL
+          scanners: vuln
         env:
           TRIVY_USERNAME: ${{ secrets.CONTAINER_USERNAME }}
           TRIVY_PASSWORD: ${{ secrets.CONTAINER_PASSWORD }}
 
       - name: Upload SBOM to Dependency Track
         run: |
-          echo "Uploading SBOM to Dependency Track..."
           curl -L -X POST ${DTRACK_URL} \
             -H 'Content-Type: multipart/form-data' \
             -H "X-API-Key:${{ secrets.DTRACK_API_TOKEN }}" \
