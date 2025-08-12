@@ -70,23 +70,30 @@ jobs:
       PARENTUUID: "e9376173-816a-4443-b971-8e9c5243b124"
       FILENAME: sbom_rahla_latest.json
     steps:
+      - name: Docker Login to private registry
+        run: echo "${{ secrets.CONTAINER_PASSWORD }}" | docker login ${{ env.REGISTRY }} -u "${{ secrets.CONTAINER_USERNAME }}" --password-stdin
+
       - name: Parse latest tag from tags string
         id: parse-latest
         run: |
-          TAGS="${{ needs.build.outputs.tags || steps.meta.outputs.tags }}"
-          # Fallback: if TAGS is empty, set TAG to 'latest'
+          TAGS="${{ needs.build.outputs.tags }}"
           if [ -z "$TAGS" ]; then
             echo "TAG=latest" >> $GITHUB_ENV
           else
-            # Ex
+            FOUND=false
             for i in $(echo "$TAGS" | tr ',' '\n'); do
               tag=$(echo $i | cut -d ':' -f 2)
               if [[ "$tag" == "latest" ]]; then
                 echo "TAG=latest" >> $GITHUB_ENV
+                FOUND=true
                 break
               fi
             done
+            if [ "$FOUND" = false ]; then
+              echo "TAG=latest" >> $GITHUB_ENV
+            fi
           fi
+
       - name: Scan image in a private registry
         uses: aquasecurity/trivy-action@0.28.0
         with:
