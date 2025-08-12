@@ -9,7 +9,7 @@ jobs:
       contents: read
       packages: write
     outputs:
-      tag: ${{ steps.compose-tag.outputs.tag }}   
+      tag: ${{ steps.compose-tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v3
 
@@ -100,7 +100,7 @@ jobs:
       - name: Scan image in a private registry
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE }}:latest
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ env.TAG }}
           scan-type: image
           format: cyclonedx
           output: ${{ env.FILENAME }}
