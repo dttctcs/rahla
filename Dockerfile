@@ -1,4 +1,4 @@
-FROM docker.io/eclipse-temurin:21-jre-alpine
+FROM docker.io/eclipse-temurin:21-jre
 RUN adduser -D -h /rahla -s /bin/ash -u 101 rahla
 #RUN apt update && apt upgrade -y && apt clean
 USER rahla

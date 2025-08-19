@@ -1,3 +1,11 @@
+# 1.2.2 (2025-09-19)
+
+
+### Changes 
+
+* Switched base image from eclipse-temurin:21-jre-alpine to eclipse-temurin:21-jre
+
+
 # 1.2.1 (2025-07-15)
 
 
