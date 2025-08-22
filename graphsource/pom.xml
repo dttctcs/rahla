@@ -200,7 +200,7 @@
     <artifactId>reactor</artifactId>
     <groupId>rahla</groupId>
     <relativePath>../pom.xml</relativePath>
-    <version>1.2.3-SNAPSHOT</version>
+    <version>1.2.3</version>
   </parent>
 
 </project>
