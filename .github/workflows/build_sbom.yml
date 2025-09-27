@@ -9,7 +9,8 @@ jobs:
       contents: read
       packages: write
     outputs:
-      tag: ${{ steps.compose-tag.outputs.tag }}
+    #  tag: ${{ steps.compose-tag.outputs.tag }}
+      tag: ${{ steps.meta.outputs.tags }}
     steps:
       - uses: actions/checkout@v3
 
@@ -36,21 +37,21 @@ jobs:
             type=semver,pattern={{version}}
             type=sha,prefix=
 
-      - name: Compose combined tag
-        id: compose-tag
-        run: |
-          TAGS="${{ steps.meta.outputs.tags }}"
-          echo "Raw tags: $TAGS"
-          VERSION=$(echo "$TAGS" | tr ',' '\n' | grep -E ':[0-9]+\.[0-9]+\.[0-9]+' | head -n1 | cut -d':' -f2)
-          SHA=$(echo "$TAGS" | tr ',' '\n' | grep -E ':[a-f0-9]{6,}' | head -n1 | cut -d':' -f2)
-          if [ -z "$SHA" ]; then
-            SHA=${GITHUB_SHA::7}
-          fi
-          if [ -z "$VERSION" ]; then
-            VERSION="latest"
-          fi
-          COMBINED="${VERSION}-${SHA}"
-          echo "tag=$COMBINED" >> $GITHUB_OUTPUT
+      #- name: Compose combined tag
+      #  id: compose-tag
+      #  run: |
+      #    TAGS="${{ steps.meta.outputs.tags }}"
+      #    echo "Raw tags: $TAGS"
+      #    VERSION=$(echo "$TAGS" | tr ',' '\n' | grep -E ':[0-9]+\.[0-9]+\.[0-9]+' | head -n1 | cut -d':' -f2)
+      #    SHA=$(echo "$TAGS" | tr ',' '\n' | grep -E ':[a-f0-9]{6,}' | head -n1 | cut -d':' -f2)
+      #    if [ -z "$SHA" ]; then
+      #      SHA=${GITHUB_SHA::7}
+      #    fi
+      #    if [ -z "$VERSION" ]; then
+      #      VERSION="latest"
+      #    fi
+      #    COMBINED="${VERSION}-${SHA}"
+      #    echo "tag=$COMBINED" >> $GITHUB_OUTPUT
 
       - name: Set up docker
         run: |
