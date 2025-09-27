@@ -9,7 +9,7 @@ on: push
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: docker
 
     permissions:
       contents: read
