@@ -32,7 +32,7 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            datatactics/rahla
+            dtacs/rahla
             #dttctcs/rahla problem with dockerhub
           # generate Docker tags based on the following events/attributes
           tags: |
@@ -51,8 +51,8 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_PASS }}
+          username: releaser
+          password: ${{ vars.RELEASE_TOKEN }}
       
       - name: Build and push
         uses: docker/build-push-action@v2
@@ -63,13 +63,13 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Workspace Notification
-        uses: DTherHtun/google-chat-action@v0.9
-        if: always()
-        with:
-          project: ${{ github.repository }}
-          commit: "${{ github.event.head_commit.message }}" # ${{ steps.meta.outputs.tags }} ${{ steps.meta-frontend.outputs.tags }}
-          branch: ${{ github.ref }}
-          status: ${{ job.status }}
-          actionid: ${{ github.repository }}/runs/${{ github.run_id }}
-          webhook: "${{ secrets.GOOGLE_NOTIFICATION_WEBHOOK }}"
+      #- name: Workspace Notification
+      #  uses: DTherHtun/google-chat-action@v0.9
+      #  if: always()
+      #  with:
+      #    project: ${{ github.repository }}
+      #    commit: "${{ github.event.head_commit.message }}" # ${{ steps.meta.outputs.tags }} ${{ steps.meta-frontend.outputs.tags }}
+      #    branch: ${{ github.ref }}
+      #    status: ${{ job.status }}
+      #    actionid: ${{ github.repository }}/runs/${{ github.run_id }}
+      #    webhook: "${{ secrets.GOOGLE_NOTIFICATION_WEBHOOK }}"
