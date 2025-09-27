@@ -30,7 +30,8 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: |
-            repo.datatactics.dev/datatactics/rahla
+            #datatactics/rahla
+            repo.datatactics.dev/dtacs/rahla
           tags: |
             type=raw,latest
             type=ref,event=tag
