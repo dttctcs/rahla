@@ -38,7 +38,7 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            dtacs/rahla
+            repo.datatactics.dev/dtacs/rahla
             #dttctcs/rahla problem with dockerhub
           # generate Docker tags based on the following events/attributes
           tags: |
