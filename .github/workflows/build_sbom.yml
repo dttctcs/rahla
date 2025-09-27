@@ -20,14 +20,16 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots clean package
+        run: |
+          apt update -qq && apt install -qq -y maven
+          mvn --batch-mode --update-snapshots clean package
 
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v3
         with:
           images: |
-            datatactics/rahla
+            repo.datatactics.dev/datatactics/rahla
           tags: |
             type=raw,latest
             type=ref,event=tag
@@ -50,6 +52,11 @@ jobs:
           COMBINED="${VERSION}-${SHA}"
           echo "tag=$COMBINED" >> $GITHUB_OUTPUT
 
+      - name: Set up docker
+        run: |
+          apt update -qq
+          apt install -qq -y docker.io
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -60,6 +67,9 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
         with:
+          registry: repo.datatactics.dev
+          #username: ${{ secrets.CONTAINER_USERNAME }}
+          #password: ${{ secrets.CONTAINER_PASSWORD }}
           username: releaser
           password: ${{ vars.RELEASE_TOKEN }}
 
