@@ -123,6 +123,15 @@ jobs:
       #- name: Docker Login to private registry
         #run: echo "${{ secrets.CONTAINER_PASSWORD }}" | docker login ${{ env.REGISTRY }} -u "${{ secrets.CONTAINER_USERNAME }}" --password-stdin
 
+      - name: Setup trivy
+        run: |
+          apt-get install -qq -y wget gnupg
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | tee /usr/share/keyrings/trivy.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | tee -a /etc/apt/sources.list.d/trivy.list
+          apt-get update -qq
+          apt-get install -qq -y trivy
+
+
       - name: Scan image in a private registry
         uses: aquasecurity/trivy-action@0.28.0
         with:
