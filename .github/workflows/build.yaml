@@ -24,6 +24,7 @@ jobs:
           distribution: 'temurin'
       - name: Build with Maven
         run: |
+          apt update && apt install -y maven
           mvn --batch-mode --update-snapshots clean package 
 
       - name: Docker meta
