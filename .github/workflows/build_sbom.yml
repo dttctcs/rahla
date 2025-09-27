@@ -4,7 +4,7 @@ on: push
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: docker
     permissions:
       contents: read
       packages: write
@@ -60,8 +60,8 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_PASS }}
+          username: releaser
+          password: ${{ vars.RELEASE_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v2
@@ -72,16 +72,16 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Workspace Notification
-        uses: DTherHtun/google-chat-action@v0.9
-        if: always()
-        with:
-          project: ${{ github.repository }}
-          commit: "${{ github.event.head_commit.message }}"
-          branch: ${{ github.ref }}
-          status: ${{ job.status }}
-          actionid: ${{ github.repository }}/runs/${{ github.run_id }}
-          webhook: "${{ secrets.GOOGLE_NOTIFICATION_WEBHOOK }}"
+      #- name: Workspace Notification
+      #  uses: DTherHtun/google-chat-action@v0.9
+      #  if: always()
+      #  with:
+      #    project: ${{ github.repository }}
+      #    commit: "${{ github.event.head_commit.message }}"
+      #    branch: ${{ github.ref }}
+      #    status: ${{ job.status }}
+      #    actionid: ${{ github.repository }}/runs/${{ github.run_id }}
+      #    webhook: "${{ secrets.GOOGLE_NOTIFICATION_WEBHOOK }}"
 
   vulnerability-scan:
     needs: build
@@ -94,8 +94,8 @@ jobs:
       FILENAME: sbom_rahla_latest.json
       TAG: ${{ needs.build.outputs.tag }}
     steps:
-      - name: Docker Login to private registry
-        run: echo "${{ secrets.CONTAINER_PASSWORD }}" | docker login ${{ env.REGISTRY }} -u "${{ secrets.CONTAINER_USERNAME }}" --password-stdin
+      #- name: Docker Login to private registry
+        #run: echo "${{ secrets.CONTAINER_PASSWORD }}" | docker login ${{ env.REGISTRY }} -u "${{ secrets.CONTAINER_USERNAME }}" --password-stdin
 
       - name: Scan image in a private registry
         uses: aquasecurity/trivy-action@0.28.0
@@ -107,14 +107,14 @@ jobs:
           severity: MEDIUM,HIGH,CRITICAL
           scanners: vuln
         env:
-          TRIVY_USERNAME: ${{ secrets.CONTAINER_USERNAME }}
-          TRIVY_PASSWORD: ${{ secrets.CONTAINER_PASSWORD }}
+          TRIVY_USERNAME: releaser
+          TRIVY_PASSWORD: ${{ vars.RELEASE_TOKEN }}
 
       - name: Upload SBOM to Dependency Track
         run: |
           curl -L -X POST ${DTRACK_URL} \
             -H 'Content-Type: multipart/form-data' \
-            -H "X-API-Key:${{ secrets.DTRACK_API_TOKEN }}" \
+            #-H "X-API-Key:${{ secrets.DTRACK_API_TOKEN }}" \
             -F "autoCreate=true" \
             -F "projectName=${IMAGE}" \
             -F "projectVersion=${TAG}" \
