@@ -27,6 +27,11 @@ jobs:
           apt update && apt install -y maven
           mvn --batch-mode --update-snapshots clean package 
 
+      - name: Set up docker
+        run: |
+          apt update
+          apt install -y docker.io
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v3
