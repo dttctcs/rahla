@@ -2,11 +2,6 @@ name: Java CI
 
 on: push
 
-#on:
-#  release:
-#    types:
-#      - published
-
 jobs:
   build:
     runs-on: docker
@@ -16,9 +11,10 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v5
+      
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'temurin'
@@ -34,51 +30,32 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v5
         with:
-          # list of Docker images to use as base name for tags
           images: |
-            repo.datatactics.dev/dtacs/rahla
+            docker.io/datatactics/rahla
             #dttctcs/rahla problem with dockerhub
-          # generate Docker tags based on the following events/attributes
           tags: |
             type=raw,latest
             type=ref,event=tag
             type=semver,pattern={{version}}
             type=sha,prefix=
-      
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-          
+                
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       
       - name: Login to Dockerhub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
-        with:
-          registry: repo.datatactics.dev
-          #username: ${{ secrets.CONTAINER_USERNAME }}
-          #password: ${{ secrets.CONTAINER_PASSWORD }}
-          username: releaser
-          password: ${{ vars.RELEASE_TOKEN }}
+        with:          
+          username: ${{ secrets.CONTAINER_USERNAME }}
+          password: ${{ secrets.CONTAINER_PASSWORD }}          
       
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      #- name: Workspace Notification
-      #  uses: DTherHtun/google-chat-action@v0.9
-      #  if: always()
-      #  with:
-      #    project: ${{ github.repository }}
-      #    commit: "${{ github.event.head_commit.message }}" # ${{ steps.meta.outputs.tags }} ${{ steps.meta-frontend.outputs.tags }}
-      #    branch: ${{ github.ref }}
-      #    status: ${{ job.status }}
-      #    actionid: ${{ github.repository }}/runs/${{ github.run_id }}
-      #    webhook: "${{ secrets.GOOGLE_NOTIFICATION_WEBHOOK }}"
