@@ -1,4 +1,22 @@
-# 1.2.2 (2025-09-19)
+# 1.2.4 (2025-09-19)
+
+
+### Dependency Updates
+
+* Switched base image from eclipse temurin to linuxserver/baseimage-debian:trixie
+* karaf: 4.4.7 -> 4.4.8
+* camel: 4.10.3 -> 4.10.7
+* groovy: 4.0.25 -> 4.0.29
+* jackson2: 2.18.2 -> 2.20.1
+* pax-logging: 2.2.8 -> 2.3.1
+* lombok: 1.18.36 -> 1.18.42
+* commons-configuration2: 2.12.0 -> 2.13.0
+* log4j2: 2.24.3 -> 2.25.2
+* jedis: 5.2.0 -> 7.1.0
+* opentelemetry_agent: 2.12.0 -> 2.22.0
+* opentelemetry-sdk-extension-autoconfigure: 1.21.0-alpha -> 1.57.0
+
+# 1.2.3 (2025-09-19)
 
 
 ### Fix 
@@ -79,7 +97,7 @@ RUN (sleep 60; karaf stop ) & karaf server
 ### Changes
 
 * Camel Version : 4.9.0
-* Karf Version: 4.4.7
+* Karf Version: 4.4.8
 * Mulitiple dependency updates
 
 
