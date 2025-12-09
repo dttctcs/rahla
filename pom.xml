@@ -1157,9 +1157,9 @@
     <scm>
         <connection>scm:git:https://repo.datatactics.dev/oss/rahla.git</connection>
         <developerConnection>scm:git:https://repo.datatactics.dev/oss/rahla.git</developerConnection>
-        <tag>v1.2.4</tag>
+        <tag>HEAD</tag>
         <url>https://codeberg.org/dataTactics/rahla</url>
     </scm>
 
-    <version>1.2.4</version>
+    <version>1.2.4-SNAPSHOT</version>
 </project>
