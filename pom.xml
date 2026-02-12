@@ -1117,9 +1117,9 @@
         <log4j2.version>2.25.3</log4j2.version>
         <janusgraph-driver.version>1.1.0</janusgraph-driver.version>
         <gremlin-groovy.version>3.7.3</gremlin-groovy.version>
-        <jedis.version>7.1.0</jedis.version>
+        <jedis.version>7.2.1</jedis.version>
         <guava.version>23.6.1-jre</guava.version>
-        <log4j2-appender-loki.version>0.9.32</log4j2-appender-loki.version>
+        <log4j2-appender-loki.version>0.9.41</log4j2-appender-loki.version>
         <jmx_exporter.version>1.0.1</jmx_exporter.version>
         <opentelemetry_agent.version>2.22.0</opentelemetry_agent.version>
         <stax2-api.version>4.2.2</stax2-api.version>

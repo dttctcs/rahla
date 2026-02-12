@@ -69,15 +69,15 @@ RUN set -eux; \
     echo "java --version"; java --version; \
     echo "Complete."
 
-
+COPY root /
 COPY --chown=abc:911 assembly/target/assembly /app/rahla
 RUN sed -i -e '/ rahla-logging.*/d' -i -e '/ framework.*/d'  /app/rahla/etc/org.apache.karaf.features.cfg; \
     rm -rf /app/rahla/deploy; \
     mkdir -p /config/deploy; \
+    mv /app/rahla/etc /config/; \
     chown abc:911 /config/deploy; \
-    ln -s /config/deploy /app/rahla/deploy
-COPY root /
-
+    ln -s /config/deploy /app/rahla/deploy; \
+    ln -s /config/etc /app/rahla/etc
 
 ENV PATH=$PATH:/app/rahla/bin
 ENV KARAF_EXEC=exec

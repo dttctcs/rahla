@@ -1,10 +1,12 @@
 # 1.3.0 (2026-02-12)
 
-### Changes 
+### Changes *BREAKING*
 * Switched base iamge to `linuxserver/baseimage-alpine:3.23`
 * Switched to temurin `jdk-21.0.10+7`
-* **Breaking:** moved rahla from `/rahla` to `/app/rahla` to meet LSIO standards.
-* **Breaking:** `rahla/deploy` is now linked to `/config/deploy` to meet LSIO standards.
+* **Breaking:** LSIO conventions 
+  * moved rahla from `/rahla` to `/app/rahla`.
+  * `rahla/deploy` is now linked to `/config/deploy`.
+  * `rahla/etc` is now linked to `/config/etc`.
 * Added kubernetes deployments `manifests/rahla.yaml`
 
 ### Dependency Updates
@@ -15,6 +17,8 @@
 * jackson2: `2.20.1 > 2.21.0`
 * pax-logging: `2.3.1 > 2.3.2`
 * log4j2: `2.25.2 > 2.25.3`
+* log4j loki appender `0.9.32 > 0.9.41`
+* redis.clients:jedis  `7.1.0 > 7.2.1`
 
 # 1.2.4 (2025-09-19)
 
