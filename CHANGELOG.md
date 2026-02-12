@@ -1,5 +1,22 @@
-# 1.2.4 (2025-09-19)
+# 1.3.0 (2026-02-12)
 
+### Changes 
+* Switched base iamge to `linuxserver/baseimage-alpine:3.23`
+* Switched to temurin `jdk-21.0.10+7`
+* **Breaking:** moved rahla from `/rahla` to `/app/rahla` to meet LSIO standards.
+* **Breaking:** `rahla/deploy` is now linked to `/config/deploy` to meet LSIO standards.
+* Added kubernetes deployments `manifests/rahla.yaml`
+
+### Dependency Updates
+
+* karaf: `4.4.8 > 4.4.9`
+* groovy: `4.0.29 > 4.0.30`
+* opentelemetry-sdk-extension-autoconfigure: `1.57.0 > 1.59.0`
+* jackson2: `2.20.1 > 2.21.0`
+* pax-logging: `2.3.1 > 2.3.2`
+* log4j2: `2.25.2 > 2.25.3`
+
+# 1.2.4 (2025-09-19)
 
 ### Dependency Updates
 
@@ -97,7 +114,7 @@ RUN (sleep 60; karaf stop ) & karaf server
 ### Changes
 
 * Camel Version : 4.9.0
-* Karf Version: 4.4.8
+* Karf Version: 4.4.9
 * Mulitiple dependency updates
 
 

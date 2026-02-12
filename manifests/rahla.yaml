@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rahla
+  labels:
+    app: rahla
+spec:
+  selector:
+    matchLabels:
+      app: rahla
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rahla
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9001"
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+        - name: rahla
+          image: datatactics/rahla:v1.3.0
+          ports:
+            - name: ssh
+              containerPort: 8101
+              protocol: TCP
+            - name: osgi
+              containerPort: 8181
+              protocol: TCP
+            - name: prometheus
+              containerPort: 9001
+              protocol: TCP
+          volumeMounts:
+            - name: data-cache
+              mountPath: "/rahla/data"
+      volumes:
+        - name: data-cache
+          emptyDir:
+            sizeLimit: 512Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rahla
+  labels:
+    app: rahla
+spec:
+  ports:
+    - name: osgi
+      port: 8181
+      protocol: TCP
+      targetPort: osgi
+    - name: ssh
+      port: 8101
+      protocol: TCP
+      targetPort: ssh
+  selector:
+    app: rahla
+  type: ClusterIP

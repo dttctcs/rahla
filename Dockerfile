@@ -1,27 +1,91 @@
-FROM ghcr.io/linuxserver/baseimage-debian:trixie
+#FROM ghcr.io/linuxserver/baseimage-debian:trixie
+FROM ghcr.io/linuxserver/baseimage-alpine:3.23
 
-RUN apt update \
-    && apt install -y wget apt-transport-https gpg ca-certificates procps \
-    && wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor | tee /etc/apt/trusted.gpg.d/adoptium.gpg > /dev/null \
-    && echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list \
-    && apt update \
-    && DEBIAN_FRONTEND=noninteractive apt install -y temurin-21-jre \
-    && apt upgrade -y \
-    && apt clean \
-    && mkdir -p /rahla \
-    && chown 911:911 /rahla
-WORKDIR /rahla/
-COPY --chown=911:911 assembly/target/assembly /rahla
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Default to UTF-8 file.encoding
+ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
+
+RUN set -eux; \
+    apk add --no-cache \
+        # java.lang.UnsatisfiedLinkError: libfontmanager.so: libfreetype.so.6: cannot open shared object file: No such file or directory
+        # java.lang.NoClassDefFoundError: Could not initialize class sun.awt.X11FontManager
+        # https://github.com/docker-library/openjdk/pull/235#issuecomment-424466077
+        fontconfig ttf-dejavu \
+        # gnupg required to verify the signature
+        gnupg \
+        # utilities for keeping Alpine and OpenJDK CA certificates in sync
+        # https://github.com/adoptium/containers/issues/293
+        ca-certificates p11-kit-trust \
+        # locales ensures proper character encoding and locale-specific behaviors using en_US.UTF-8
+        musl-locales musl-locales-lang \
+        tzdata \
+        # Contains `csplit` used for splitting multiple certificates in one file to multiple files, since keytool can
+        # only import one at a time.
+        coreutils \
+        # Needed to extract CN and generate aliases for certificates
+        openssl \
+    ; \
+    rm -rf /var/cache/apk/*
+
+ENV JAVA_VERSION=jdk-21.0.10+7
+
+RUN set -eux; \
+    ARCH="$(apk --print-arch)"; \
+    case "${ARCH}" in \
+       aarch64) \
+         ESUM='d1cd7b33dcd81293b0b705f4d0e79adce092786be31736a63abe6a4b31841ae5'; \
+         BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.10%2B7/OpenJDK21U-jre_aarch64_alpine-linux_hotspot_21.0.10_7.tar.gz'; \
+         ;; \
+       x86_64) \
+         ESUM='4f6200277644afe6ad49218ae1dd45ab3d0d0b2ac4109163604e36156a93a306'; \
+         BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.10%2B7/OpenJDK21U-jre_x64_alpine-linux_hotspot_21.0.10_7.tar.gz'; \
+         ;; \
+       *) \
+         echo "Unsupported arch: ${ARCH}"; \
+         exit 1; \
+         ;; \
+    esac; \
+    wget -O /tmp/openjdk.tar.gz ${BINARY_URL}; \
+    wget -O /tmp/openjdk.tar.gz.sig ${BINARY_URL}.sig; \
+    export GNUPGHOME="$(mktemp -d)"; \
+    # gpg: key 843C48A565F8F04B: "Adoptium GPG Key (DEB/RPM Signing Key) <temurin-dev@eclipse.org>" imported
+    gpg --batch --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B; \
+    gpg --batch --verify /tmp/openjdk.tar.gz.sig /tmp/openjdk.tar.gz; \
+    rm -rf "${GNUPGHOME}" /tmp/openjdk.tar.gz.sig; \
+    echo "${ESUM} */tmp/openjdk.tar.gz" | sha256sum -c -; \
+    mkdir -p "$JAVA_HOME"; \
+    tar --extract \
+        --file /tmp/openjdk.tar.gz \
+        --directory "$JAVA_HOME" \
+        --strip-components 1 \
+        --no-same-owner \
+    ; \
+    rm -f /tmp/openjdk.tar.gz;
+
+RUN set -eux; \
+    echo "Verifying install ..."; \
+    echo "java --version"; java --version; \
+    echo "Complete."
+
+
+COPY --chown=abc:911 assembly/target/assembly /app/rahla
+RUN sed -i -e '/ rahla-logging.*/d' -i -e '/ framework.*/d'  /app/rahla/etc/org.apache.karaf.features.cfg; \
+    rm -rf /app/rahla/deploy; \
+    mkdir -p /config/deploy; \
+    chown abc:911 /config/deploy; \
+    ln -s /config/deploy /app/rahla/deploy
 COPY root /
-RUN sed -i -e '/ rahla-logging.*/d' -i -e '/ framework.*/d'  /rahla/etc/org.apache.karaf.features.cfg # temporary workaround
 
-ENV PATH=$PATH:/rahla/bin
+
+ENV PATH=$PATH:/app/rahla/bin
 ENV KARAF_EXEC=exec
 ENV KARAF_SYSTEM_OPTS="-javaagent:./lib/jmx_prometheus_javaagent-1.0.1.jar=9001:etc/config.yaml -javaagent:./lib/opentelemetry-javaagent-2.22.0.jar"
 ENV OTEL_LOGS_EXPORTER=none
 ENV OTEL_METRICS_EXPORTER=none
 ENV OTEL_TRACES_EXPORTER=none
 
-EXPOSE 8101 1099 44444 8181 8182
+EXPOSE 8101 1099 44444 8181
 
 
