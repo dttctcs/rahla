@@ -4,10 +4,12 @@
 * Switched base iamge to `linuxserver/baseimage-alpine:3.23`
 * Switched to temurin `jdk-21.0.10+7`
 * **Breaking:** LSIO conventions 
-  * moved rahla from `/rahla` to `/app/rahla`.
-  * `rahla/deploy` is now linked to `/config/deploy`.
-  * `rahla/etc` is now linked to `/config/etc`.
+  * moved rahla from `/rahla` to `/app/rahla`. 
+  * `/app/rahla/deploy` is linked to `/config/deploy`.
+  * `/app/rahla/etc` is linked to `/config/etc`.
+  * `/rahla/deploy` is no longer scanned for files
 * Added kubernetes deployments `manifests/rahla.yaml`
+*  **Breaking:** RAHLA_DEPLOY_PATH has been removed; if you require this functionality use `org.apache.felix.fileinstall`
 
 ### Dependency Updates
 

@@ -28,20 +28,10 @@ public class FradiComponent extends DefaultComponent {
   public static final String FRADI_HEADER_FOR_EVENTS = "headerForEvents";
 
   public static final String RESOURCE_FILE = "resource:file:";
-  public static final String RESOURCE_DEPLOY = "resource:deploy:";
-  private String deploy_path = System.getenv().getOrDefault("RAHLA_DEPLOY_PATH", "/deploy");
   private static final Logger log = LogManager.getLogger();
-
-  public FradiComponent() {
-      if (!deploy_path.endsWith("/"))
-        deploy_path += "/";
-      fradiEngine = new FradiEngine();
-    }
 
 
   public FradiComponent(String urlSpec) throws IOException {
-    if (!deploy_path.endsWith("/"))
-      deploy_path += "/";
     fradiEngine = new FradiEngine();
     URL url = new URL(urlSpec);
     InputStream inputStream = url.openStream();
@@ -77,18 +67,6 @@ public class FradiComponent extends DefaultComponent {
       log.warn("setPlan is deprecated Use argument constructor with URL (file://, http://, ...)");
       if (plan.startsWith(RESOURCE_FILE)) {
         String fileName = plan.substring(RESOURCE_FILE.length());
-        Path path = Path.of(fileName);
-        try {
-          plan = Files.readString(path, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-      } else if (plan.startsWith(RESOURCE_DEPLOY)) {
-        String fileName = plan.substring(RESOURCE_DEPLOY.length());
-        if (fileName.startsWith("/")) {
-          fileName = fileName.substring(1);
-        }
-        fileName = deploy_path + fileName;
         Path path = Path.of(fileName);
         try {
           plan = Files.readString(path, StandardCharsets.UTF_8);

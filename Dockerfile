@@ -77,7 +77,8 @@ RUN sed -i -e '/ rahla-logging.*/d' -i -e '/ framework.*/d'  /app/rahla/etc/org.
     mv /app/rahla/etc /config/; \
     chown abc:911 /config/deploy; \
     ln -s /config/deploy /app/rahla/deploy; \
-    ln -s /config/etc /app/rahla/etc
+    ln -s /config/etc /app/rahla/etc;
+
 
 ENV PATH=$PATH:/app/rahla/bin
 ENV KARAF_EXEC=exec

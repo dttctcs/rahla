@@ -25,13 +25,6 @@ public class GroovyBeanFactoryImpl implements GroovyBeanFactory {
   private BundleContext bundleContext;
 
   public static final String RESOURCE_FILE = "resource:file:";
-  public static final String RESOURCE_DEPLOY = "resource:deploy:";
-  private String deploy_path = System.getenv().getOrDefault("RAHLA_DEPLOY_PATH" , "/deploy");
-
-  public GroovyBeanFactoryImpl() {
-    if (!deploy_path.endsWith("/"))
-      deploy_path += "/";
-  }
 
   @Activate
   public void activate(ComponentContext cc) throws InvalidSyntaxException, IOException {
@@ -49,16 +42,7 @@ public class GroovyBeanFactoryImpl implements GroovyBeanFactory {
         String fileName = urlSpec.substring(RESOURCE_FILE.length());
         File file = new File(fileName);
         clazz = groovyClassLoader.parseClass(file);
-      } else if (urlSpec.startsWith(RESOURCE_DEPLOY)) {
-        log.warn("resource:deploy: is deprecated and will be removed in a future release! Use URLs (file:// http://, ...)");
-        String fileName = urlSpec.substring(RESOURCE_DEPLOY.length());
-        if(fileName.startsWith("/")){
-          fileName = fileName.substring(1);
-        }
-        fileName = deploy_path + fileName;
-        File file = new File(fileName);
-        clazz = groovyClassLoader.parseClass(file);
-      } else {
+      }  else {
         URL url = new URL(urlSpec);
         InputStream inputStream = url.openStream();
         String clazzString = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);

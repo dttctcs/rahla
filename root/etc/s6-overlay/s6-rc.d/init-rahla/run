@@ -1,0 +1,21 @@
+#!/usr/bin/with-contenv ash
+
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+if [ -n "$RAHLA_DEPLOY_PATH" ]; then
+echo -e "${YELLOW}[WARNING] The environment variable 'RAHLA_DEPLOY_PATH' is set, but it has been removed since version 1.3.5.${NC}"
+echo -e "${YELLOW}          Please use 'org.apachle.felix.fileinstall' configuration if you need to monitor a custom directory.${NC}"
+fi
+
+if [ -d "/deploy" ] && [ "$(ls -A /deploy 2>/dev/null)" ]; then
+echo -e "${YELLOW}[WARNING] Files detected in '/deploy'.${NC}"
+echo -e "${YELLOW}          This directory is no longer monitored by default because 'RAHLA_DEPLOY_PATH' was removed.${NC}"
+fi
+
+if [ -d "/rahla/deploy" ]; then
+echo -e "${YELLOW}[WARNING] Directory '/rahla/deploy' detected.${NC}"
+echo -e "${YELLOW}          Rahla now uses a LinuxServer.io base image.${NC}"
+echo -e "${YELLOW}          The application is now located in '/app/rahla'.${NC}"
+echo -e "${YELLOW}          Please move your configuration to '/config/deploy' and '/config/etc'.${NC}"
+fi

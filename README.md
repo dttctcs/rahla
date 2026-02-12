@@ -1,163 +1,116 @@
-# Rahla - An Open-Source Apache Camel Appliance for Apache Karaf
+<a id="readme-top"></a>
 
-[![Build Status](https://github.com/dttctcs/rahla/actions/workflows/build.yaml/badge.svg)](https://github.com/dttctcs/rahla/actions/workflows/build.yaml)
-[![License](https://img.shields.io/badge/license-Apache%202.0-green)](https://github.com/dttctcs/rahla/blob/main/LICENSE)
+[![Build Status][build-shield]][build-url]
+[![License][license-shield]][license-url]
 
 
-**Rahla** is an open-source Apache Camel container designed for easy deployment within Apache Karaf. It simplifies the process of building and deploying robust integration solutions by leveraging Camel’s powerful routing and mediation engine in an OSGi environment.
+<br />
+<div align="center">
+  <h3 align="center">Rahla</h3>
 
-## Key Features
+  <p align="center">
+    An Open-Source Apache Camel Appliance for Apache Karaf
+    <br />
+    <a href="https://codeberg.org/dataTactics/rahla/"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://codeberg.org/dataTactics/rahla/issues">Report Bug</a>
+    &middot;
+    <a href="https://codeberg.org/dataTactics/rahla/issues">Request Feature</a>
+  </p>
+</div>
 
-- **Containerized:** Rahla is packaged as a Docker container, making it easy to deploy and manage in various environments.
-- **OSGi-Enabled**: Leverages OSGi services for modularity and seamless integration with Apache Karaf.
-- **Dynamic Deployment**: Automatically detects and loads resources (jars, configurations, Camel contexts) on-the-fly from the specified deployment directory.
-- **Advanced Monitoring**: Built-in support for Prometheus and OpenTelemetry to monitor application performance.
-    * **SmartURL:**  Dynamically add URL handlers to files, MinIO, Redis, and other file-based structures.
-    * **Groovy Bean Factory:**  Compile and use Groovy beans in your Camel routes at runtime.
-    * **Template File Installer:**  Define reusable route templates in YAML files for easy configuration management.
-    * **GraphSource:**  Seamlessly interact with graph databases (e.g., JanusGraph) using Gremlin queries.
-    * **JedisSource:**  Simplify interactions with Redis databases using the Jedis library.
-    * **Siddhi Integration (Fradi Camel Component):**  Integrate Siddhi, a complex event processing engine, into your Camel routes for stream processing and SQL-like operations.
-* **Monitoring:** Rahla integrates Prometheus JMX Exporter and OpenTelemetry Agent for comprehensive monitoring and observability.
+
+## About The Project
+
+**Rahla** is an open-source Apache Karaf appliance designed for easy deployment with Apache Camel. It simplifies the process of building and deploying robust integration solutions by leveraging Camel’s powerful routing and mediation engine in an OSGi environment.
+
+It is packaged as a Docker container, making it easy to deploy and manage in various environments, and automatically detects and loads resources (JARs, configurations, Camel contexts) on-the-fly.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Key Features
+
+* **Containerized:** Packaged as a Docker container for easy deployment.
+* **OSGi-Enabled:** Leverages OSGi services for modularity and integration with Apache Karaf.
+* **Dynamic Deployment:** Monitors `/config/deploy` to load resources on-the-fly.
+* **Groovy Bean Factory:** Compile and use Groovy beans in your Camel routes at runtime.
+* **Template File Installer:** Define reusable route templates in YAML files.
+* **GraphSource:** Seamlessly interact with graph databases (e.g., JanusGraph).
+* **JedisSource:** Simplify interactions with Redis databases using the Jedis library.
+* **Siddhi Integration:** Integrate complex event processing into Camel routes.
+* **Advanced Monitoring:** Built-in Prometheus JMX Exporter and OpenTelemetry Agent.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 ## Getting Started
 
+To get a local copy up and running follow these simple example steps.
+
 ### Prerequisites
 
-- **Container Runtime (e.g., Docker)**: Basic knowledge of starting containers, mounting files, and managing directories.
+* **Docker** or a compatible container runtime.
+* Basic knowledge of mounting volumes and managing directories.
 
-### Steps to start Rahla with Docker
+### Installation
 
-1. **Start Rahla Distribution:**  ```mkdir deploy && docker run --rm -p 8101 -v ./deploy:/deploy datatactics/rahla:latest```
-2. **Deploy to Rahla** Copy your jars, configs, and Camel contexts into the deploy directory. Rahla automatically monitors this directory for changes and dynamically loads new resources. To customize the deployment path, set the ```RAHLA_DEPLOY_PATH``` environment variable.
-3. **Access Rahla Console:** Connect to the Rahla console via SSH: ```ssh -p 8101 admin@localhost``` **Note:** Default password is ```admin``` and  can be changed via environment variable ```ADMIN_PASS```
+1.  **Prepare Deployment Directory:**
+    Create a local directory for your artifacts.
+    ```sh
+    mkdir deploy
+    ```
+2.  **Start Rahla:**
+    Run the container, mounting your local deploy folder to `/config/deploy`.
+    ```sh
+    docker run --rm -p 8101:8101 -v ./deploy:/config/deploy datatactics/rahla:latest
+    ```
+3.  **Deploy Artifacts:**
+    Copy your JARs, configurations (`.cfg`, `.groovy`), and Camel contexts (`.xml`) into your local `deploy` directory. Rahla automatically detects changes in `/config/deploy` and loads them.
 
+4.  **Access Console:**
+    Connect via SSH (Default password: `admin`):
+    ```sh
+    ssh -p 8101 admin@localhost
+    ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+## Usage
 
 ### Kubernetes Deployment
-Due to the cloud readiness of the application an simple deployment is given here:
-```yaml
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: rahla
-  labels:
-    app: rahla
-spec:
-  selector:
-    matchLabels:
-      app: rahla
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: rahla
-      annotations:
-        prometheus.io/path: /metrics
-        prometheus.io/port: "9001"
-        prometheus.io/scrape: "true"
-    spec:
-      containers:
-      - name: rahla
-        image: datatactics/rahla:latest
-        resources:
-          requests:
-            cpu: 100m
-            memory: 768Mi
-        ports:
-        - name: ssh
-          containerPort: 8101
-          protocol: TCP
-        - name: osgi
-          containerPort: 8181
-          protocol: TCP
-        volumeMounts:
-        - name: data-cache
-          mountPath: "/rahla/data"
-      volumes:
-      - name: data-cache
-        emptyDir: {}
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: rahla
-  labels:
-    app: rahla
-spec:
-  ports:
-  - name: osgi
-    port: 8181
-    protocol: TCP
-    targetPort: osgi
-  - name: ssh
-    port: 8101
-    protocol: TCP
-    targetPort: ssh
-  selector:
-    app: rahla
-  type: ClusterIP
 
-```
+Rahla is cloud-ready. A sample Kubernetes deployment manifest is available in the repository at `manifests/rahla.yaml`.
 
-### Build your own
-You can checkout the repo and do maven ```mvn clean package``` of the project. Inside ```assembly/target/assembly/``` is the unpacked karaf application 
+This manifest configures the necessary ports (SSH 8101, OSGi 8181, Prometheus 9001) and volume mounts. Ensure you configure your `PersistentVolumeClaim` or `ConfigMap` to mount to `/config/deploy` if you wish to inject routes dynamically.
 
+### Configuration
 
-### JVM Configration
-Rahla relies on karaf so use  ```EXTRA_JAVA_OPTS``` to add additional parameters for the java virtual machine e.g. Truststore, Xmx and so on.
+#### JVM Configuration
+Use the environment variable `EXTRA_JAVA_OPTS` to add additional parameters for the Java Virtual Machine (e.g., Truststore, Xmx).
 
-### Console
-After successfully connected to the Rahla (Karaf) Console. You have access to a standard karaf envorinment. We addeed one command ``log:logs`` in case you mount the ```log4j2.xml``` read-only.
+#### Important Configuration Files
+Rahla includes several pre-configured files. You can override these by mounting valid configurations:
 
-- **List Installed Bundles:** Use the following command to verify bundles are installed and active:
+* **`users.properties`:** Defines user accounts/roles.
+* **`config.yaml`:** Configures the Prometheus JMX Exporter.
+* **`log4j2.xml`:** Configures logging (default is JSON format for containers).
+* **`org.apache.felix.fileinstall-rahla.cfg`:** Configures the File Install bundle to monitor `/config/deploy`.
 
-  ```bash
-  bundle:list 
-  ```
-- **Check for Problems:** Use the following command to diagnose bundles:
+### Advanced Capabilities
 
-  ```bash
-  bundle:diag <num> 
-  ```
+#### Groovy Bean Factory
+Compile beans with Groovy for your Camel contexts during runtime using the `file://` protocol:
 
-
-### Additional Feature Overview
-
-Rahla leverages OSGi services for dependency management and modularity, ensuring seamless integration with Apache Karaf. It additionally adds some components wich are noit 
-
-####  SmartURL:
-
-Rahla's `smarturl` can dynamically add url handlers to files, minio or any other file based structure.
-Smarturl currently existis for file, minio and redis backends.
-
-E.g.: Using a ```rahla.smarturl.minio.cfg`` file:
-
-```ini
-url.handler.protocol: minio
-endpoint: http://minio
-access.key: admin
-secret.key: admin
-```
-
-Access streaming data from an oject
-```groovy
-def inputStream = new URL("minio://bucket/object").openConnection().getGZInputStream()
-
-```
-
-#### Groovy Bean Factory 
-
-Compile beans with Groovy for your camel contexts during runtime:
 ```xml
 <reference id="beanFactory" interface="rahla.api.GroovyBeanFactory"/>
 
 <bean id="myInstance" factory-ref="beanFactory" factory-method="createBean">
-   <argument value="resource:deploy:MyClass.groovy"/>
+<argument value="file:///config/deploy/MyClass.groovy"/>
 </bean>
-
 ```
+
 #### Template File Installer 
 
 Define your route templates in YAML files:
@@ -223,7 +176,6 @@ public interface GraphSource<T, V> {
 #### JedisSource
 
 Easily interact with redis databases via java low level jedis library using the `JedisSource` Interface:
-
 
 E.g.: Using a ```rahla.jedissource-redis.cfg`` file:
 
@@ -301,23 +253,6 @@ We added a pax compatible appender for Loki.
 ***Note*** keep in mind that you need to add ```<Configuration packages="pl.tkowalcz.tjahzi.log4j2">``` to get ```<Loki ...``` working.
 
 
-### Configuration Files
-
-Rahla adds or modifies a set of configuration files for customization and fine-tuning:
-
-- **`branding.properties`:** Contains properties used by the Karaf shell to customize the shell prompt and other display elements.
-- **`branding-ssh.properties`:** Similar to `branding.properties`, but specifically for the SSH console.
-- **`custom.properties`:**  A placeholder file for your custom system properties. This allows you to override or extend Rahla's default configuration. We added base package sun.nio.ch. If you require packages from inside your jvm implemenation which are not standard.
-- **`org.apache.karaf.log.cfg`:** Configures Karaf's console logging system, including log levels and output formatting..
-- **`org.apache.karaf.management.cfg`:** Defines settings related to JMX management for Karaf, enabling remote monitoring and control.
-- **`org.ops4j.pax.logging.cfg`:** Just configures pax to use log4j2.xml.
-- **`org.ops4j.pax.url.mvn.cfg`:** Configures Pax URL's Maven resolver, allowing Karaf to download dependencies from Maven repositories. We added local repository to package lookup  (+)
-- **`users.properties`:** Defines user accounts and roles for accessing the Karaf console and managing the container. You can add more users here.
-- **`config.yaml`:** Configures the Prometheus JMX Exporter to expose Camel metrics for monitoring. You can add custom metric mappings to this file. For example, if you require to 
-- **`log4j2.xml`:** Configures Rahla's logging behavior. The default configuration is for container usage, including console output in JSON format. You can modify or replace the configuration file to meet your requirements. e.g. special naming for your ```org.apache.camel.metrics``.
-- **`org.apache.felix.fileinstall-rahla.cfg`:** Configures the File Install bundle to monitor a directory (by default, `/deploy` can be replaced by the environment variable ```RAHLA_DEPLOY_PATH``` ) to automatically deploy or update configruations, budles or packages in the Karaf container. 
-
-
 ## Monitoring
 
 For monitoring, the Rahla appliance comes equipped with Prometheus JMX Exporter integration and OpenTelemety Agent. The java properties are  configured via environment variable ```KARAF_SYSTEM_OPTS```. The Rahla Karaf assembly includes the necessary libraries.
@@ -334,6 +269,4 @@ For monitoring, the Rahla appliance comes equipped with Prometheus JMX Exporter 
 
 Contributions to Rahla are highly encouraged! 
 
-- **File Issues:** Use the [GitHub issue tracker](https://github.com/dttctcs/rahla/issues) to report bugs or request new features.
-- **Submit Pull Requests:**  Contribute code changes through pull requests. Please follow the project's coding standards.
 - **License:** Rahla is licensed under the Apache 2.0 License.
