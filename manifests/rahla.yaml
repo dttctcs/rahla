@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: rahla
-          image: datatactics/rahla:v1.3.0
+          image: datatactics/rahla:latest
           ports:
             - name: ssh
               containerPort: 8101

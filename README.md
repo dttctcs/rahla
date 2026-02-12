@@ -1,9 +1,5 @@
 <a id="readme-top"></a>
 
-[![Build Status][build-shield]][build-url]
-[![License][license-shield]][license-url]
-
-
 <br />
 <div align="center">
   <h3 align="center">Rahla</h3>
