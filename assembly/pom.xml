@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <artifactId>rahla</artifactId>
 
@@ -157,7 +158,7 @@
             <feature>standard</feature>
             <feature>scr</feature>
             <feature>spifly</feature>
-            <feature>pax-web-http</feature>
+            <feature>pax-web-http-undertow</feature>
             <feature>jolokia</feature>
             <feature>rahla</feature>
           </bootFeatures>
@@ -174,6 +175,10 @@
           <blacklistedBundles>
             <bundle>mvn:org.apache.groovy/groovy/[4,5)</bundle>
             <bundle>mvn:com.fasterxml.woodstox/woodstox-core/7.0.0</bundle>
+            <bundle>mvn:io.undertow/undertow-core/2.2.37.Final</bundle>
+            <bundle>mvn:io.undertow/undertow-servlet/2.2.37.Final</bundle>
+            <bundle>mvn:org.ops4j.pax.logging/pax-logging-api/2.3.0</bundle>
+            <bundle>mvn:org.ops4j.pax.logging/pax-logging-log4j2/2.3.0</bundle>
             <!--<bundle>mvn:org.codehaus.woodstox/stax2-api/4.2.1</bundle>
             <bundle>mvn:org.codehaus.woodstox/woodstox-core-asl/4.4.1</bundle>
             <bundle>mvn:org.yaml/snakeyaml/1.30</bundle>-->

@@ -49,6 +49,16 @@
       <scope>compile</scope>
     </dependency>-->
     <dependency>
+      <artifactId>pax-logging-api</artifactId>
+      <groupId>org.ops4j.pax.logging</groupId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <artifactId>pax-logging-log4j2</artifactId>
+      <groupId>org.ops4j.pax.logging</groupId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <artifactId>pax-logging-log4j2-extra</artifactId>
       <groupId>org.ops4j.pax.logging</groupId>
       <scope>compile</scope>

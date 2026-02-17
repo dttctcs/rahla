@@ -353,6 +353,7 @@
                 <scope>provided</scope>
                 <version>${pax-logging.version}</version>
             </dependency>
+
             <dependency>
                 <artifactId>stax2-api</artifactId>
                 <groupId>org.codehaus.woodstox</groupId>
@@ -364,6 +365,16 @@
                 <groupId>org.ops4j.pax.logging</groupId>
                 <scope>provided</scope>
                 <version>${pax-logging.version}</version>
+              <exclusions>
+                <exclusion>
+                  <groupId>org.osgi</groupId>
+                  <artifactId>osgi.cmpn</artifactId>
+                </exclusion>
+                <exclusion>
+                  <groupId>org.osgi</groupId>
+                  <artifactId>osgi.annotation</artifactId>
+                </exclusion>
+              </exclusions>
             </dependency>
             <dependency>
                 <artifactId>jackson-dataformat-yaml</artifactId>

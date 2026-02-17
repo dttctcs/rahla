@@ -10,6 +10,8 @@
   * `/rahla/deploy` is no longer scanned for files
 * Added kubernetes deployments `manifests/rahla.yaml`
 *  **Breaking:** RAHLA_DEPLOY_PATH has been removed; if you require this functionality use `org.apache.felix.fileinstall`
+*  **Breaking:** replaced pax-web-http-jetty with pax-web-http-undertow
+*  Replaced pax-logging-* from karaf with rahla-logging version
 
 ### Dependency Updates
 
