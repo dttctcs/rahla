@@ -10,30 +10,30 @@
       </plugin>
 
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.apache.groovy</groupId>
-                  <artifactId>groovy</artifactId>
-                  <outputDirectory>${project.build.directory}/unpack</outputDirectory>
-                  <includes>**/dgminfo</includes>
-                </artifactItem>
+<!--      <plugin>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <artifactId>maven-dependency-plugin</artifactId>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>unpack</id>-->
+<!--            <phase>generate-sources</phase>-->
+<!--            <goals>-->
+<!--              <goal>unpack</goal>-->
+<!--            </goals>-->
+<!--            <configuration>-->
+<!--              <artifactItems>-->
+<!--                <artifactItem>-->
+<!--                  <groupId>org.apache.groovy</groupId>-->
+<!--                  <artifactId>groovy</artifactId>-->
+<!--                  <outputDirectory>${project.build.directory}/unpack</outputDirectory>-->
+<!--                  <includes>**/dgminfo</includes>-->
+<!--                </artifactItem>-->
 
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+<!--              </artifactItems>-->
+<!--            </configuration>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
 
 
       <plugin>
@@ -44,44 +44,43 @@
             <Bundle-Version>${project.version}</Bundle-Version>
             <Export-Package>
               rahla.*;version=${project.version},
-              org.apache.groovy.*,
-              org.codehaus.groovy.*,
-              groovy.*,
-              groovyjarjarantlr4.*,
-              groovyjarjarasm.*,
-              groovyjarjarpicocli.*,
-              <!-- org.apache.tinkerpop.gremlin.*-->
+<!--              org.apache.groovy.*,-->
+<!--              org.codehaus.groovy.*,-->
+<!--              groovy.*,-->
+<!--              groovyjarjarantlr4.*,-->
+<!--              groovyjarjarasm.*,-->
+<!--              groovyjarjarpicocli.*,-->
             </Export-Package>
             <DynamicImport-Package>*</DynamicImport-Package>
-            <Require-Capability>
-              osgi.extender;filter:="(osgi.extender=osgi.serviceloader.registrar)",
-              osgi.extender;filter:="(osgi.extender=osgi.serviceloader.processor)",
-              osgi.serviceloader;filter:="(osgi.serviceloader=org.apache.groovy.json.FastStringServiceFactory)";cardinality:=multiple,osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.8))",
-              osgi.serviceloader;filter:="(osgi.serviceloader=javax.script.ScriptEngineFactory)";cardinality:=multiple,osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.8))",
-              osgi.serviceloader;filter:="(osgi.serviceloader=org.codehaus.groovy.transform.ASTTransformation)";cardinality:=multiple,osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.8))",
-            </Require-Capability>
-            <Provide-Capability>
-              osgi.serviceloader;osgi.serviceloader="org.apache.groovy.json.FastStringServiceFactory",
-              osgi.serviceloader;osgi.serviceloader="javax.script.ScriptEngineFactory",
-              osgi.serviceloader;osgi.serviceloader="org.codehaus.groovy.transform.ASTTransformation",
-            </Provide-Capability>
+<!--            <Require-Capability>-->
+<!--              osgi.extender;filter:="(osgi.extender=osgi.serviceloader.registrar)",-->
+<!--              osgi.extender;filter:="(osgi.extender=osgi.serviceloader.processor)",-->
+<!--              osgi.serviceloader;filter:="(osgi.serviceloader=org.apache.groovy.json.FastStringServiceFactory)";cardinality:=multiple,osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.8))",-->
+<!--              osgi.serviceloader;filter:="(osgi.serviceloader=javax.script.ScriptEngineFactory)";cardinality:=multiple,osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.8))",-->
+<!--              osgi.serviceloader;filter:="(osgi.serviceloader=org.codehaus.groovy.transform.ASTTransformation)";cardinality:=multiple,osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.8))",-->
+<!--            </Require-Capability>-->
+<!--            <Provide-Capability>-->
+<!--              osgi.serviceloader;osgi.serviceloader="org.apache.groovy.json.FastStringServiceFactory",-->
+<!--              osgi.serviceloader;osgi.serviceloader="javax.script.ScriptEngineFactory",-->
+<!--              osgi.serviceloader;osgi.serviceloader="org.codehaus.groovy.transform.ASTTransformation",-->
+<!--            </Provide-Capability>-->
             <Import-Package>
 <!--              org.apache.camel.catalog,-->
               org.apache.karaf.shell*;version="[4,5)",
 <!--              !COM.newmonics,-->
             </Import-Package>
-            <Private-Package>
-              org.apache.groovy.*,
-              org.codehaus.groovy.*,
-              groovy.*,
-              groovyjarjarantlr4.*,
-              groovyjarjarasm.*,
-              groovyjarjarpicocli.*,
-            </Private-Package>
-            <Include-Resource>
-              {maven-resources},
-              META-INF/dgminfo=target/unpack/META-INF/dgminfo
-            </Include-Resource>
+<!--            <Private-Package>-->
+<!--              org.apache.groovy.*,-->
+<!--              org.codehaus.groovy.*,-->
+<!--              groovy.*,-->
+<!--              groovyjarjarantlr4.*,-->
+<!--              groovyjarjarasm.*,-->
+<!--              groovyjarjarpicocli.*,-->
+<!--            </Private-Package>-->
+<!--            <Include-Resource>-->
+<!--              {maven-resources},-->
+<!--              META-INF/dgminfo=target/unpack/META-INF/dgminfo-->
+<!--            </Include-Resource>-->
           </instructions>
         </configuration>
         <groupId>org.apache.felix</groupId>
@@ -189,136 +188,136 @@
 <!--      <scope>provided</scope>-->
 <!--    </dependency>-->
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-ant</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-ant</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-ginq</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-ginq</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-cli-picocli</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-cli-picocli</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-console</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-console</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
     <dependency>
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-datetime</artifactId>
-      <scope>provided</scope>
+<!--      <scope>provided</scope>-->
     </dependency>
 
     <dependency>
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-dateutil</artifactId>
-      <scope>provided</scope>
+<!--      <scope>provided</scope>-->
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-docgenerator</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-docgenerator</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-groovydoc</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-groovydoc</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-groovysh</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-groovysh</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-jmx</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-jmx</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
     <dependency>
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-json</artifactId>
-      <scope>provided</scope>
+<!--      <scope>provided</scope>-->
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-jsr223</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-jsr223</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
     <dependency>
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-macro</artifactId>
-      <scope>provided</scope>
+<!--      <scope>provided</scope>-->
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-nio</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-nio</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-servlet</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-servlet</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
     <dependency>
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-sql</artifactId>
-      <scope>provided</scope>
+<!--      <scope>provided</scope>-->
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-swing</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-swing</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
     <dependency>
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-templates</artifactId>
-      <scope>provided</scope>
+<!--      <scope>provided</scope>-->
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-test</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-test</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy-test-junit5</artifactId>
-      <scope>provided</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.groovy</groupId>-->
+<!--      <artifactId>groovy-test-junit5</artifactId>-->
+<!--      <scope>provided</scope>-->
+<!--    </dependency>-->
 
     <dependency>
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-xml</artifactId>
-      <scope>provided</scope>
+<!--      <scope>provided</scope>-->
     </dependency>
 
     <dependency>
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-yaml</artifactId>
-      <scope>provided</scope>
+<!--      <scope>provided</scope>-->
     </dependency>
 
     <dependency>
@@ -349,6 +348,10 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
+    </dependency>
+     <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>

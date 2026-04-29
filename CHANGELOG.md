@@ -1,3 +1,16 @@
+# 1.3.1 (2026-04-29)
+
+### Dependency Updates
+
+* camel: `4.10.7 > 4.18.1`
+* jackson2: `2.21.0 > 2.21.3`
+* pax-logging: `2.3.2 > 2.3.3`
+* lombok: `1.18.42 > 1.18.46`
+* log4j2: `2.25.3 > 2.25.4`
+* jedis: `7.2.1 > 7.5.0`
+* log4j loki appender: `0.9.41 > 0.9.42`
+* opentelemetry-sdk-extension-autoconfigure: `1.59.0 > 1.61.0`
+
 # 1.3.0 (2026-02-12)
 
 ### Changes *BREAKING*

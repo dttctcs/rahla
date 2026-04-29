@@ -172,12 +172,17 @@
             <library>mvn:io.opentelemetry.javaagent/opentelemetry-javaagent/${opentelemetry_agent.version}</library>
           </libraries>
           <blacklistedBundles>
-            <bundle>mvn:org.apache.groovy/groovy/[4,5)</bundle>
+<!--            <bundle>mvn:org.apache.groovy/groovy/[4,5)</bundle>-->
             <bundle>mvn:com.fasterxml.woodstox/woodstox-core/7.0.0</bundle>
+            <bundle>mvn:io.undertow/undertow-core/2.2.37.Final</bundle>
             <bundle>mvn:io.undertow/undertow-core/2.2.37.Final</bundle>
             <bundle>mvn:io.undertow/undertow-servlet/2.2.37.Final</bundle>
             <bundle>mvn:org.ops4j.pax.logging/pax-logging-api/2.3.0</bundle>
             <bundle>mvn:org.ops4j.pax.logging/pax-logging-log4j2/2.3.0</bundle>
+            <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.20</bundle>
+            <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.20.1</bundle>
+            <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.20.1</bundle>
+            <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.20.1</bundle>
             <!--<bundle>mvn:org.codehaus.woodstox/stax2-api/4.2.1</bundle>
             <bundle>mvn:org.codehaus.woodstox/woodstox-core-asl/4.4.1</bundle>
             <bundle>mvn:org.yaml/snakeyaml/1.30</bundle>-->
