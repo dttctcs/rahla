@@ -580,18 +580,6 @@
                 <version>${jedis.version}</version>
             </dependency>
             <dependency>
-                <artifactId>groovy-templates</artifactId>
-                <classifier>indy</classifier>
-                <groupId>org.codehaus.groovy</groupId>
-                <version>${groovy.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>groovy-xml</artifactId>
-                <classifier>indy</classifier>
-                <groupId>org.codehaus.groovy</groupId>
-                <version>${groovy.version}</version>
-            </dependency>
-            <dependency>
                 <artifactId>pax-logging-api</artifactId>
                 <groupId>org.ops4j.pax.logging</groupId>
                 <version>${pax-logging.version}</version>
@@ -1050,7 +1038,7 @@
             <dependency>
                 <groupId>com.lmax</groupId>
                 <artifactId>disruptor</artifactId>
-                <version>3.4.4</version>
+                <version>${disruptor.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.opentelemetry</groupId>
@@ -1088,13 +1076,19 @@
 
     <packaging>pom</packaging>
     <properties>
-        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.proc>full</maven.compiler.proc>
+
+        <!-- IDE-specific (IntelliJ): keeps the indexer quiet. -->
         <dependency.locations.enabled>false</dependency.locations.enabled>
         <getRevisionOnce>false</getRevisionOnce>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-
+        <!-- Core platform -->
         <karaf.version>4.4.9</karaf.version>
+        <camel.version>4.18.1</camel.version>
+        <groovy.version>4.0.30</groovy.version>
+
+        <!-- OSGi APIs -->
         <osgi.version>8.0.0</osgi.version>
         <org.osgi.service.cm.version>1.6.1</org.osgi.service.cm.version>
         <org.osgi.service.component.version>1.5.1</org.osgi.service.component.version>
@@ -1102,56 +1096,50 @@
         <org.osgi.service.event.version>1.4.1</org.osgi.service.event.version>
         <org.osgi.service.http.version>1.2.2</org.osgi.service.http.version>
         <org.osgi.service.jdbc.version>1.1.0</org.osgi.service.jdbc.version>
-        <org.osgi.service.jpa.version>1.1.1</org.osgi.service.jpa.version>
         <org.osgi.service.log.version>1.5.0</org.osgi.service.log.version>
         <org.osgi.service.metatype.version>1.4.1</org.osgi.service.metatype.version>
         <org.osgi.service.namespace.version>1.0.0</org.osgi.service.namespace.version>
         <org.osgi.service.repository.version>1.1.0</org.osgi.service.repository.version>
         <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
-        <org.osgi.util.function.version>1.2.0</org.osgi.util.function.version>
         <org.osgi.util.promise.version>1.3.0</org.osgi.util.promise.version>
 
-        <camel.version>4.18.1</camel.version>
-        <groovy.version>4.0.30</groovy.version>
+        <!-- Logging -->
+        <pax-logging.version>2.3.3</pax-logging.version>
+        <log4j2.version>2.25.4</log4j2.version>
+        <log4j2-appender-loki.version>0.9.42</log4j2-appender-loki.version>
+        <stax2-api.version>4.2.2</stax2-api.version>
+
+        <!-- Libraries -->
         <jackson2.version>2.21.3</jackson2.version>
         <commons-collections4.version>4.4</commons-collections4.version>
-        <javax.ws.rs-api.version>2.1</javax.ws.rs-api.version>
-        <pax-logging.version>2.3.3</pax-logging.version>
+        <commons-configuration2.version>2.13.0</commons-configuration2.version>
         <lombok.version>1.18.46</lombok.version>
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
-        <opentelemetry.version>1.21.0</opentelemetry.version>
-        <commons-configuration2.version>2.13.0</commons-configuration2.version>
-        <log4j2.version>2.25.4</log4j2.version>
         <janusgraph-driver.version>1.1.0</janusgraph-driver.version>
         <gremlin-groovy.version>3.7.3</gremlin-groovy.version>
         <jedis.version>7.5.0</jedis.version>
         <guava.version>23.6.1-jre</guava.version>
-        <log4j2-appender-loki.version>0.9.42</log4j2-appender-loki.version>
+        <disruptor.version>3.4.4</disruptor.version>
+
+        <!-- Observability -->
         <jmx_exporter.version>1.0.1</jmx_exporter.version>
         <opentelemetry_agent.version>2.22.0</opentelemetry_agent.version>
-        <stax2-api.version>4.2.2</stax2-api.version>
+        <opentelemetry-sdk-extension-autoconfigure.version>1.61.0</opentelemetry-sdk-extension-autoconfigure.version>
 
+        <!-- Siddhi (EOL — fradi component) -->
+        <siddhi.version>5.1.24-dt</siddhi.version>
+        <siddhi-store-rdbms.version>7.0.16-dtacs</siddhi-store-rdbms.version>
         <siddhi-execution-regex.version>5.0.7</siddhi-execution-regex.version>
         <siddhi-execution-string.version>5.0.12</siddhi-execution-string.version>
         <siddhi-execution-unique.version>5.0.5</siddhi-execution-unique.version>
-        <siddhi-store-rdbms.version>7.0.16-dtacs</siddhi-store-rdbms.version>
-        <siddhi.version>5.1.24-dt</siddhi.version>
-        <disruptor.version>3.4.4</disruptor.version>
 
+        <!-- Maven plugins -->
         <maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
         <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
         <maven-deploy-plugin.version>3.1.0</maven-deploy-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-install-plugin.version>3.1.0</maven-install-plugin.version>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
-        <maven.compiler.proc>full</maven.compiler.proc>
-        <maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
-        <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
-        <maven-deploy-plugin.version>3.1.0</maven-deploy-plugin.version>
-        <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-        <maven-install-plugin.version>3.1.0</maven-install-plugin.version>
-        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
-        <opentelemetry-sdk-extension-autoconfigure.version>1.61.0</opentelemetry-sdk-extension-autoconfigure.version>
     </properties>
 
     <repositories>

@@ -1,6 +1,5 @@
 package rahla.graphsource.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.tinkerpop.gremlin.driver.Client;
@@ -14,16 +13,32 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal;
 
+/**
+ * Configuration-driven {@link rahla.graphsource.GraphSource} backed by a TinkerPop
+ * Gremlin {@link Cluster}.
+ * <p>
+ * One service instance is registered per {@code rahla.graphsource-<name>.cfg} dropped
+ * into the deploy directory. Recognised configuration keys:
+ * <ul>
+ *   <li>{@code hosts} (required) — comma-separated list of host names</li>
+ *   <li>{@code port} (required) — Gremlin server port</li>
+ *   <li>{@code user}, {@code pass} — credentials (optional)</li>
+ *   <li>{@code graphTraversalSourceName} — name of the remote traversal source</li>
+ *   <li>{@code serializer}, {@code serializerConfig} — message serializer FQCN and JSON config</li>
+ *   <li>connection-pool tuning: {@code minConnectionPoolSize}, {@code maxConnectionPoolSize},
+ *       {@code minInProcessPerConnection}, {@code maxInProcessPerConnection},
+ *       {@code minSimultaneousUsagePerConnection}, {@code maxSimultaneousUsagePerConnection},
+ *       {@code maxWaitForConnection}, {@code maxContentLength},
+ *       {@code nioPoolSize}, {@code workerPoolSize}</li>
+ * </ul>
+ */
 @Log4j2
 @Component(
         configurationPid = "rahla.graphsource",
@@ -35,7 +50,6 @@ public class GraphSourceImpl implements rahla.graphsource.GraphSource<GraphTrave
   private static final String PORT_KEY = "port";
   private static final String USER_KEY = "user";
   private static final String PASS_KEY = "pass";
-  private static final String GRAPHSOURCENAME_KEY = "graphSourceName";
   private static final String GRAPHTRAVERSALSOURCENAME_KEY = "graphTraversalSourceName";
   private static final String SERIALIZER_KEY = "serializer";
   private static final String SERIALIZERCONFIG_KEY = "serializerConfig";
@@ -49,6 +63,9 @@ public class GraphSourceImpl implements rahla.graphsource.GraphSource<GraphTrave
   private static final String MAXSIMULTANEOUSUSAGEPERCONNECTION_KEY = "maxSimultaneousUsagePerConnection";
   private static final String MAXWAITFORCONNECTION_KEY = "maxWaitForConnection";
   private static final String MAXCONTENTLENGTH_KEY = "maxContentLength";
+  private static final String DEFAULT_SERIALIZER =
+          "org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1";
+
   private Cluster cluster;
   private Client client;
   private String graphTraversalSourceName;
@@ -71,100 +88,111 @@ public class GraphSourceImpl implements rahla.graphsource.GraphSource<GraphTrave
   }
 
   @Activate
-  public synchronized void activate(ComponentContext cc)
-          throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
-          InvocationTargetException, InstantiationException, JsonProcessingException {
-    Map<String, Object> properties = Collections.list(cc.getProperties().keys()).stream()
-            .collect(Collectors.toMap(Function.identity(), cc.getProperties()::get));
+  public synchronized void activate(ComponentContext cc) throws ReflectiveOperationException, java.io.IOException {
+    Map<String, Object> properties = readProperties(cc);
 
-    String hosts = (String) properties.get(HOSTS_KEY);
-    String[] hostss = hosts.split(",");
+    String hostsRaw = (String) properties.get(HOSTS_KEY);
+    if (hostsRaw == null || hostsRaw.isBlank()) {
+      throw new IllegalArgumentException("Required property '" + HOSTS_KEY + "' is missing");
+    }
+    hosts = Arrays.stream(hostsRaw.split(","))
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .toList();
 
-    log.info("Starting Janusgraph client...");
-
-    String host = hostss[0];
-
-    Integer port = Integer.parseInt((String) properties.get(PORT_KEY));
+    int port = Integer.parseInt((String) properties.get(PORT_KEY));
     user = (String) properties.get(USER_KEY);
     String pass = (String) properties.get(PASS_KEY);
     graphTraversalSourceName = (String) properties.get(GRAPHTRAVERSALSOURCENAME_KEY);
 
-    Cluster.Builder builder = Cluster.build(host).port(port);
+    log.info("Starting Janusgraph client for hosts={} port={}", hosts, port);
 
-    String serializerClassName = (String) properties.getOrDefault(SERIALIZER_KEY, "org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1");
+    MessageSerializer<?> serializer = buildSerializer(cc, properties);
 
-    Class clazz =
-            cc.getBundleContext()
-                    .getBundle()
-                    .adapt(BundleWiring.class)
-                    .getClassLoader()
-                    .loadClass(serializerClassName);
-
-    String serializerConfigJson = (String) properties.get(SERIALIZERCONFIG_KEY);
-
-    Map serilaizerConfig = new ObjectMapper().readValue(serializerConfigJson, Map.class);
-
-    MessageSerializer serializer = (MessageSerializer) clazz.getDeclaredConstructor().newInstance();
-    Optional.ofNullable(serilaizerConfig)
-            .ifPresent(
-                    (c) -> {
-                      serializer.configure(c, null);
-                    });
-
-    int maxContentLength = Integer.parseInt((String) properties.getOrDefault(MAXCONTENTLENGTH_KEY, "65536"));
-    int minConnectionPoolSize = Integer.parseInt((String) properties.getOrDefault(MINCONNECTIONPOOLSIZE_KEY, "32"));
-    int maxConnectionPoolSize = Integer.parseInt((String) properties.getOrDefault(MAXCONNECTIONPOOLSIZE_KEY, "32"));
-    int minSimultaneousUsagePerConnection = Integer.parseInt((String) properties.getOrDefault(MINSIMULTANEOUSUSAGEPERCONNECTION_KEY, "16"));
-    int maxSimultaneousUsagePerConnection = Integer.parseInt((String) properties.getOrDefault(MAXSIMULTANEOUSUSAGEPERCONNECTION_KEY, "16"));
-    int minInProcessPerConnection = Integer.parseInt((String) properties.getOrDefault(MININPROCESSPERCONNECTION_KEY, "16"));
-    int maxInProcessPerConnection = Integer.parseInt((String) properties.getOrDefault(MAXINPROCESSPERCONNECTION_KEY, "16"));
-    int maxWaitForConnection = Integer.parseInt((String) properties.getOrDefault(MAXWAITFORCONNECTION_KEY, "3000"));
-    int nioPoolSize = Integer.parseInt((String) properties.getOrDefault(NIOPOOLSIZE_KEY, "" + Runtime.getRuntime().availableProcessors()));
-    int workerPoolSize = Integer.parseInt((String) properties.getOrDefault(WORKERPOOLSIZE_KEY, "" + Runtime.getRuntime().availableProcessors() * 2));
-    builder
+    Cluster.Builder builder = Cluster.build(hosts.get(0))
+            .port(port)
             .serializer(serializer)
-            .maxContentLength(maxContentLength)
-            .minConnectionPoolSize(minConnectionPoolSize)
-            .maxConnectionPoolSize(maxConnectionPoolSize)
-            .minSimultaneousUsagePerConnection(minSimultaneousUsagePerConnection)
-            .maxSimultaneousUsagePerConnection(maxSimultaneousUsagePerConnection)
-            .minInProcessPerConnection(minInProcessPerConnection)
-            .maxInProcessPerConnection(maxInProcessPerConnection)
-            .nioPoolSize(nioPoolSize)
-            .maxWaitForConnection(maxWaitForConnection)
-            .workerPoolSize(workerPoolSize)
-            .create();
+            .maxContentLength(intProp(properties, MAXCONTENTLENGTH_KEY, 65536))
+            .minConnectionPoolSize(intProp(properties, MINCONNECTIONPOOLSIZE_KEY, 32))
+            .maxConnectionPoolSize(intProp(properties, MAXCONNECTIONPOOLSIZE_KEY, 32))
+            .minSimultaneousUsagePerConnection(intProp(properties, MINSIMULTANEOUSUSAGEPERCONNECTION_KEY, 16))
+            .maxSimultaneousUsagePerConnection(intProp(properties, MAXSIMULTANEOUSUSAGEPERCONNECTION_KEY, 16))
+            .minInProcessPerConnection(intProp(properties, MININPROCESSPERCONNECTION_KEY, 16))
+            .maxInProcessPerConnection(intProp(properties, MAXINPROCESSPERCONNECTION_KEY, 16))
+            .nioPoolSize(intProp(properties, NIOPOOLSIZE_KEY, Runtime.getRuntime().availableProcessors()))
+            .maxWaitForConnection(intProp(properties, MAXWAITFORCONNECTION_KEY, 3000))
+            .workerPoolSize(intProp(properties, WORKERPOOLSIZE_KEY, Runtime.getRuntime().availableProcessors() * 2));
 
-    for (int i = 1; i < hostss.length; i++) {
-      String hostname = hostss[i].trim();
-      if (!hostname.isEmpty()) {
-        builder.addContactPoint(hostname);
-      }
+    for (int i = 1; i < hosts.size(); i++) {
+      builder.addContactPoint(hosts.get(i));
     }
     if (pass != null && !pass.isBlank()) {
       builder.credentials(user, pass);
     }
     cluster = builder.create();
-
     client = cluster.connect();
-    log.info("Started Janusgraph client for: " + cluster.toString());
+    log.info("Started Janusgraph client for: {}", cluster);
   }
 
   @Deactivate
   public synchronized void deactivate(ComponentContext cc) {
     log.info("Stopping Janusgraph client...");
     try {
-      client.close();
-      cluster.close();
+      if (client != null) {
+        client.close();
+      }
     } catch (Exception e) {
       log.error("Error closing Janusgraph client", e);
     }
-    log.info("Stopped Janusgraph client for: " + cluster.toString());
-
+    try {
+      if (cluster != null) {
+        cluster.close();
+      }
+    } catch (Exception e) {
+      log.error("Error closing Janusgraph cluster", e);
+    }
+    log.info("Stopped Janusgraph client");
   }
 
   @Override
   public GraphTraversalSource getGraphTraversalSource() {
     return traversal().withRemote(DriverRemoteConnection.using(client, graphTraversalSourceName));
+  }
+
+  private static Map<String, Object> readProperties(ComponentContext cc) {
+    Map<String, Object> properties = new java.util.HashMap<>();
+    var keys = cc.getProperties().keys();
+    while (keys.hasMoreElements()) {
+      String k = keys.nextElement();
+      properties.put(k, cc.getProperties().get(k));
+    }
+    return properties;
+  }
+
+  private static int intProp(Map<String, Object> properties, String key, int defaultValue) {
+    Object raw = properties.get(key);
+    return raw == null ? defaultValue : Integer.parseInt(raw.toString());
+  }
+
+  private static MessageSerializer<?> buildSerializer(ComponentContext cc, Map<String, Object> properties)
+          throws ReflectiveOperationException, java.io.IOException {
+    String serializerClassName = (String) properties.getOrDefault(SERIALIZER_KEY, DEFAULT_SERIALIZER);
+    Class<?> clazz = cc.getBundleContext()
+            .getBundle()
+            .adapt(BundleWiring.class)
+            .getClassLoader()
+            .loadClass(serializerClassName);
+    MessageSerializer<?> serializer =
+            (MessageSerializer<?>) clazz.getDeclaredConstructor().newInstance();
+
+    String serializerConfigJson = (String) properties.get(SERIALIZERCONFIG_KEY);
+    if (serializerConfigJson != null && !serializerConfigJson.isBlank()) {
+      @SuppressWarnings("unchecked")
+      Map<String, Object> serializerConfig =
+              new ObjectMapper().readValue(serializerConfigJson, Map.class);
+      // Second arg (Map<String, Graph>) is unused for our configurations.
+      serializer.configure(serializerConfig, null);
+    }
+    return serializer;
   }
 }

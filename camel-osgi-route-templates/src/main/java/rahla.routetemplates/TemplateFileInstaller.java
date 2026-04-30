@@ -21,6 +21,15 @@ import java.util.*;
 import static org.apache.camel.spi.RouteTemplateParameterSource.TEMPLATE_ID;
 import static rahla.routetemplates.OsgiRouteTemplateParameterSource.TEMPLATE_PREFIX;
 
+/**
+ * Felix file-install handler that translates route-template YAML files dropped into the
+ * deploy directory into {@code camel.route.template} factory configurations.
+ * <p>
+ * Each YAML file describes one or more {@link Template}s; for every template a factory
+ * configuration is created that an {@link OsgiRouteTemplateParameterSource} component
+ * picks up. Optional {@code sharedConfigPid}s are bumped via
+ * {@link #SHARED_CONFIG_COUNTER} so dependent components re-activate.
+ */
 @Component(service = {ArtifactInstaller.class, ArtifactListener.class}, property = {"TemplateFileInstaller=true"}, immediate = true)
 @Log4j2
 public class TemplateFileInstaller implements ArtifactInstaller {
@@ -39,10 +48,9 @@ public class TemplateFileInstaller implements ArtifactInstaller {
   }
 
   public List<Template> templatesFromYaml(File file) throws IOException {
-    YAMLFactory yamlFactory = new YAMLFactory();
-    YAMLParser yamlParser = yamlFactory.createParser(file);
-    return mapper.readValues(yamlParser, new TypeReference<Template>() {
-    }).readAll();
+    try (YAMLParser yamlParser = new YAMLFactory().createParser(file)) {
+      return mapper.readValues(yamlParser, new TypeReference<Template>() {}).readAll();
+    }
   }
 
   private void deleteConfig(File file) {
@@ -55,7 +63,7 @@ public class TemplateFileInstaller implements ArtifactInstaller {
         }
       }
     } catch (IOException | InvalidSyntaxException e) {
-      log.error("BUG():", e.getMessage(), e);
+      log.error("action=delete config for {}, reason={}", file.getAbsolutePath(), e.getMessage(), e);
     }
   }
 
@@ -78,7 +86,7 @@ public class TemplateFileInstaller implements ArtifactInstaller {
       }
 
     } catch (IOException ex) {
-      log.error("BUG(): {}", ex.getMessage(), ex);
+      log.error("action=upsert config for {}, reason={}", file.getAbsolutePath(), ex.getMessage(), ex);
     }
 
 
@@ -117,19 +125,22 @@ public class TemplateFileInstaller implements ArtifactInstaller {
 
   @Override
   public synchronized void uninstall(File file) {
-    log.info("action=uninstall template{}", file.getAbsolutePath());
+    log.info("action=uninstall template {}", file.getAbsolutePath());
     deleteConfig(file);
   }
 
   @Override
   public boolean canHandle(File file) {
-    if (file.getName().toLowerCase().endsWith("yaml")) try {
+    if (!file.getName().toLowerCase().endsWith("yaml")) {
+      return false;
+    }
+    try {
       templatesFromYaml(file);
       return true;
     } catch (Exception e) {
       log.warn("action=parsing compound {}: {}", file.getName(), e.getMessage());
+      return false;
     }
-    return false;
   }
 
   private void updateSharedConfig(String sharedConfigPid) throws IOException {

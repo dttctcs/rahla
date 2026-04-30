@@ -175,7 +175,6 @@
 <!--            <bundle>mvn:org.apache.groovy/groovy/[4,5)</bundle>-->
             <bundle>mvn:com.fasterxml.woodstox/woodstox-core/7.0.0</bundle>
             <bundle>mvn:io.undertow/undertow-core/2.2.37.Final</bundle>
-            <bundle>mvn:io.undertow/undertow-core/2.2.37.Final</bundle>
             <bundle>mvn:io.undertow/undertow-servlet/2.2.37.Final</bundle>
             <bundle>mvn:org.ops4j.pax.logging/pax-logging-api/2.3.0</bundle>
             <bundle>mvn:org.ops4j.pax.logging/pax-logging-log4j2/2.3.0</bundle>

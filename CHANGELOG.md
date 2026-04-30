@@ -1,5 +1,28 @@
 # 1.3.1 (2026-04-29)
 
+### Bug Fixes
+
+* `JedisServiceImpl`: fixed broken default for `host` (was `"65536"` — copy-paste from `maxContentLength`) → `localhost`
+* `JedisServiceImpl`: connect-retry loop no longer swallows `InterruptedException`; the interrupt flag is restored
+* `GraphSourceImpl`: stopped leaking a `Cluster` instance built twice during activate
+* `GraphSourceImpl`: `deactivate` no longer NPEs when activate failed before the cluster/client were created
+* `GroovyBeanFactoryImpl`: `InputStream` is now closed via try-with-resources, replaced deprecated `new URL(String)` with `URI.create(...).toURL()`
+* `OsgiRouteTemplateParameterSource`: malformed `camel.route.template.*` keys are skipped instead of throwing `StringIndexOutOfBoundsException`
+* `TemplateFileInstaller`: fixed broken log messages (`BUG():`, `template{}`); YAML parser is now closed
+
+### Improvements
+
+* Public APIs (`GroovyBeanFactory`, `GraphSource`, `JedisSource`) and component impls now have Javadoc describing accepted URLs, factory PIDs and config keys
+* Replaced raw types and string-concatenated log messages with parameterised logging
+* `JedisSource` and `JedisServiceImpl` are marked `@Deprecated` (already EOL per runtime warning)
+
+### Build / POM cleanup
+
+* Parent `pom.xml`: removed duplicate plugin-version property block, dead properties (`java.version`, `javax.ws.rs-api.version`, `opentelemetry.version`, `org.osgi.service.jpa.version`, `org.osgi.util.function.version`) and dead `org.codehaus.groovy` `indy` entries (Groovy 4 ships under `org.apache.groovy` without `indy` classifier); regrouped properties by topic
+* Parent `pom.xml`: `disruptor` dependency now uses `${disruptor.version}` instead of a hardcoded version
+* `assembly/pom.xml`: removed duplicate `mvn:io.undertow/undertow-core/2.2.37.Final` entry from `<blacklistedBundles>`
+* `rahla/pom.xml`: dropped ~150 lines of stale commented-out Groovy embedding configuration; consolidated `groovy-*` dependencies and normalised tag order
+
 ### Dependency Updates
 
 * camel: `4.10.7 > 4.18.1`
