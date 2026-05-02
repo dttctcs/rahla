@@ -1084,7 +1084,7 @@
         <getRevisionOnce>false</getRevisionOnce>
 
         <!-- Core platform -->
-        <karaf.version>4.4.9</karaf.version>
+        <karaf.version>4.4.11</karaf.version>
         <camel.version>4.18.1</camel.version>
         <groovy.version>4.0.30</groovy.version>
 

@@ -1,3 +1,13 @@
+# 1.3.2 (2026-05-02)
+
+### Bug Fixes
+
+* `etc/org.ops4j.pax.url.mvn.cfg`: fixed empty repository entry that broke boot-feature resolution on Karaf 4.4.11. The bundled `pax-url-aether` parser strips the leading `+` flag from `org.ops4j.pax.url.mvn.repositories`; the previous ` +,` value left a stray comma, so the split produced an empty first entry which the (now stricter) `MavenRepositoryURL` constructor rejects with `Repository spec is empty string.` The value is now `+ ` (no comma), preserving the "include settings.xml profile repos" semantics.
+
+### Dependency Updates
+
+* karaf: `4.4.9 > 4.4.11`
+
 # 1.3.1 (2026-04-29)
 
 ### Bug Fixes
