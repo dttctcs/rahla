@@ -5,7 +5,7 @@
   This pom is NOT a Maven module of the rahla reactor and is NOT published to a Maven repo.
   Projects fetch it straight from this repo (main) in their Dockerfile, e.g.:
 
-    ADD https://repo.datatactics.dev/oss/rahla/raw/branch/main/feature-kar/pom.xml ./pom.xml
+    ADD https://codeberg.org/datatactics/rahla/raw/branch/main/manifests/feature-kar.xml ./pom.xml
     COPY deploy/features.xml ./deploy/features.xml
     RUN mvn -f pom.xml package -Dkar.feature=<feature> -Dkar.karaf.version=<v> -Dkar.camel.version=<v>
 
@@ -17,8 +17,8 @@
   Parameters (-D...):
     kar.feature         which feature in the features.xml to resolve            (required)
     kar.featuresFile    path to the features.xml   (default: ${basedir}/deploy/features.xml)
-    kar.karaf.version   karaf feature-repo version, MUST match the target rahla (default 4.4.9)
-    kar.camel.version   apache-camel feature-repo version, match target rahla   (default 4.10.7)
+    kar.karaf.version   karaf feature-repo version, MUST match the target rahla (default 4.4.11 = rahla 1.3.2)
+    kar.camel.version   apache-camel feature-repo version, match target rahla   (default 4.18.1 = rahla 1.3.2)
 
   Note: karaf-maven-plugin 4.4.x requires Java >= 22 at build time -> use a JDK 22+ maven image.
 -->
@@ -34,8 +34,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <kar.featuresFile>${project.basedir}/deploy/features.xml</kar.featuresFile>
-    <kar.karaf.version>4.4.9</kar.karaf.version>
-    <kar.camel.version>4.10.7</kar.camel.version>
+    <kar.karaf.version>4.4.11</kar.karaf.version>
+    <kar.camel.version>4.18.1</kar.camel.version>
   </properties>
 
   <build>
