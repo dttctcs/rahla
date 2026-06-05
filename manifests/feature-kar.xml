@@ -33,7 +33,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <kar.feature>fuel</kar.feature>
+    <!-- kar.feature is auto-detected from the first <feature name="…"> in the features.xml
+         (see gmavenplus below) — projects normally set nothing. Override with -Dkar.feature=… only
+         if the features.xml defines several and you want a non-first one. -->
     <kar.featuresFile>${project.basedir}/deploy/features.xml</kar.featuresFile>
     <kar.karaf.version>4.4.11</kar.karaf.version>
     <kar.camel.version>4.18.1</kar.camel.version>
@@ -43,6 +45,31 @@
     <!-- the KAR is named after the feature, e.g. fuel.kar -->
     <finalName>${kar.feature}</finalName>
     <plugins>
+      <!-- auto-detect kar.feature from the project's features.xml (unless set via -D) -->
+      <plugin>
+        <groupId>org.codehaus.gmavenplus</groupId>
+        <artifactId>gmavenplus-plugin</artifactId>
+        <version>3.0.2</version>
+        <dependencies>
+          <dependency><groupId>org.apache.groovy</groupId><artifactId>groovy</artifactId><version>4.0.22</version></dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals><goal>execute</goal></goals>
+            <configuration><scripts><script><![CDATA[
+              if (!project.properties['kar.feature']) {
+                def f = new File(project.properties['kar.featuresFile'])
+                def m = (f.text =~ /<feature\s+name="([^"]+)"/)
+                assert m : "no <feature name=...> found in " + f
+                project.properties['kar.feature'] = m[0][1]
+                log.info "feature-kar: auto-detected kar.feature = " + project.properties['kar.feature']
+              }
+            ]]></script></scripts></configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
