@@ -1,5 +1,3 @@
-<a id="readme-top"></a>
-
 # Rahla
 
 **Rahla** is an open-source [Apache Karaf](https://karaf.apache.org/) appliance preconfigured for
@@ -37,8 +35,6 @@ Current release ships **Karaf 4.4.11 + Camel 4.18.1** on JDK 21.
 * **Monitoring** — Prometheus JMX Exporter and OpenTelemetry agent built in.
 * **Offline KAR packaging** — ship a project self-contained for air-gapped installs.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ## Getting started
 
 ### Prerequisites
@@ -73,8 +69,6 @@ ssh -p 8101 admin@localhost
 Useful shell commands: `bundle:list -s`, `bundle:diag <id>` (why a bundle is `Waiting`),
 `feature:list -i`, `camel:context-list`, `log:tail`.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ## The deploy directory is the API
 
 Rahla dispatches each file in `/config/deploy` by extension:
@@ -95,8 +89,6 @@ check the logs after dropping something new.
 > Camel itself is **not** preinstalled. A dropped `*.xml` Camel context needs the Camel runtime —
 > install it via a `features.xml` in deploy (e.g. `<feature>camel-blueprint</feature>`) or bake it
 > into a KAR.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Special features
 
@@ -220,8 +212,6 @@ A pax-logging-compatible appender for Grafana Loki ships in the `rahla-logging` 
 > You must add `<Configuration packages="pl.tkowalcz.tjahzi.log4j2">` to `log4j2.xml` for the
 > `<Loki .../>` appender to resolve.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ## HTTP / REST
 
 The boot HTTP runtime is **Undertow** (`pax-web-http-undertow`); the OSGi/Pax-Web port defaults to
@@ -234,8 +224,6 @@ The boot HTTP runtime is **Undertow** (`pax-web-http-undertow`); the OSGi/Pax-We
 Jetty is **not** the default. `camel-jetty` / `pax-web-http-jetty` still work, but the Jetty version
 pulled by Karaf 4.4.x has known CVEs — pin a fixed version (or just stay on Undertow). Run one
 Pax-Web HTTP feature at a time.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Deploying as a KAR (offline / prod)
 
@@ -252,8 +240,6 @@ as a KAR. There are three approaches — full commands and Dockerfiles in
 All three reuse one build pom fetched from
 `https://codeberg.org/datatactics/rahla/raw/branch/main/manifests/feature-kar.xml`, which
 auto-detects the feature from your `features.xml` (no `-D` needed) and resolves its bundle closure.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Configuration
 
@@ -275,8 +261,6 @@ Override these by mounting your own into `/config/etc`:
 
 To watch an additional directory, drop another `org.apache.felix.fileinstall-<name>.cfg`.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ## Monitoring
 
 Both agents ship in the assembly (attached via `KARAF_SYSTEM_OPTS`, see [Configuration](#configuration)).
@@ -285,8 +269,6 @@ Both agents ship in the assembly (attached via `KARAF_SYSTEM_OPTS`, see [Configu
   `config.yaml`).
 - **OpenTelemetry agent** — `OTEL_LOGS_EXPORTER` / `OTEL_METRICS_EXPORTER` / `OTEL_TRACES_EXPORTER`
   are `none` by default; set them to enable export.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Kubernetes
 
@@ -305,8 +287,6 @@ docker build -t datatactics/rahla:dev .
 The runnable Karaf distribution under `assembly/target/assembly/` can also be started directly
 (`bin/karaf`, `bin/karaf debug`, `bin/start`/`bin/stop`, `bin/client`) — handy for reproducing OSGi
 wiring problems without the container layer.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## FAQ
 
@@ -331,10 +311,7 @@ Bake it into a KAR — see [`manifests/kar.md`](manifests/kar.md).
 Gone since 1.3. Only `/config/deploy` is monitored; add an
 `org.apache.felix.fileinstall-<name>.cfg` for extra directories.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ## Contributing
 
 Contributions are welcome. Rahla is licensed under the **Apache 2.0 License**.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
