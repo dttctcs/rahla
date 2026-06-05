@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Shared "features.xml -> offline KAR" build for Rahla projects.
+  Shared build pom: turn a project's deploy/features.xml into an OFFLINE / air-gapped KAR.
 
-  This pom is NOT a Maven module of the rahla reactor and is NOT published to a Maven repo.
-  Projects fetch it straight from this repo (main) in their Dockerfile, e.g.:
-
+  Not a Maven module and not published — projects fetch it over HTTP in their Dockerfile:
     ADD https://codeberg.org/datatactics/rahla/raw/branch/main/manifests/feature-kar.xml ./pom.xml
     COPY deploy/features.xml ./deploy/features.xml
-    RUN mvn -f pom.xml package -Dkar.feature=<feature> -Dkar.karaf.version=<v> -Dkar.camel.version=<v>
+    RUN mvn -B -q -f pom.xml package          # -> target/<feature>.kar
 
-  It resolves the named feature out of the project's features.xml and packs it plus its full
-  bundle closure into one offline-installable KAR (kar:install / drop in /config/deploy). Features
-  rahla already ships (fradi, graphsource, jedissource, camel-route-templates) are stubbed out so
-  the build needs only Maven Central (no dtacs repo) and the KAR stays a minimal delta.
+  WHY THE CLOSURE: the plain karaf `kar` goal only packs bundles a feature lists *directly*.
+  For an air-gapped KAR (no download at startup) we need the feature's FULL bundle closure
+  (camel, pax-jdbc-oracle/ojdbc, …), which is what `features-add-to-repository` resolves.
 
-  Parameters (-D...):
-    kar.feature         which feature in the features.xml to resolve            (default: fuel)
-    kar.featuresFile    path to the features.xml   (default: ${basedir}/deploy/features.xml)
-    kar.karaf.version   karaf feature-repo version, MUST match the target rahla (default 4.4.11 = rahla 1.3.2)
-    kar.camel.version   apache-camel feature-repo version, match target rahla   (default 4.18.1 = rahla 1.3.2)
+  WHY THE STUB: that closure resolver must resolve every <feature> reference at BUILD time,
+  including rahla's own features (fradi, graphsource, jedissource, camel-route-templates).
+  Their definitions live in rahla/dtacs, not Maven Central, so the build can't find them — and
+  we don't want to bundle them anyway, because rahla already ships them and installs them
+  air-gapped from its own system/ at runtime. The stub feeds the resolver an EMPTY definition
+  for each, so it skips them. (Build-time only; runtime uses rahla's real features.)
 
-  Note: karaf-maven-plugin 4.4.x requires Java >= 22 at build time -> use a JDK 22+ maven image.
+  Build needs Java >= 22 (karaf tooling) -> use a JDK 22+ Maven image.
+  kar.feature is auto-detected from the first <feature name="…">; override with -Dkar.feature=…
+  Versions default to rahla 1.3.2 (-Dkar.karaf.version / -Dkar.camel.version to change).
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -33,19 +33,15 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- kar.feature is auto-detected from the first <feature name="…"> in the features.xml
-         (see gmavenplus below) — projects normally set nothing. Override with -Dkar.feature=… only
-         if the features.xml defines several and you want a non-first one. -->
     <kar.featuresFile>${project.basedir}/deploy/features.xml</kar.featuresFile>
     <kar.karaf.version>4.4.11</kar.karaf.version>
     <kar.camel.version>4.18.1</kar.camel.version>
   </properties>
 
   <build>
-    <!-- the KAR is named after the feature, e.g. fuel.kar -->
     <finalName>${kar.feature}</finalName>
     <plugins>
-      <!-- auto-detect kar.feature from the project's features.xml (unless set via -D) -->
+      <!-- auto-detect kar.feature from deploy/features.xml (so projects pass no -D) -->
       <plugin>
         <groupId>org.codehaus.gmavenplus</groupId>
         <artifactId>gmavenplus-plugin</artifactId>
@@ -63,7 +59,7 @@
                 def m = (f.text =~ /<feature\s+name="([^"]+)"/)
                 assert m : "no <feature name=...> found in " + f
                 project.properties['kar.feature'] = m[0][1]
-                log.info "feature-kar: auto-detected kar.feature = " + project.properties['kar.feature']
+                log.info "feature-kar: kar.feature = " + project.properties['kar.feature']
               }
             ]]></script></scripts></configuration>
           </execution>
@@ -75,7 +71,7 @@
         <artifactId>maven-antrun-plugin</artifactId>
         <version>3.1.0</version>
         <executions>
-          <!-- generate the rahla-provided-feature stubs so they are NOT bundled (rahla has them) -->
+          <!-- empty stubs for the features rahla provides -> resolver skips them, not bundled -->
           <execution>
             <id>rahla-stubs</id>
             <phase>generate-resources</phase>
@@ -85,7 +81,7 @@
               <echo file="${project.build.directory}/rahla-stubs.xml"><![CDATA[<features name="rahla-provided" xmlns="http://karaf.apache.org/xmlns/features/v1.6.0"><feature name="fradi" version="0"/><feature name="graphsource" version="0"/><feature name="jedissource" version="0"/><feature name="camel-route-templates" version="0"/></features>]]></echo>
             </target></configuration>
           </execution>
-          <!-- merge the resolved closure jars into the KAR the kar-goal built (jars only) -->
+          <!-- merge the resolved closure jars into the KAR built by the kar goal -->
           <execution>
             <id>merge-closure</id>
             <phase>package</phase>
@@ -104,10 +100,8 @@
         <artifactId>karaf-maven-plugin</artifactId>
         <version>${kar.karaf.version}</version>
         <extensions>true</extensions>
-        <!-- kar packaging: builds the KAR with the feature descriptor + the directly-listed bundles -->
         <configuration><featuresFile>${kar.featuresFile}</featuresFile></configuration>
         <executions>
-          <!-- resolve the named feature's full bundle closure (camel, pax-jdbc, ... via Central) -->
           <execution>
             <id>closure</id>
             <phase>prepare-package</phase>

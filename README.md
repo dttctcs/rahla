@@ -15,7 +15,7 @@ Current release ships **Karaf 4.4.11 + Camel 4.18.1** on JDK 21.
 - [The deploy directory is the API](#the-deploy-directory-is-the-api)
 - [Special features](#special-features)
 - [HTTP / REST](#http--rest)
-- [Deploying as a KAR (offline / prod)](#deploying-as-a-kar-offline--prod)
+- [Deploying as a KAR](#deploying-as-a-kar)
 - [Configuration](#configuration)
 - [Monitoring](#monitoring)
 - [Kubernetes](#kubernetes)
@@ -80,7 +80,7 @@ Rahla dispatches each file in `/config/deploy` by extension:
 | `*.cfg`      | registered as an **OSGi configuration** (factory PIDs split on the `-` in the filename) |
 | `*.yaml`     | turned into **Camel route templates** by `TemplateFileInstaller` |
 | `*.jar`      | installed as an **OSGi bundle** |
-| `*.kar`      | installed as a **feature archive** (see [Deploying as a KAR](#deploying-as-a-kar-offline--prod)) |
+| `*.kar`      | installed as a **feature archive** (see [Deploying as a KAR](#deploying-as-a-kar)) |
 | `*.siddhi`   | loaded by the Fradi CEP component *(EOL)* |
 
 If a file is rejected (bad XML, missing service reference, …), Rahla logs it and moves on — always
@@ -225,21 +225,40 @@ Jetty is **not** the default. `camel-jetty` / `pax-web-http-jetty` still work, b
 pulled by Karaf 4.4.x has known CVEs — pin a fixed version (or just stay on Undertow). Run one
 Pax-Web HTTP feature at a time.
 
-## Deploying as a KAR (offline / prod)
+## Deploying as a KAR
 
-For dev you just mount `deploy/`. For int/prod you can ship a project **self-contained and offline**
-as a KAR. There are three approaches — full commands and Dockerfiles in
-**[`manifests/kar.md`](manifests/kar.md)**:
+For dev you mount `deploy/`. If you **don't want to download anything at startup** (air-gapped
+environments), build an offline KAR from your `features.xml` and bake its bundles into the image.
 
-1. **Build & deploy the KAR** — drop a `.kar` in `/config/deploy`; the deployer installs it on boot.
-2. **Pre-extract into the image** *(recommended)* — extract the bundles into Karaf's `system/` at
-   build time, so they install offline **and** are visible to image scanners (Trivy).
-3. **Resolve & scan locally** — resolve the bundle closure into a folder and run
-   `trivy rootfs` on it to see exactly what would be installed, without building an image.
+The KAR build is a shared pom kept in this repo and fetched over HTTP (not published to Maven):
+[`manifests/feature-kar.xml`](manifests/feature-kar.xml). It resolves the feature's **full bundle
+closure** (camel, pax-jdbc-oracle/ojdbc, …). Features rahla already ships (fradi, graphsource,
+jedissource, camel-route-templates) are *stubbed out* during the build so they aren't bundled — rahla
+installs those air-gapped from its own `system/` at runtime.
 
-All three reuse one build pom fetched from
-`https://codeberg.org/datatactics/rahla/raw/branch/main/manifests/feature-kar.xml`, which
-auto-detects the feature from your `features.xml` (no `-D` needed) and resolves its bundle closure.
+A project `Dockerfile.kar` — build the KAR, then **extract it into Karaf's `system/`** so the bundles
+install with no download **and** are visible to image scanners (Trivy) as plain jars:
+
+```dockerfile
+# syntax=docker/dockerfile:1
+FROM docker.io/library/maven:3.9-eclipse-temurin-23 AS build      # JDK >= 22 (karaf tooling)
+WORKDIR /build
+ADD https://codeberg.org/datatactics/rahla/raw/branch/main/manifests/feature-kar.xml ./pom.xml
+COPY deploy/features.xml ./deploy/features.xml
+RUN --mount=type=cache,target=/root/.m2 mvn -B -q -f pom.xml package \
+ && mkdir overlay && (cd overlay && jar xf /build/target/*.kar repository)
+
+FROM docker.io/datatactics/rahla:1.3.2
+COPY --from=build --chown=911:911 /build/overlay/repository/ /app/rahla/system/
+COPY --chown=911:911 deploy /config/deploy
+```
+
+`features.xml` stays in `deploy/` and triggers the install — now resolved offline from the pre-seeded
+`system/`. No need to drop the `.kar` itself in `/config/deploy`.
+
+**Scanning with Trivy:** since the bundles are loose jars under `system/`, a normal image scan finds
+them. Use `trivy image` (or `trivy rootfs` on an exported tree) — **not** `trivy fs`, which only reads
+dependency files (pom/lockfiles), not loose jars.
 
 ## Configuration
 
@@ -304,8 +323,11 @@ means an unsatisfied OSGi `<reference>` (missing service or feature).
 `camel-jetty` pulls in Eclipse Jetty even though Rahla serves HTTP via Undertow. If your routes
 don't use Jetty, drop `<feature>camel-jetty</feature>`.
 
-**How do I make a project work offline (air-gapped)?**
-Bake it into a KAR — see [`manifests/kar.md`](manifests/kar.md).
+**Is the KAR fully offline / air-gapped?**
+No. It packs the feature + its directly-listed bundles; `<feature>` includes (camel, pax-jdbc, …)
+are resolved at deploy from rahla's repos, so the target needs Maven access for anything rahla
+doesn't already ship. A fully air-gapped artifact means packing the entire bundle closure — more
+involved, not done by the shared pom.
 
 **`RAHLA_DEPLOY_PATH` / `/rahla/deploy` / `/deploy`?**
 Gone since 1.3. Only `/config/deploy` is monitored; add an
