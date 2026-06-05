@@ -135,7 +135,7 @@ the parameter values.
 
 ### GraphSource (Gremlin / JanusGraph)
 
-Each `rahla.graphsource-<name>.cfg` publishes a `rahla.api.GraphSource` service, filterable by name:
+Each `rahla.graphsource-<name>.cfg` publishes a `rahla.graphsource.GraphSource` service, filterable by name:
 
 ```ini
 hosts=janusgraph
@@ -279,7 +279,7 @@ To watch an additional directory, drop another `org.apache.felix.fileinstall-<na
 
 ## Monitoring
 
-Configured as Java agents via `KARAF_SYSTEM_OPTS`; the assembly bundles the libraries.
+Both agents ship in the assembly (attached via `KARAF_SYSTEM_OPTS`, see [Configuration](#configuration)).
 
 - **Prometheus JMX Exporter** — exposes metrics at `http://<host>:9001/metrics` (config in
   `config.yaml`).
