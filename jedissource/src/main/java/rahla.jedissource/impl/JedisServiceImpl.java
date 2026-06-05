@@ -55,6 +55,7 @@ public class JedisServiceImpl implements JedisSource {
   private static final String TEST_ON_BORROW_KEY = "testOnBorrow";
   private static final String TEST_ON_RETURN_KEY = "testOnReturn";
   private static final String TEST_WHILE_IDLE_KEY = "testWhileIdle";
+  private static final String SSL = "ssl";
   private static final String MIN_EVICTABLE_IDLE_TIME_SECONDS_KEY = "minEvictableIdleTimeSeconds";
   private static final String TIME_BETWEEN_EVICTION_RUNS_SECONDS_KEY = "timeBetweenEvictionRunsSeconds";
   private static final String NUM_TESTS_PER_EVICTION_RUN_KEY = "numTestsPerEvictionRun";
@@ -79,6 +80,7 @@ public class JedisServiceImpl implements JedisSource {
   private boolean testOnBorrow;
   private boolean testOnReturn;
   private boolean testWhileIdle;
+  private boolean ssl;
   private int minEvictableIdleTimeSeconds;
   private int timeBetweenEvictionRunsSeconds;
   private int numTestsPerEvictionRun;
@@ -102,6 +104,7 @@ public class JedisServiceImpl implements JedisSource {
     testOnBorrow = boolProp(properties, TEST_ON_BORROW_KEY, true);
     testOnReturn = boolProp(properties, TEST_ON_RETURN_KEY, true);
     testWhileIdle = boolProp(properties, TEST_WHILE_IDLE_KEY, true);
+    ssl = Boolean.parseBoolean((String) properties.getOrDefault(SSL, "false"));
     minEvictableIdleTimeSeconds = intProp(properties, MIN_EVICTABLE_IDLE_TIME_SECONDS_KEY, 60);
     timeBetweenEvictionRunsSeconds = intProp(properties, TIME_BETWEEN_EVICTION_RUNS_SECONDS_KEY, 30);
     numTestsPerEvictionRun = intProp(properties, NUM_TESTS_PER_EVICTION_RUN_KEY, 3);
@@ -111,7 +114,7 @@ public class JedisServiceImpl implements JedisSource {
 
   private void init() {
     closePoolQuietly();
-    jedisPool = new JedisPool(buildPoolConfig(), host, port, timeout, user, pass, db);
+    jedisPool = new JedisPool(buildPoolConfig(), host, port, timeout, user, pass, db, ssl);
 
     for (int i = 0; i < CONNECT_RETRY_COUNT && !shutdown; i++) {
       try (Jedis resource = jedisPool.getResource()) {
