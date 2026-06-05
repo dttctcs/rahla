@@ -1,268 +1,340 @@
 <a id="readme-top"></a>
 
-<br />
-<div align="center">
-  <h3 align="center">Rahla</h3>
+# Rahla
 
-  <p align="center">
-    An Open-Source Apache Camel Appliance for Apache Karaf
-    <br />
-    <a href="https://codeberg.org/dataTactics/rahla/"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://codeberg.org/dataTactics/rahla/issues">Report Bug</a>
-    &middot;
-    <a href="https://codeberg.org/dataTactics/rahla/issues">Request Feature</a>
-  </p>
-</div>
+**Rahla** is an open-source [Apache Karaf](https://karaf.apache.org/) appliance preconfigured for
+[Apache Camel](https://camel.apache.org/), packaged as a Docker image. It runs your integrations in
+an OSGi container and **hot-loads everything you drop into one directory** — Camel routes, OSGi
+configs, Groovy beans, route-template YAML, bundles and feature archives — with no rebuild and no
+restart.
 
+Current release ships **Karaf 4.4.11 + Camel 4.18.1** on JDK 21.
 
-## About The Project
+## Contents
 
-**Rahla** is an open-source Apache Karaf appliance designed for easy deployment with Apache Camel. It simplifies the process of building and deploying robust integration solutions by leveraging Camel’s powerful routing and mediation engine in an OSGi environment.
+- [Key features](#key-features)
+- [Getting started](#getting-started)
+- [The deploy directory is the API](#the-deploy-directory-is-the-api)
+- [Special features](#special-features)
+- [HTTP / REST](#http--rest)
+- [Deploying as a KAR (offline / prod)](#deploying-as-a-kar-offline--prod)
+- [Configuration](#configuration)
+- [Monitoring](#monitoring)
+- [Kubernetes](#kubernetes)
+- [Build from source](#build-from-source)
+- [FAQ](#faq)
+- [Contributing](#contributing)
 
-It is packaged as a Docker container, making it easy to deploy and manage in various environments, and automatically detects and loads resources (JARs, configurations, Camel contexts) on-the-fly.
+## Key features
+
+* **Dynamic deployment** — monitors `/config/deploy` and loads resources on the fly.
+* **Groovy bean factory** — compile Groovy processors/beans into Camel routes at runtime.
+* **Camel route templates** — define reusable templates in YAML.
+* **GraphSource** — pooled Gremlin/TinkerPop client (e.g. JanusGraph) as an OSGi service.
+* **JedisSource** — pooled Redis (Jedis) client as an OSGi service *(deprecated)*.
+* **Fradi** — Siddhi complex-event-processing as a Camel component *(EOL — see below)*.
+* **Loki appender** — pax-logging-compatible Log4j2 appender for Grafana Loki.
+* **Monitoring** — Prometheus JMX Exporter and OpenTelemetry agent built in.
+* **Offline KAR packaging** — ship a project self-contained for air-gapped installs.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Key Features
-
-* **Containerized:** Packaged as a Docker container for easy deployment.
-* **OSGi-Enabled:** Leverages OSGi services for modularity and integration with Apache Karaf.
-* **Dynamic Deployment:** Monitors `/config/deploy` to load resources on-the-fly.
-* **Groovy Bean Factory:** Compile and use Groovy beans in your Camel routes at runtime.
-* **Template File Installer:** Define reusable route templates in YAML files.
-* **GraphSource:** Seamlessly interact with graph databases (e.g., JanusGraph).
-* **JedisSource:** Simplify interactions with Redis databases using the Jedis library.
-* **Siddhi Integration:** Integrate complex event processing into Camel routes.
-* **Advanced Monitoring:** Built-in Prometheus JMX Exporter and OpenTelemetry Agent.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-## Getting Started
-
-To get a local copy up and running follow these simple example steps.
+## Getting started
 
 ### Prerequisites
 
-* **Docker** or a compatible container runtime.
-* Basic knowledge of mounting volumes and managing directories.
+* Docker / Podman (or any OCI runtime).
 
-### Installation
+### Run
 
-1.  **Prepare Deployment Directory:**
-    Create a local directory for your artifacts.
-    ```sh
-    mkdir deploy
-    ```
-2.  **Start Rahla:**
-    Run the container, mounting your local deploy folder to `/config/deploy`.
-    ```sh
-    docker run --rm -p 8101:8101 -v ./deploy:/config/deploy datatactics/rahla:latest
-    ```
-3.  **Deploy Artifacts:**
-    Copy your JARs, configurations (`.cfg`, `.groovy`), and Camel contexts (`.xml`) into your local `deploy` directory. Rahla automatically detects changes in `/config/deploy` and loads them.
+```sh
+mkdir -p deploy
+docker run --rm \
+  -p 8101:8101 -p 8181:8181 \
+  -v ./deploy:/config/deploy \
+  datatactics/rahla:latest
+```
 
-4.  **Access Console:**
-    Connect via SSH (Default password: `admin`):
-    ```sh
-    ssh -p 8101 admin@localhost
-    ```
+Drop your artifacts into `./deploy` — Rahla picks up changes automatically. Removing a file
+uninstalls the artifact; editing it reloads it.
+
+> **LSIO base image:** the container runs as `PUID`/`PGID` (default `911`). `/config/etc` and
+> `/config/deploy` are the persistent config and deploy mounts; `/app/rahla/{etc,deploy}` are
+> symlinks to them.
+
+### Console access
+
+SSH on port **8101** (default user/password `admin` / `admin`, see `users.properties`):
+
+```sh
+ssh -p 8101 admin@localhost
+```
+
+Useful shell commands: `bundle:list -s`, `bundle:diag <id>` (why a bundle is `Waiting`),
+`feature:list -i`, `camel:context-list`, `log:tail`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## The deploy directory is the API
 
-## Usage
+Rahla dispatches each file in `/config/deploy` by extension:
 
-### Kubernetes Deployment
+| File         | What happens |
+|--------------|--------------|
+| `*.xml`      | loaded as a **Camel Blueprint context** (routes, REST, beans, OSGi `<reference>`s) |
+| `*.groovy`   | compiled at runtime via `rahla.api.GroovyBeanFactory` (referenced by URL from an XML) |
+| `*.cfg`      | registered as an **OSGi configuration** (factory PIDs split on the `-` in the filename) |
+| `*.yaml`     | turned into **Camel route templates** by `TemplateFileInstaller` |
+| `*.jar`      | installed as an **OSGi bundle** |
+| `*.kar`      | installed as a **feature archive** (see [Deploying as a KAR](#deploying-as-a-kar-offline--prod)) |
+| `*.siddhi`   | loaded by the Fradi CEP component *(EOL)* |
 
-Rahla is cloud-ready. A sample Kubernetes deployment manifest is available in the repository at `manifests/rahla.yaml`.
+If a file is rejected (bad XML, missing service reference, …), Rahla logs it and moves on — always
+check the logs after dropping something new.
 
-This manifest configures the necessary ports (SSH 8101, OSGi 8181, Prometheus 9001) and volume mounts. Ensure you configure your `PersistentVolumeClaim` or `ConfigMap` to mount to `/config/deploy` if you wish to inject routes dynamically.
+> Camel itself is **not** preinstalled. A dropped `*.xml` Camel context needs the Camel runtime —
+> install it via a `features.xml` in deploy (e.g. `<feature>camel-blueprint</feature>`) or bake it
+> into a KAR.
 
-### Configuration
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-#### JVM Configuration
-Use the environment variable `EXTRA_JAVA_OPTS` to add additional parameters for the Java Virtual Machine (e.g., Truststore, Xmx).
+## Special features
 
-#### Important Configuration Files
-Rahla includes several pre-configured files. You can override these by mounting valid configurations:
+### Groovy bean factory
 
-* **`users.properties`:** Defines user accounts/roles.
-* **`config.yaml`:** Configures the Prometheus JMX Exporter.
-* **`log4j2.xml`:** Configures logging (default is JSON format for containers).
-* **`org.apache.felix.fileinstall-rahla.cfg`:** Configures the File Install bundle to monitor `/config/deploy`.
-
-### Advanced Capabilities
-
-#### Groovy Bean Factory
-Compile beans with Groovy for your Camel contexts during runtime using the `file://` protocol:
+Compile a Groovy class from any URL into a Camel `Processor`/bean at runtime — no bundle needed:
 
 ```xml
 <reference id="beanFactory" interface="rahla.api.GroovyBeanFactory"/>
 
-<bean id="myInstance" factory-ref="beanFactory" factory-method="createBean">
-<argument value="file:///config/deploy/MyClass.groovy"/>
+<bean id="myProcessor" factory-ref="beanFactory" factory-method="createBean">
+  <argument value="file:///config/deploy/processors/MyProcessor.groovy"/>
 </bean>
 ```
 
-#### Template File Installer 
+`createBean` tries a constructor taking `org.osgi.framework.BundleContext`, then a no-arg one. Use a
+real URL (`file://`, `http://`); the old `resource:` prefix is deprecated.
 
-Define your route templates in YAML files:
+### Camel route templates
+
+Define route templates as YAML; `TemplateFileInstaller` turns each into a `camel.route.template`
+config the hosting Camel context instantiates:
 
 ```yaml
 templateId: my-route-template
-sharedConfigPid: rahla.shared.config
+sharedConfigPid: rahla.shared.config   # optional
 routes:
-  - id: my-route-1
-    parameters:
-      from: "direct:myRoute1Start"
-      to: "log:myRoute1?level=INFO"
-  - id: my-route-2
-    parameters:
-      from: "direct:myRoute2Start"
-      to: "log:myRoute2?level=INFO"
+  - id: ingest-a
+    parameters: { from: "timer:a?period=60000", to: "log:a" }
+  - id: ingest-b
+    parameters: { from: "timer:b?period=120000", to: "log:b" }
 ```
-Place these files in the configured `deploy` directory. Rahla automatically converts these YAML configurations into usable route templates. 
 
-#### GraphSource
+The Camel context must define a matching `<routeTemplate id="my-route-template">`; the YAML supplies
+the parameter values.
 
-Easily interact with gremlin databases (e.g., JanusGraph) using the `GraphSource` Interface:
+### GraphSource (Gremlin / JanusGraph)
 
-E.g.: Using a ```rahla.graphsource-jg.cfg`` file:
+Each `rahla.graphsource-<name>.cfg` publishes a `rahla.api.GraphSource` service, filterable by name:
+
 ```ini
 hosts=janusgraph
 port=8182
-user=
-pass=
 graphSourceName=aGraphSource
 graphTraversalSourceName=graph_traversal
 serializer=org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1
 serializerConfig={"ioRegistries": ["org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry"]}
-nioPoolSize=8
-workerPoolSize=8
-minConnectionPoolSize=2
-maxConnectionPoolSize=8
-minInProcessPerConnection=1
-maxInProcessPerConnection=32
-minSimultaneousUsagePerConnection=8
-maxSimultaneousUsagePerConnection=16
 ```
 
-An osgi service is registered base on the configuration above
 ```xml
-<reference id="myGraphSource" interface="rahla.api.GraphSource" filter="(graphSourceName=aGraphSource)"/>
-
+<reference id="myGraph" interface="rahla.graphsource.GraphSource" filter="(graphSourceName=aGraphSource)"/>
 ```
-The GraphSource interface is quite simple:
+
 ```java
 public interface GraphSource<T, V> {
-
   List<String> getHosts();
-
   String getUser();
-
-  V getClient();
-
-  T getGraphTraversalSource();
+  V getClient();                 // Gremlin client
+  T getGraphTraversalSource();   // g
 }
 ```
 
-#### JedisSource
+### JedisSource (Redis) *(deprecated)*
 
-Easily interact with redis databases via java low level jedis library using the `JedisSource` Interface:
+> The `JedisSource` interface is marked `@Deprecated`. Still functional, but avoid for new work.
 
-E.g.: Using a ```rahla.jedissource-redis.cfg`` file:
+Each `rahla.jedissource-<name>.cfg` publishes a pooled `rahla.jedissource.JedisSource`:
 
-```
-port=
-host=
+```ini
+host=redis
+port=6379
 db=0
-pass=
-user=
 jedisSourceName=myJedisSource
-
 ```
-
 
 ```xml
-<reference id="myJedisSource" interface="jedissource.api.JedisSource" filter="(jedisSourceName=myJedisSource)"/>
+<reference id="myRedis" interface="rahla.jedissource.JedisSource" filter="(jedisSourceName=myJedisSource)"/>
 ```
 
-With a simple interface for jedis
 ```java
-package rahla.api;
+package rahla.jedissource;
 
-import redis.clients.jedis.Jedis;
-
+@Deprecated
 public interface JedisSource {
-
   Jedis getResource();
-
   void returnResource(Jedis jedis);
-
 }
-
-
 ```
 
+### Fradi — Siddhi CEP component *(EOL)*
 
-#### Siddhi Integration (Fradi Camel Component)
+> **Deprecated / end-of-life.** Prefer `camel-mybatis`, `camel-stream`, or another supported Camel
+> component for new work. Documented here for existing deployments only.
 
-Rahla includes an custom component which brings siddhi to camel. Siddhi is a complex event processing for doing sql stuff on streams:
-See [Siddhi Query Guide](https://siddhi.io/en/v4.x/docs/query-guide/) for detailed information on siddhi.
-
-You can easyily create a component:
+[Siddhi](https://siddhi.io/) brings SQL-like complex event processing to streams. Wrap a plan as a
+Camel component:
 
 ```xml
 <bean id="siddhiPlan" class="rahla.components.fradi.FradiComponent">
-  <property name="plan" value="resource:deploy:siddhiPlan.siddhi"/>
+  <property name="plan" value="file:///config/deploy/siddhiPlan.siddhi"/>
 </bean>
 ```
-An simple plan could look like
+
 ```sql
 define stream foo(valueA int);
-
 from foo select valueA as valueB insert into bar;
-
 ```
-The plan just select valueA from stream foo renames it to valueB and sends it to the stream bar.
 
-Inside your camel context the usage is as follows:
-***Note:*** the component expects an a map with key value pairs conaining field names of the stream or an array with the correct layout. Besides single events also batches are supported. For this you need to send iterables to the component.
 ```xml
-
-<route>
- <from uri="direct:foo"/>
- <from uri="siddhiPlan:foo"/>
-</route>
-
-<route>
- <from uri="siddhiPlan:bar"/>
- <to uri="log:bar"/>
-</route>
+<route><from uri="direct:foo"/><to uri="siddhiPlan:foo"/></route>
+<route><from uri="siddhiPlan:bar"/><to uri="log:bar"/></route>
 ```
 
-#### Pax Logging Loki Appender
-We added a pax compatible appender for Loki.
-***Note*** keep in mind that you need to add ```<Configuration packages="pl.tkowalcz.tjahzi.log4j2">``` to get ```<Loki ...``` working.
+The component accepts a map of stream field name→value (or a correctly laid-out array); send an
+`Iterable` for batches.
 
+### Loki Log4j2 appender
+
+A pax-logging-compatible appender for Grafana Loki ships in the `rahla-logging` feature.
+
+> You must add `<Configuration packages="pl.tkowalcz.tjahzi.log4j2">` to `log4j2.xml` for the
+> `<Loki .../>` appender to resolve.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## HTTP / REST
+
+The boot HTTP runtime is **Undertow** (`pax-web-http-undertow`); the OSGi/Pax-Web port defaults to
+**8181**. Use it from a Camel REST config:
+
+```xml
+<restConfiguration component="undertow" port="8183" contextPath="/my-app"/>
+```
+
+Jetty is **not** the default. `camel-jetty` / `pax-web-http-jetty` still work, but the Jetty version
+pulled by Karaf 4.4.x has known CVEs — pin a fixed version (or just stay on Undertow). Run one
+Pax-Web HTTP feature at a time.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Deploying as a KAR (offline / prod)
+
+For dev you just mount `deploy/`. For int/prod you can ship a project **self-contained and offline**
+as a KAR. There are three approaches — full commands and Dockerfiles in
+**[`manifests/kar.md`](manifests/kar.md)**:
+
+1. **Build & deploy the KAR** — drop a `.kar` in `/config/deploy`; the deployer installs it on boot.
+2. **Pre-extract into the image** *(recommended)* — extract the bundles into Karaf's `system/` at
+   build time, so they install offline **and** are visible to image scanners (Trivy).
+3. **Resolve & scan locally** — resolve the bundle closure into a folder and run
+   `trivy rootfs` on it to see exactly what would be installed, without building an image.
+
+All three reuse one build pom fetched from
+`https://codeberg.org/datatactics/rahla/raw/branch/main/manifests/feature-kar.xml`, which
+auto-detects the feature from your `features.xml` (no `-D` needed) and resolves its bundle closure.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Configuration
+
+### JVM options
+
+Add JVM parameters (truststore, `-Xmx`, …) via `EXTRA_JAVA_OPTS`. Java agents are configured via
+`KARAF_SYSTEM_OPTS`.
+
+### Important config files
+
+Override these by mounting your own into `/config/etc`:
+
+| File | Purpose |
+|------|---------|
+| `users.properties` | user accounts / roles |
+| `log4j2.xml` | logging (JSON to stdout by default) |
+| `config.yaml` | Prometheus JMX Exporter |
+| `org.apache.felix.fileinstall-*.cfg` | which directory is monitored (`/config/deploy`) |
+
+To watch an additional directory, drop another `org.apache.felix.fileinstall-<name>.cfg`.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Monitoring
 
-For monitoring, the Rahla appliance comes equipped with Prometheus JMX Exporter integration and OpenTelemety Agent. The java properties are  configured via environment variable ```KARAF_SYSTEM_OPTS```. The Rahla Karaf assembly includes the necessary libraries.
+Configured as Java agents via `KARAF_SYSTEM_OPTS`; the assembly bundles the libraries.
 
-- **prometheus JMX Exporter Agent:**  
-   - We added `-javaagent:./jmx_prometheus_javaagent-1.0.1.jar=9001:etc/config.yaml`
-   - Rahla will expose Prometheus metrics at `http://localhost:9001/metrics`. 
-- **OpenTelemetry Agent:** 
-   - We added `-javaagent:./opentelemetry-javaagent-2.4.0.jar`
-   - The environment variables ```OTEL_LOGS_EXPORTER``` ```OTEL_METRICS_EXPORTER``` ```OTEL_TRACES_EXPORTER``` are ```none``` by default and need to be configured
+- **Prometheus JMX Exporter** — exposes metrics at `http://<host>:9001/metrics` (config in
+  `config.yaml`).
+- **OpenTelemetry agent** — `OTEL_LOGS_EXPORTER` / `OTEL_METRICS_EXPORTER` / `OTEL_TRACES_EXPORTER`
+  are `none` by default; set them to enable export.
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Kubernetes
+
+A sample manifest is in [`manifests/rahla.yaml`](manifests/rahla.yaml): it wires the ports (SSH 8101,
+HTTP 8181, Prometheus 9001) and volumes. Mount your routes to `/config/deploy` (ConfigMap / PVC).
+
+## Build from source
+
+JDK 21 is required (matches CI and the compiler target). The reactor has no tests:
+
+```sh
+mvn --batch-mode --update-snapshots clean package   # -> assembly/target/assembly/
+docker build -t datatactics/rahla:dev .
+```
+
+The runnable Karaf distribution under `assembly/target/assembly/` can also be started directly
+(`bin/karaf`, `bin/karaf debug`, `bin/start`/`bin/stop`, `bin/client`) — handy for reproducing OSGi
+wiring problems without the container layer.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## FAQ
+
+**Which Camel version, and how do I migrate routes?**
+Rahla 1.3.2 ships **Camel 4.18.1**. Coming from Camel 3.x, read the official
+[Camel 4 migration guide](https://camel.apache.org/manual/camel-4-migration-guide.html) (and the
+[Camel 4.x upgrade notes](https://camel.apache.org/manual/camel-4x-upgrade-guide.html)).
+
+**My `*.xml` route isn't starting.**
+Camel is not preinstalled — make sure the Camel runtime is installed (a `features.xml` with
+`<feature>camel-blueprint</feature>`, or a KAR). Check `bundle:diag <id>`: a `Waiting` bundle usually
+means an unsatisfied OSGi `<reference>` (missing service or feature).
+
+**Trivy / a scanner flags Jetty.**
+`camel-jetty` pulls in Eclipse Jetty even though Rahla serves HTTP via Undertow. If your routes
+don't use Jetty, drop `<feature>camel-jetty</feature>`.
+
+**How do I make a project work offline (air-gapped)?**
+Bake it into a KAR — see [`manifests/kar.md`](manifests/kar.md).
+
+**`RAHLA_DEPLOY_PATH` / `/rahla/deploy` / `/deploy`?**
+Gone since 1.3. Only `/config/deploy` is monitored; add an
+`org.apache.felix.fileinstall-<name>.cfg` for extra directories.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Contributing
 
-Contributions to Rahla are highly encouraged! 
+Contributions are welcome. Rahla is licensed under the **Apache 2.0 License**.
 
-- **License:** Rahla is licensed under the Apache 2.0 License.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>

@@ -40,7 +40,7 @@ WORKDIR /build
 ADD https://codeberg.org/datatactics/rahla/raw/branch/main/manifests/feature-kar.xml ./pom.xml
 COPY deploy/features.xml ./deploy/features.xml
 RUN --mount=type=cache,target=/root/.m2 mvn -B -q -f pom.xml package \
- && mkdir overlay && (cd overlay && for k in /build/target/*.kar; do jar xf "$k" repository; done)
+ && mkdir overlay && (cd overlay && jar xf /build/target/*.kar repository)
 
 FROM docker.io/datatactics/rahla:1.3.2
 COPY --from=build --chown=911:911 /build/overlay/repository/ /app/rahla/system/
