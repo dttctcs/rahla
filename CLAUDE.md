@@ -6,6 +6,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Rahla is an Apache Karaf assembly (OSGi container) preconfigured for Apache Camel, packaged as a Docker image. The Maven reactor produces a Karaf distribution under `assembly/target/assembly/`, which the `Dockerfile` copies into `/app/rahla` of a `linuxserver/baseimage-alpine` image. Runtime convention is LSIO: `/app/rahla/etc` and `/app/rahla/deploy` are symlinks to `/config/etc` and `/config/deploy`, and the `org.apache.felix.fileinstall` bundle hot-loads anything dropped into `/config/deploy` (jars, `.cfg`, `.groovy`, Camel XML/YAML, route-template YAML).
 
+## Dockerfile & base image (manually synced from adoptium)
+
+The `Dockerfile` is `FROM ghcr.io/linuxserver/baseimage-alpine:3.23` (LSIO), but the **JRE-install
+portion is copied from the upstream Eclipse Temurin image**:
+<https://github.com/adoptium/containers/tree/main/21/jre/alpine/3.23> (the `apk add` dependency list,
+`ENV JAVA_VERSION`, and the arch-`case` block that downloads + gpg-verifies + extracts the Temurin
+JRE). **Renovate does not track this** — it's hardcoded in a `RUN`. When bumping the JRE you must
+manually copy from upstream and update **all** of: `JAVA_VERSION`, both `ESUM` checksums (aarch64 +
+x86_64), the two `BINARY_URL`s, and the `apk add` list. Keep the alpine tag (`3.23`) aligned with the
+adoptium variant you copy from.
+
+Also manually coupled: `KARAF_SYSTEM_OPTS` hardcodes the **agent jar filenames+versions**
+(`jmx_prometheus_javaagent-*.jar`, `opentelemetry-javaagent-*.jar`). These must match the versions
+the assembly actually ships (the parent `pom.xml`) — bump them together, or the `-javaagent:` path
+won't exist at runtime.
+
 ## Build commands
 
 JDK 21 is required (matches the CI workflow and `maven-compiler-plugin` source/target). The reactor has no tests, so the standard build is just `package`:
