@@ -107,7 +107,7 @@ jobs:
             -H 'Content-Type: multipart/form-data' \
             -H "X-API-Key: ${DTRACK_API_KEY}" \
             -F "autoCreate=true" \
-            -F "projectName=rahla" \
+            -F "projectName=datatactics/rahla" \
             -F "projectVersion=${{ steps.set-filename.outputs.version }}" \
             -F "parentUUID=${PARENTUUID}" \
             -F "bom=@${{ steps.set-filename.outputs.filename }}"
