@@ -90,49 +90,12 @@ jobs:
           TRIVY_PASSWORD: ${{ secrets.DOCKERHUB_PASS }}
         run: trivy image docker.io/datatactics/rahla:${{ steps.set-filename.outputs.version }}
 
-      - name: Fix License Format for Dependency-Track
+      - name: Strip licenses (Dependency-Track dislikes Trivy's license format)
         env:
           SBOM_FILE: "${{ steps.set-filename.outputs.filename }}"
-          SBOM_FILE_TEMP: "${{ steps.set-filename.outputs.filename }}.temp"
         run: |
-          jq '
-            def fix_licenses:
-              if .licenses then
-                if (.licenses | length) > 1 then
-                  {expression: (.licenses | map(
-                    if .license.id then .license.id
-                    elif .license.name then .license.name
-                    else "Unknown"
-                    end
-                  ) | join(" OR "))}
-                elif (.licenses | length) == 1 then
-                  if .licenses[0].license.id then
-                    {license: {name: .licenses[0].license.id}}
-                  elif .licenses[0].license.name then
-                    {license: {name: .licenses[0].license.name}}
-                  else
-                    .licenses[0]
-                  end
-                else
-                  .
-                end
-              else
-                .
-              end;
-            if .components then
-              .components |= map(
-                if .licenses then . + {licenses: [fix_licenses]} else . end
-              )
-            else . end |
-            if .metadata.component.licenses then
-              .metadata.component += {licenses: [(.metadata.component | fix_licenses)]}
-            else . end
-          ' "${SBOM_FILE}" > "${SBOM_FILE_TEMP}"
-
-          [ -s "${SBOM_FILE_TEMP}" ] || { echo "license conversion produced empty file"; exit 1; }
-          jq -e . "${SBOM_FILE_TEMP}" > /dev/null || { echo "invalid JSON after conversion"; exit 1; }
-          echo "components: $(jq '.components | length' ${SBOM_FILE_TEMP})  vulns: $(jq '.vulnerabilities | length // 0' ${SBOM_FILE_TEMP})"
-          mv "${SBOM_FILE_TEMP}" "${SBOM_FILE}"
+          jq '.components |= map(del(.licenses)) | del(.metadata.component.licenses)' "${SBOM_FILE}" > "${SBOM_FILE}.tmp"
+          mv "${SBOM_FILE}.tmp" "${SBOM_FILE}"
 
       - name: Upload SBOM to Dependency Track
         env:
