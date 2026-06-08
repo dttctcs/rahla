@@ -49,7 +49,7 @@ jobs:
         uses: docker/login-action@v1
         with:          
           username: ${{ vars.DOCKERHUB_USER }}
-          password: ${{ vars.DOCKERHUB_PASS }}          
+          password: ${{ secrets.DOCKERHUB_PASS }}          
       
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -87,7 +87,7 @@ jobs:
           TRIVY_SCANNERS: "vuln"
           TRIVY_SEVERITY: "MEDIUM,HIGH,CRITICAL"
           TRIVY_USERNAME: ${{ vars.DOCKERHUB_USER }}
-          TRIVY_PASSWORD: ${{ vars.DOCKERHUB_PASS }}
+          TRIVY_PASSWORD: ${{ secrets.DOCKERHUB_PASS }}
         run: trivy image docker.io/datatactics/rahla:${{ steps.set-filename.outputs.version }}
 
       - name: Fix License Format for Dependency-Track
