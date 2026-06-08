@@ -137,7 +137,7 @@ jobs:
       - name: Upload SBOM to Dependency Track
         env:
           DTRACK_URL: ${{ vars.DTRACK_URL }}
-          PARENTUUID: ${{ vars.DTRACK_PARENTUUID }}
+          PARENTUUID: "cff07b40-c95c-47e9-9367-cb9e8df75dcd"   # rahla parent project in Dependency Track
           DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
         run: |
           curl -L -X POST ${DTRACK_URL} \
