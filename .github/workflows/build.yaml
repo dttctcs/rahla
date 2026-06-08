@@ -59,3 +59,88 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  trivy-scan:
+    name: Trivy SBOM -> Dependency Track
+    runs-on: docker
+    needs: build
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Set filename
+        id: set-filename
+        run: echo "filename=sbom_rahla_${FORGEJO_REF_NAME}.json" >> $GITHUB_OUTPUT
+
+      - name: Install Trivy + jq
+        run: |
+          apt-get update -qq
+          apt-get install -qq -y curl jq
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/v0.58.1/contrib/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Trivy SBOM (CycloneDX) of the pushed image
+        env:
+          TRIVY_FORMAT: "cyclonedx"
+          TRIVY_OUTPUT: "${{ steps.set-filename.outputs.filename }}"
+          TRIVY_SCANNERS: "vuln"
+          TRIVY_SEVERITY: "MEDIUM,HIGH,CRITICAL"
+          TRIVY_USERNAME: ${{ vars.DOCKERHUB_USER }}
+          TRIVY_PASSWORD: ${{ vars.DOCKERHUB_PASS }}
+        run: trivy image docker.io/datatactics/rahla:latest
+
+      - name: Fix License Format for Dependency-Track
+        env:
+          SBOM_FILE: "${{ steps.set-filename.outputs.filename }}"
+          SBOM_FILE_TEMP: "${{ steps.set-filename.outputs.filename }}.temp"
+        run: |
+          jq '
+            def fix_licenses:
+              if .licenses then
+                if (.licenses | length) > 1 then
+                  {expression: (.licenses | map(
+                    if .license.id then .license.id
+                    elif .license.name then .license.name
+                    else "Unknown"
+                    end
+                  ) | join(" OR "))}
+                elif (.licenses | length) == 1 then
+                  if .licenses[0].license.id then
+                    {license: {name: .licenses[0].license.id}}
+                  elif .licenses[0].license.name then
+                    {license: {name: .licenses[0].license.name}}
+                  else
+                    .licenses[0]
+                  end
+                else
+                  .
+                end
+              else
+                .
+              end;
+            if .components then
+              .components |= map(
+                if .licenses then . + {licenses: [fix_licenses]} else . end
+              )
+            else . end |
+            if .metadata.component.licenses then
+              .metadata.component += {licenses: [(.metadata.component | fix_licenses)]}
+            else . end
+          ' "${SBOM_FILE}" > "${SBOM_FILE_TEMP}"
+
+          [ -s "${SBOM_FILE_TEMP}" ] || { echo "license conversion produced empty file"; exit 1; }
+          jq -e . "${SBOM_FILE_TEMP}" > /dev/null || { echo "invalid JSON after conversion"; exit 1; }
+          echo "components: $(jq '.components | length' ${SBOM_FILE_TEMP})  vulns: $(jq '.vulnerabilities | length // 0' ${SBOM_FILE_TEMP})"
+          mv "${SBOM_FILE_TEMP}" "${SBOM_FILE}"
+
+      - name: Upload SBOM to Dependency Track
+        env:
+          DTRACK_URL: ${{ vars.DTRACK_URL }}
+          PARENTUUID: ${{ vars.DTRACK_PARENTUUID }}
+          DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
+        run: |
+          curl -L -X POST ${DTRACK_URL} \
+            -H 'Content-Type: multipart/form-data' \
+            -H "X-API-Key: ${DTRACK_API_KEY}" \
+            -F "autoCreate=true" \
+            -F "projectName=rahla" \
+            -F "projectVersion=${FORGEJO_REF_NAME}" \
+            -F "parentUUID=${PARENTUUID}" \
+            -F "bom=@${{ steps.set-filename.outputs.filename }}"
