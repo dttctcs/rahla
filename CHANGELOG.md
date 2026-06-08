@@ -1,3 +1,9 @@
+# 1.3.3 (unreleased)
+
+### Dependency Updates
+
+* opentelemetry agent: `2.22.0 > 2.26.1`
+
 # 1.3.2 (2026-05-02)
 
 ### Bug Fixes

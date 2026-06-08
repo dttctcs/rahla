@@ -1123,7 +1123,7 @@
 
         <!-- Observability -->
         <jmx_exporter.version>1.0.1</jmx_exporter.version>
-        <opentelemetry_agent.version>2.22.0</opentelemetry_agent.version>
+        <opentelemetry_agent.version>2.26.1</opentelemetry_agent.version>
         <opentelemetry-sdk-extension-autoconfigure.version>1.61.0</opentelemetry-sdk-extension-autoconfigure.version>
 
         <!-- Siddhi (EOL — fradi component) -->
