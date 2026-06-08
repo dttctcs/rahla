@@ -29,6 +29,7 @@ RUN set -eux; \
     ; \
     rm -rf /var/cache/apk/*
 
+# renovate: datasource=github-releases depName=adoptium/temurin21-binaries versioning=regex:^jdk-(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)\+(?<build>\d+)$
 ENV JAVA_VERSION=jdk-21.0.11+10
 
 RUN set -eux; \

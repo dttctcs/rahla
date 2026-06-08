@@ -12,10 +12,13 @@ The `Dockerfile` is `FROM ghcr.io/linuxserver/baseimage-alpine:3.23` (LSIO), but
 portion is copied from the upstream Eclipse Temurin image**:
 <https://github.com/adoptium/containers/tree/main/21/jre/alpine/3.23> (the `apk add` dependency list,
 `ENV JAVA_VERSION`, and the arch-`case` block that downloads + gpg-verifies + extracts the Temurin
-JRE). **Renovate does not track this** — it's hardcoded in a `RUN`. When bumping the JRE you must
-manually copy from upstream and update **all** of: `JAVA_VERSION`, both `ESUM` checksums (aarch64 +
-x86_64), the two `BINARY_URL`s, and the `apk add` list. Keep the alpine tag (`3.23`) aligned with the
-adoptium variant you copy from.
+JRE). **Renovate only _monitors_ the version, it cannot apply the bump.** A `# renovate:` annotation
+above `ENV JAVA_VERSION` (customManager → `github-releases` on `adoptium/temurin21-binaries`, see
+`renovate.json`) surfaces new `21.0.x` releases in the **Dependency Dashboard** (approval-gated, no
+auto-PR — Renovate can't recompute the sha256 `ESUM`s). When the dashboard flags one, manually copy
+from upstream and update **all** of: `JAVA_VERSION`, both `ESUM` checksums (aarch64 + x86_64), the two
+`BINARY_URL`s, and the `apk add` list. Keep the alpine tag (`3.23`) aligned with the adoptium variant
+you copy from.
 
 Also manually coupled: `KARAF_SYSTEM_OPTS` hardcodes the **agent jar filenames+versions**
 (`jmx_prometheus_javaagent-*.jar`, `opentelemetry-javaagent-*.jar`). These must match the versions

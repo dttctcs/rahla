@@ -3,18 +3,37 @@
   "extends": [
     "config:recommended"
   ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Monitor the Temurin JRE version baked into the Dockerfile (ESUMs/URLs still need manual sync)",
+      "managerFilePatterns": [
+        "/(^|/)Dockerfile$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\s+ENV JAVA_VERSION=(?<currentValue>\\S+)"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    }
+  ],
   "packageRules": [
     {
-      "description": "Only open PRs for major version updates",
+      "description": "Only open PRs for minor and patch updates (no major)",
       "matchUpdateTypes": [
-        "minor",
-        "patch",
+        "major",
         "pin",
         "digest",
         "bump",
         "rollback"
       ],
       "enabled": false
+    },
+    {
+      "description": "JRE: monitor only via dashboard - renovate cannot update the coupled ESUMs/URLs, so do the full sync by hand",
+      "matchDepNames": [
+        "adoptium/temurin21-binaries"
+      ],
+      "dependencyDashboardApproval": true
     }
   ]
 }
