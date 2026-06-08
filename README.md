@@ -34,6 +34,7 @@ Current release ships **Karaf 4.4.11 + Camel 4.18.1** on JDK 21.
 * **Loki appender** — pax-logging-compatible Log4j2 appender for Grafana Loki.
 * **Monitoring** — Prometheus JMX Exporter and OpenTelemetry agent built in.
 * **Offline KAR packaging** — ship a project self-contained for air-gapped installs.
+* **Easy CA certs** — drop PEM/`.crt` into `/config/certs`; they're imported into the JVM truststore on start.
 
 ## Getting started
 
@@ -279,6 +280,13 @@ Override these by mounting your own into `/config/etc`:
 | `org.apache.felix.fileinstall-*.cfg` | which directory is monitored (`/config/deploy`) |
 
 To watch an additional directory, drop another `org.apache.felix.fileinstall-<name>.cfg`.
+
+### Custom CA certificates
+
+Drop PEM / `.crt` files into **`/config/certs`** — on start the `init-rahla-certs` service imports
+them into the JVM truststore (`cacerts`), so Camel routes and HTTPS clients trust them. No hand-built
+JKS needed. Files may hold multiple certificates; the alias is derived from each certificate's CN
+(and the serial on collision). Re-import is idempotent (skips certs already trusted by fingerprint).
 
 ## Monitoring
 

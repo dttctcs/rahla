@@ -1,0 +1,42 @@
+#!/usr/bin/with-contenv sh
+# Import user-provided certificates into the JVM truststore so Camel routes / HTTPS clients
+# trust them — no hand-built JKS needed. Drop *.crt / *.pem files into /config/certs.
+# Adapted from the Eclipse Temurin container entrypoint (adoptium/containers).
+set -e
+
+CERT_DIR=/config/certs
+mkdir -p "$CERT_DIR"
+
+if [ -z "$(ls -A "$CERT_DIR" 2>/dev/null)" ]; then
+    echo "[init-rahla-certs] no certificates in $CERT_DIR — nothing to import"
+    exit 0
+fi
+
+# keytool -cacerts (JDK 9+) targets the default $JAVA_HOME/lib/security/cacerts; we run as root so it's writable.
+find -L "$CERT_DIR" -type f \( -name '*.crt' -o -name '*.pem' \) | sort | while IFS= read -r src; do
+    base=$(basename "$src" | sed 's/\.[^.]*$//')
+    tmp=$(mktemp -d)
+    # a file may hold several certs; keytool imports one at a time -> split (needs coreutils' csplit)
+    csplit -s -z -b '%02d.crt' -f "$tmp/${base}-" "$src" '/-----BEGIN CERTIFICATE-----/' '{*}' 2>/dev/null || cp "$src" "$tmp/${base}-00.crt"
+    for crt in "$tmp/${base}"-*; do
+        [ -f "$crt" ] || continue
+        cn=$(openssl x509 -in "$crt" -noout -subject -nameopt -space_eq 2>/dev/null | sed -n 's/^.*CN=\([^,]*\).*$/\1/p')
+        serial=$(openssl x509 -in "$crt" -noout -serial 2>/dev/null | sed -n 's/^serial=\(.*\)$/\1/p')
+        alias="${cn:-$base}"
+        # already trusted (by SHA-256 fingerprint)? skip -> idempotent across restarts
+        fp=$(openssl x509 -in "$crt" -noout -fingerprint -sha256 2>/dev/null | cut -d= -f2)
+        if [ -n "$fp" ] && keytool -cacerts -storepass changeit -list -v 2>/dev/null | grep -qiF "$fp"; then
+            echo "[init-rahla-certs] already trusted: ${alias}"
+            continue
+        fi
+        # alias collision -> disambiguate with the serial
+        if keytool -cacerts -storepass changeit -list -alias "$alias" >/dev/null 2>&1; then
+            alias="${alias}_${serial}"
+        fi
+        echo "[init-rahla-certs] importing: ${alias}  (from $(basename "$src"))"
+        keytool -cacerts -storepass changeit -noprompt -importcert -alias "$alias" -file "$crt" >/dev/null
+    done
+    rm -rf "$tmp"
+done
+
+echo "[init-rahla-certs] done"
