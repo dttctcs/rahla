@@ -64,11 +64,15 @@ jobs:
     name: Trivy SBOM -> Dependency Track
     runs-on: docker
     needs: build
-    if: github.event_name != 'pull_request'
+    # only on a release tag (release:prepare runs locally and pushes a vX.Y.Z tag)
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - name: Set filename
+      - name: Set version & filename
         id: set-filename
-        run: echo "filename=sbom_rahla_${FORGEJO_REF_NAME}.json" >> $GITHUB_OUTPUT
+        run: |
+          VERSION="${FORGEJO_REF_NAME#v}"          # v1.3.2 -> 1.3.2 (matches the docker semver tag)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "filename=sbom_rahla_${VERSION}.json" >> $GITHUB_OUTPUT
 
       - name: Install Trivy + jq
         run: |
@@ -76,7 +80,7 @@ jobs:
           apt-get install -qq -y curl jq
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/v0.58.1/contrib/install.sh | sh -s -- -b /usr/local/bin
 
-      - name: Trivy SBOM (CycloneDX) of the pushed image
+      - name: Trivy SBOM (CycloneDX) of the released image
         env:
           TRIVY_FORMAT: "cyclonedx"
           TRIVY_OUTPUT: "${{ steps.set-filename.outputs.filename }}"
@@ -84,7 +88,7 @@ jobs:
           TRIVY_SEVERITY: "MEDIUM,HIGH,CRITICAL"
           TRIVY_USERNAME: ${{ vars.DOCKERHUB_USER }}
           TRIVY_PASSWORD: ${{ vars.DOCKERHUB_PASS }}
-        run: trivy image docker.io/datatactics/rahla:latest
+        run: trivy image docker.io/datatactics/rahla:${{ steps.set-filename.outputs.version }}
 
       - name: Fix License Format for Dependency-Track
         env:
@@ -141,6 +145,6 @@ jobs:
             -H "X-API-Key: ${DTRACK_API_KEY}" \
             -F "autoCreate=true" \
             -F "projectName=rahla" \
-            -F "projectVersion=${FORGEJO_REF_NAME}" \
+            -F "projectVersion=${{ steps.set-filename.outputs.version }}" \
             -F "parentUUID=${PARENTUUID}" \
             -F "bom=@${{ steps.set-filename.outputs.filename }}"
