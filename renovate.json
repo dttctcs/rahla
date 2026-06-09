@@ -34,6 +34,14 @@
         "adoptium/temurin21-binaries"
       ],
       "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Ignore Siddhi (EOL, unpatchable) and wagon-ssh-external (being removed) - no updates at all",
+      "matchPackageNames": [
+        "/^io\\.siddhi/",
+        "org.apache.maven.wagon:wagon-ssh-external"
+      ],
+      "enabled": false
     }
   ]
 }
