@@ -104,7 +104,7 @@ public class JedisServiceImpl implements JedisSource {
     testOnBorrow = boolProp(properties, TEST_ON_BORROW_KEY, true);
     testOnReturn = boolProp(properties, TEST_ON_RETURN_KEY, true);
     testWhileIdle = boolProp(properties, TEST_WHILE_IDLE_KEY, true);
-    ssl = Boolean.parseBoolean((String) properties.getOrDefault(SSL, "false"));
+    ssl = boolProp(properties, SSL, false);
     minEvictableIdleTimeSeconds = intProp(properties, MIN_EVICTABLE_IDLE_TIME_SECONDS_KEY, 60);
     timeBetweenEvictionRunsSeconds = intProp(properties, TIME_BETWEEN_EVICTION_RUNS_SECONDS_KEY, 30);
     numTestsPerEvictionRun = intProp(properties, NUM_TESTS_PER_EVICTION_RUN_KEY, 3);
