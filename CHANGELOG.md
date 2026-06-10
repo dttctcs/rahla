@@ -1,8 +1,38 @@
 # 1.3.3 (unreleased)
 
+### Improvements
+
+* Custom CA certificates: drop PEM/`.crt` files into `/config/certs`; the new `init-rahla-certs` s6 service imports them into the JVM truststore before Karaf starts (idempotent, alias derived from the certificate CN) — no hand-built JKS needed
+* Container pins `org.ops4j.pax.url.mvn.localRepository` to `/config/.m2` (pre-created, owned by `abc`) so feature-install downloads use a fixed, persistent path instead of an ambiguous `~/.m2`; set in the `Dockerfile` only, so local non-container runs are unaffected
+* Renovate: only minor/patch updates are PR'd (no major); the Temurin JRE version is monitored via a customManager (Dependency Dashboard, approval-gated); Siddhi (EOL) and `wagon-ssh-external` are ignored
+
 ### Dependency Updates
 
+* JRE (Temurin): `jdk-21.0.10+7 > jdk-21.0.11+10`
 * opentelemetry agent: `2.22.0 > 2.26.1`
+* Apache Camel: `4.18.1 > 4.18.2` (held at 4.18.x — the Karaf `apache-camel` features the assembly needs are not published for 4.20.x)
+* Groovy: `4.0.30 > 4.0.32`
+* Jackson: `2.21.3 > 2.22.0`
+* Log4j2: `2.25.4 > 2.26.0`
+* pax-logging: `2.3.3 > 2.3.4`
+* Woodstox stax2-api: `4.2.2 > 4.3.0`
+* commons-collections4: `4.4 > 4.5.0`
+* commons-configuration2: `2.13.0 > 2.15.1`
+* TinkerPop/Gremlin: `3.7.3 > 3.8.1`
+* Jedis: `7.5.0 > 7.5.2`
+* OpenTelemetry SDK extension-autoconfigure: `1.61.0 > 1.63.0`
+* Agrona (loki-appender): `1.12.0 > 1.23.1`
+* Maven plugins: compiler `3.14.0 > 3.15.0`, resources `3.3.0 > 3.5.0`, deploy `3.1.0 > 3.1.4`, install `3.1.0 > 3.1.4`
+* Not pulled: major updates (per Renovate policy); `janusgraph-driver` stays at `1.1.0` (the only newer version offered is a timestamped build, not a clean release)
+
+### Bug Fixes
+
+* `JedisServiceImpl`: the SSL-support change used `Dictionary.getOrDefault(...)`, which does not compile (method is on `Map`, not `Dictionary`); now uses the existing `boolProp()` helper — `main` did not build before this
+* `Dockerfile`: `KARAF_SYSTEM_OPTS` still referenced `opentelemetry-javaagent-2.22.0.jar` while the assembly ships `2.26.1`, so the `-javaagent` path did not exist and the JVM failed to boot — synced to `2.26.1`
+
+### Removed
+
+* KAR-based offline packaging (`manifests/feature-kar.xml`). Offline images now prime Karaf's OSGi cache at build time (boot once → install → ship the cache) instead of resolving a KAR closure.
 
 # 1.3.2 (2026-05-02)
 
