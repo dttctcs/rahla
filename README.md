@@ -6,7 +6,7 @@ an OSGi container and **hot-loads everything you drop into one directory** — C
 configs, Groovy beans, route-template YAML, bundles and feature archives — with no rebuild and no
 restart.
 
-Current release ships **Karaf 4.4.11 + Camel 4.18.1** on JDK 21.
+Current release ships **Karaf 4.4.11 + Camel 4.18.2** on JDK 21.
 
 ## Contents
 
@@ -324,7 +324,7 @@ wiring problems without the container layer.
 ## FAQ
 
 **Which Camel version, and how do I migrate routes?**
-Rahla 1.3.2 ships **Camel 4.18.1**. Coming from Camel 3.x, read the official
+Rahla 1.3.3 ships **Camel 4.18.2**. Coming from Camel 3.x, read the official
 [Camel 4 migration guide](https://camel.apache.org/manual/camel-4-migration-guide.html) (and the
 [Camel 4.x upgrade notes](https://camel.apache.org/manual/camel-4x-upgrade-guide.html)).
 

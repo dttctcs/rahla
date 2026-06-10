@@ -47,6 +47,8 @@ mvn -pl rahla -am package
 
 Releases use `maven-release-plugin` (the recent commits `[maven-release-plugin] prepare release/next iteration` show the convention); tags are then picked up by `.github/workflows/build.yaml` to publish `docker.io/datatactics/rahla`. The Maven artifact repo `https://mvn.datatactics.dev` (id `dtacs`) is required for some non-public Siddhi artifacts (`siddhi-store-rdbms` `7.0.16-dtacs`, `siddhi` `5.1.24-dt`).
 
+**On every version bump (incl. Renovate updates), hand-update the version strings that are NOT derived from the pom:** the `README.md` lines `Current release ships **Karaf … + Camel …**` and `Rahla x.y.z ships **Camel …**`, and add a `CHANGELOG.md` entry. Also keep **`camel.version` capped at the latest published `org.apache.camel.karaf:apache-camel` features release** — `assembly/pom.xml` pulls the Karaf `apache-camel` features descriptor by `${camel.version}` (no explicit version), and the Karaf distribution lags camel-core, so don't take Renovate's camel-core version blindly (e.g. use `4.18.2`, not `4.20.0`). Always `mvn package` after a Camel bump.
+
 ## Running locally (without Docker)
 
 After `mvn package`, the Karaf assembly under `assembly/target/assembly/` is directly runnable — useful for reproducing OSGi wiring problems without the container layer. The `bin/` scripts mirror Karaf's standard set: `karaf` (foreground), `karaf debug` (foreground + JDWP on `5005`), `start` (daemon), `stop`, `status`, `client` (SSH client to the running instance).
