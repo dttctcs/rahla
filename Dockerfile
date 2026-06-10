@@ -78,7 +78,10 @@ RUN sed -i -e '/ rahla-logging.*/d' -i -e '/ framework.*/d'  /app/rahla/etc/org.
     mv /app/rahla/etc /config/; \
     chown abc:911 /config/deploy; \
     ln -s /config/deploy /app/rahla/deploy; \
-    ln -s /config/etc /app/rahla/etc;
+    ln -s /config/etc /app/rahla/etc; \
+    printf '\norg.ops4j.pax.url.mvn.localRepository=/config/.m2\n' >> /config/etc/org.ops4j.pax.url.mvn.cfg; \
+    mkdir -p /config/.m2; \
+    chown abc:911 /config/.m2;
 
 
 ENV PATH=$PATH:/app/rahla/bin
