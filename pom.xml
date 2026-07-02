@@ -1105,7 +1105,7 @@
 
         <!-- Logging -->
         <pax-logging.version>2.3.4</pax-logging.version>
-        <log4j2.version>2.26.0</log4j2.version>
+        <log4j2.version>2.26.1</log4j2.version>
         <log4j2-appender-loki.version>0.9.42</log4j2-appender-loki.version>
         <stax2-api.version>4.3.0</stax2-api.version>
 
