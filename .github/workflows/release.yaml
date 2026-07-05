@@ -1,0 +1,41 @@
+name: GitHub Release
+
+# This repo lives on Forgejo (repo.datatactics.dev/oss/rahla) and is
+# push-mirrored to github.com/dttctcs/rahla. Both platforms read
+# .github/workflows/, so the job-level `github.server_url` guard keeps this
+# workflow inert on Forgejo and only creates the release on GitHub.
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    if: github.server_url == 'https://github.com'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract changelog section for this tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"        # v1.3.3 -> 1.3.3
+          # Pull the block under "# <version> ..." up to the next "# " heading.
+          awk -v ver="$VERSION" '
+            $0 ~ /^# / { if (inblk) exit; if ($0 ~ ("^# " ver "([ ]|$)")) { inblk=1; next } }
+            inblk { print }
+          ' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "Release ${GITHUB_REF_NAME}. See CHANGELOG.md for details." > release-notes.md
+          fi
+          echo "----- release notes -----"; cat release-notes.md
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file release-notes.md
