@@ -45,9 +45,9 @@ Build a single module against already-installed siblings, e.g. just the `rahla` 
 mvn -pl rahla -am package
 ```
 
-Releases use `maven-release-plugin` (the recent commits `[maven-release-plugin] prepare release/next iteration` show the convention); tags are then picked up by `.github/workflows/build.yaml` to publish `docker.io/datatactics/rahla`. The Maven artifact repo `https://mvn.datatactics.dev` (id `dtacs`) is required for some non-public Siddhi artifacts (`siddhi-store-rdbms` `7.0.16-dtacs`, `siddhi` `5.1.24-dt`).
+Releases use `maven-release-plugin` (the recent commits `[maven-release-plugin] prepare release/next iteration` show the convention); tags are then picked up by `.forgejo/workflows/build.yaml` (Forgejo Actions — GitHub ignores `.forgejo/`) to publish `docker.io/datatactics/rahla`. The repo is push-mirrored to <https://github.com/dttctcs/rahla>; on a `v*` tag the mirror-side `.github/workflows/release.yaml` (guarded via `github.server_url`, inert on Forgejo) creates a GitHub Release from the matching `CHANGELOG.md` section — no build runs on GitHub; the release exists so Renovate consumers can track rahla via the `github-releases` datasource. The Maven artifact repo `https://mvn.datatactics.dev` (id `dtacs`) is required for some non-public Siddhi artifacts (`siddhi-store-rdbms` `7.0.16-dtacs`, `siddhi` `5.1.24-dt`).
 
-**On every version bump (incl. Renovate updates), hand-update the version strings that are NOT derived from the pom:** the `README.md` lines `Current release ships **Karaf … + Camel …**` and `Rahla x.y.z ships **Camel …**`, and add a `CHANGELOG.md` entry. Also keep **`camel.version` capped at the latest published `org.apache.camel.karaf:apache-camel` features release** — `assembly/pom.xml` pulls the Karaf `apache-camel` features descriptor by `${camel.version}` (no explicit version), and the Karaf distribution lags camel-core, so don't take Renovate's camel-core version blindly (e.g. use `4.18.2`, not `4.20.0`). Always `mvn package` after a Camel bump.
+**On every version bump (incl. Renovate updates), hand-update the version strings that are NOT derived from the pom:** the `README.md` lines `Current release ships **Karaf … + Camel …**` and `Rahla x.y.z ships **Camel …**`, and add a `CHANGELOG.md` entry. Also keep **`camel.version` capped at the latest published `org.apache.camel.karaf:apache-camel` features release** — `assembly/pom.xml` pulls the Karaf `apache-camel` features descriptor by `${camel.version}` (no explicit version), and the Karaf distribution lags camel-core, so don't take Renovate's camel-core version blindly (e.g. use `4.18.2`, not `4.20.0`). Always `mvn package` after a Camel bump. `renovate.json` enforces this automatically for bot PRs: updates for `org.apache.camel:*` (base camel) are disabled so the shared `${camel.version}` property tracks only `org.apache.camel.karaf` (<https://github.com/apache/camel-karaf>) — a "missing" camel PR is intentional; the cap rule above still applies to manual bumps. It also restricts `janusgraph-driver` to clean `X.Y.Z` releases (upstream ships only timestamped dev builds past 1.1.0) and sets `dependencyDashboard: true` (the global self-hosted config disables the dashboard; without the re-enable the approval-gated JRE update would surface nowhere).
 
 ## Running locally (without Docker)
 
@@ -59,7 +59,7 @@ assembly/target/assembly/bin/karaf debug
 
 # or as a background daemon
 assembly/target/assembly/bin/start
-assembly/target/assembly/bin/client    # default user/password: karaf / karaf, or admin / admin per users.properties
+assembly/target/assembly/bin/client    # admin / admin (users.properties defines only `admin`, password `${env:ADMIN_PASS:-admin}`)
 assembly/target/assembly/bin/stop
 ```
 

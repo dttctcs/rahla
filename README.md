@@ -352,3 +352,7 @@ Gone since 1.3. Only `/config/deploy` is monitored; add an
 
 Contributions are welcome. Rahla is licensed under the **Apache 2.0 License**.
 
+Development happens on [repo.datatactics.dev/oss/rahla](https://repo.datatactics.dev/oss/rahla);
+[github.com/dttctcs/rahla](https://github.com/dttctcs/rahla) is a push mirror where GitHub
+Releases are published on every `v*` tag.
+
