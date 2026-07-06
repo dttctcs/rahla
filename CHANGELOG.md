@@ -1,4 +1,11 @@
-# 1.3.3 (unreleased)
+# 1.3.4 (unreleased)
+
+### Dependency Updates
+
+* Jedis: `7.5.2 > 7.5.3`
+* Log4j2: `2.26.0 > 2.26.1`
+
+# 1.3.3 (2026-06-10)
 
 ### Improvements
 
