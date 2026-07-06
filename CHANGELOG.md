@@ -10,7 +10,8 @@
 
 * Jedis: `7.5.2 > 7.5.3`
 * Log4j2: `2.26.0 > 2.26.1`
-* Not pulled: Camel `4.21.0` (the Karaf `apache-camel` features top out at `4.18.2` — now enforced by the Renovate config); `janusgraph-driver` `1.2.0-20250607-...` (timestamped dev build, not a clean release); `baseimage-alpine` `3.24` (pending — requires the manual Temurin JRE re-sync from the matching adoptium variant)
+* Base image: `linuxserver/baseimage-alpine` `3.23 > 3.24` (JRE block verified against the adoptium `21/jre/alpine/3.24` variant — identical `JAVA_VERSION`/ESUMs/URLs/apk list, so only the `FROM` changed)
+* Not pulled: Camel `4.21.0` (the Karaf `apache-camel` features top out at `4.18.2` — now enforced by the Renovate config); `janusgraph-driver` `1.2.0-20250607-...` (timestamped dev build, not a clean release)
 
 ### Bug Fixes
 
