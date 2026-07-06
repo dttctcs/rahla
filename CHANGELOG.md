@@ -2,20 +2,19 @@
 
 ### Improvements
 
-* Renovate: `camel.version` now tracks `org.apache.camel.karaf` automatically (updates for base `org.apache.camel:*` are disabled, so the shared property can never outrun the published Karaf features); `janusgraph-driver` restricted to clean `X.Y.Z` releases; Dependency Dashboard re-enabled per-repo (the global self-hosted config disables it, which would have hidden the approval-gated JRE updates)
-* CI: Forgejo build workflow moved to `.forgejo/workflows/` (GitHub ignores that dir); the repo is push-mirrored to `github.com/dttctcs/rahla`, where a new release workflow creates a GitHub Release from the matching `CHANGELOG.md` section on every `v*` tag — no build on the mirror, the release exists as a `github-releases` datasource for Renovate consumers
-* The `rahla-developer` authoring skill now ships in-repo (`.claude/skills/rahla-developer/`); added `migration.md`, a verified per-version migration reference (1.2.1 → 1.3.3)
+* Renovate: `camel.version` follows `org.apache.camel.karaf` (base `org.apache.camel:*` updates disabled); `janusgraph-driver` restricted to `X.Y.Z` releases; Dependency Dashboard enabled per-repo
+* CI: Forgejo build workflow moved to `.forgejo/workflows/`; push mirror to `github.com/dttctcs/rahla` with a workflow that creates a GitHub Release from the `CHANGELOG.md` section on every `v*` tag
+* `rahla-developer` skill ships in-repo (`.claude/skills/rahla-developer/`); added `migration.md` (per-version migration reference 1.2.1 → 1.3.3)
 
 ### Dependency Updates
 
 * Jedis: `7.5.2 > 7.5.3`
 * Log4j2: `2.26.0 > 2.26.1`
-* Base image: `linuxserver/baseimage-alpine` `3.23 > 3.24` (JRE block verified against the adoptium `21/jre/alpine/3.24` variant — identical `JAVA_VERSION`/ESUMs/URLs/apk list, so only the `FROM` changed)
-* Not pulled: Camel `4.21.0` (the Karaf `apache-camel` features top out at `4.18.2` — now enforced by the Renovate config); `janusgraph-driver` `1.2.0-20250607-...` (timestamped dev build, not a clean release)
+* Base image: `linuxserver/baseimage-alpine` `3.23 > 3.24`
 
 ### Bug Fixes
 
-* `init-rahla` startup warning claimed `RAHLA_DEPLOY_PATH` was "removed since version 1.3.5" — it was removed in 1.3.0; also fixed the `org.apachle.felix` typo in the hint text
+* `init-rahla` startup warning: `RAHLA_DEPLOY_PATH` was removed in 1.3.0, not 1.3.5; fixed the `org.apachle.felix` typo in the hint text
 
 # 1.3.3 (2026-06-10)
 
