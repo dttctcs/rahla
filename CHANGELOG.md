@@ -1,8 +1,7 @@
-# 1.3.4 (unreleased)
+# 1.3.4 (2026-07-06)
 
 ### Improvements
 
-* Renovate: `camel.version` follows `org.apache.camel.karaf` (base `org.apache.camel:*` updates disabled); `janusgraph-driver` restricted to `X.Y.Z` releases; Dependency Dashboard enabled per-repo
 * CI: Forgejo build workflow moved to `.forgejo/workflows/`; push mirror to `github.com/dttctcs/rahla` with a workflow that creates a GitHub Release from the `CHANGELOG.md` section on every `v*` tag
 * `rahla-developer` skill ships in-repo (`.claude/skills/rahla-developer/`); added `migration.md` (per-version migration reference 1.2.1 → 1.3.3)
 
