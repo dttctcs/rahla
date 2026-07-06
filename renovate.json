@@ -43,6 +43,23 @@
         "org.apache.maven.wagon:wagon-ssh-external"
       ],
       "enabled": false
+    },
+    {
+      "description": "camel.version is a shared Maven property driving BOTH org.apache.camel.karaf:apache-camel (the Karaf features descriptor, which lags) and base org.apache.camel:* artifacts. Disable base-camel updates so the shared property tracks ONLY camel-karaf (https://github.com/apache/camel-karaf) and never exceeds the version the Karaf features actually publish (base camel-core is already ahead, e.g. 4.21 while camel-karaf tops out at 4.18.2). When camel-karaf releases a new version, Renovate bumps the property automatically.",
+      "matchDatasources": [
+        "maven"
+      ],
+      "matchPackageNames": [
+        "/^org\\.apache\\.camel:/"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "janusgraph-driver publishes only timestamped dev builds past 1.1.0 (e.g. 1.2.0-20250607-200526.4379014); accept only clean X.Y.Z releases",
+      "matchPackageNames": [
+        "org.janusgraph:janusgraph-driver"
+      ],
+      "allowedVersions": "/^\\d+\\.\\d+\\.\\d+$/"
     }
   ]
 }
