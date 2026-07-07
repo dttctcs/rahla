@@ -99,17 +99,40 @@ jobs:
           jq '.components |= map(del(.licenses)) | del(.metadata.component.licenses)' "${SBOM_FILE}" > "${SBOM_FILE}.tmp"
           mv "${SBOM_FILE}.tmp" "${SBOM_FILE}"
 
+      - name: Verify SBOM is non-empty
+        # Guard against silently uploading an empty BOM: a transient Trivy/DB/registry
+        # hiccup can yield a 0-component SBOM that Dependency-Track ingests as an empty
+        # project (autoCreate makes the shell, but lastBomImport stays null). Fail loud.
+        env:
+          SBOM_FILE: "${{ steps.set-filename.outputs.filename }}"
+        run: |
+          count=$(jq '.components | length' "${SBOM_FILE}")
+          echo "SBOM component count: ${count}"
+          if [ "${count}" -lt 1 ]; then
+            echo "::error::Trivy produced an SBOM with 0 components — refusing to upload an empty BOM."
+            exit 1
+          fi
+
       - name: Upload SBOM to Dependency Track
         env:
           DTRACK_URL: ${{ vars.DTRACK_URL }}
           PARENTUUID: "cff07b40-c95c-47e9-9367-cb9e8df75dcd"   # rahla parent project in Dependency Track
           DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
+        # curl sets the multipart Content-Type (incl. boundary) itself for -F uploads;
+        # do not override it. --fail-with-body turns an HTTP error into a non-zero exit
+        # (and prints DT's message) so a rejected upload fails the job instead of going green.
         run: |
-          curl -L -X POST ${DTRACK_URL} \
-            -H 'Content-Type: multipart/form-data' \
+          resp=$(curl --fail-with-body -sS -L -X POST "${DTRACK_URL}" \
             -H "X-API-Key: ${DTRACK_API_KEY}" \
             -F "autoCreate=true" \
             -F "projectName=datatactics/rahla" \
             -F "projectVersion=${{ steps.set-filename.outputs.version }}" \
             -F "parentUUID=${PARENTUUID}" \
-            -F "bom=@${{ steps.set-filename.outputs.filename }}"
+            -F "bom=@${{ steps.set-filename.outputs.filename }}")
+          echo "Dependency Track response: ${resp}"
+          token=$(echo "${resp}" | jq -r '.token // empty')
+          if [ -z "${token}" ]; then
+            echo "::error::Dependency Track did not return a processing token — upload rejected."
+            exit 1
+          fi
+          echo "Dependency Track processing token: ${token}"
