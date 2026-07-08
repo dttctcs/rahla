@@ -85,7 +85,7 @@
      </dependency>
   </dependencies>
 
-  <description />
+  <description>Deprecated: the Loki appender is retained for compatibility; prefer the OpenTelemetry logs exporter (OTEL_LOGS_EXPORTER) for new log shipping.</description>
 
   <groupId>rahla.feature</groupId>
   <modelVersion>4.0.0</modelVersion>
