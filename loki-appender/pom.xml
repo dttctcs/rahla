@@ -11,7 +11,7 @@
 
     <artifactId>loki-appender</artifactId>
 
-    <description />
+    <description>Deprecated: retained for compatibility and still dependency-bumped; prefer the OpenTelemetry logs exporter (OTEL_LOGS_EXPORTER) for new log shipping.</description>
     <modelVersion>4.0.0</modelVersion>
     <name>Loki Appender Bundle</name>
 

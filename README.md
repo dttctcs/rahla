@@ -31,7 +31,7 @@ Current release ships **Karaf 4.4.11 + Camel 4.18.2** on JDK 21.
 * **GraphSource** — pooled Gremlin/TinkerPop client (e.g. JanusGraph) as an OSGi service.
 * **JedisSource** — pooled Redis (Jedis) client as an OSGi service *(deprecated)*.
 * **Fradi** — Siddhi complex-event-processing as a Camel component *(EOL — see below)*.
-* **Loki appender** — pax-logging-compatible Log4j2 appender for Grafana Loki.
+* **Loki appender** — pax-logging-compatible Log4j2 appender for Grafana Loki *(deprecated — prefer the OpenTelemetry logs exporter)*.
 * **Monitoring** — Prometheus JMX Exporter and OpenTelemetry agent built in.
 * **Air-gapped images** — bake a project's full dependency closure into the image; no startup downloads.
 * **Easy CA certs** — drop PEM/`.crt` into `/config/certs`; they're imported into the JVM truststore on start.
@@ -207,6 +207,10 @@ The component accepts a map of stream field name→value (or a correctly laid-ou
 `Iterable` for batches.
 
 ### Loki Log4j2 appender
+
+> **Deprecated.** The Loki appender is retained for backward compatibility and still receives
+> dependency bumps, but new or additional log shipping should go through the OpenTelemetry logs
+> exporter (`OTEL_LOGS_EXPORTER`, see Monitoring) rather than the `<Loki .../>` appender.
 
 A pax-logging-compatible appender for Grafana Loki ships in the `rahla-logging` feature.
 

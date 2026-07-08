@@ -1,3 +1,13 @@
+# 1.3.5 (unreleased)
+
+### Dependency Updates
+
+* Loki appender (`pl.tkowalcz.tjahzi`): `0.9.42 > 0.9.43`
+
+### Deprecations
+
+* `loki-appender` (Grafana Loki Log4j2 appender) is deprecated — retained and still dependency-bumped, but new or additional log shipping should use the OpenTelemetry logs exporter (`OTEL_LOGS_EXPORTER`) instead of the `<Loki/>` appender.
+
 # 1.3.4 (2026-07-06)
 
 ### Improvements
