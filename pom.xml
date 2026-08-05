@@ -1086,7 +1086,7 @@
         <!-- Core platform -->
         <karaf.version>4.4.11</karaf.version>
         <camel.version>4.18.2</camel.version>
-        <groovy.version>4.0.32</groovy.version>
+        <groovy.version>4.0.33</groovy.version>
 
         <!-- OSGi APIs -->
         <osgi.version>8.0.0</osgi.version>
@@ -1110,7 +1110,7 @@
         <stax2-api.version>4.3.0</stax2-api.version>
 
         <!-- Libraries -->
-        <jackson2.version>2.22.0</jackson2.version>
+        <jackson2.version>2.22.1</jackson2.version>
         <commons-collections4.version>4.5.0</commons-collections4.version>
         <commons-configuration2.version>2.15.1</commons-configuration2.version>
         <lombok.version>1.18.46</lombok.version>
@@ -1123,8 +1123,8 @@
 
         <!-- Observability -->
         <jmx_exporter.version>1.0.1</jmx_exporter.version>
-        <opentelemetry_agent.version>2.26.1</opentelemetry_agent.version>
-        <opentelemetry-sdk-extension-autoconfigure.version>1.63.0</opentelemetry-sdk-extension-autoconfigure.version>
+        <opentelemetry_agent.version>2.30.0</opentelemetry_agent.version>
+        <opentelemetry-sdk-extension-autoconfigure.version>1.64.0</opentelemetry-sdk-extension-autoconfigure.version>
 
         <!-- Siddhi (EOL — fradi component) -->
         <siddhi.version>5.1.24-dt</siddhi.version>

@@ -30,18 +30,18 @@ RUN set -eux; \
     rm -rf /var/cache/apk/*
 
 # renovate: datasource=github-releases depName=adoptium/temurin21-binaries versioning=regex:^jdk-(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)\+(?<build>\d+)$
-ENV JAVA_VERSION=jdk-21.0.11+10
+ENV JAVA_VERSION=jdk-21.0.12+8
 
 RUN set -eux; \
     ARCH="$(apk --print-arch)"; \
     case "${ARCH}" in \
        aarch64) \
-         ESUM='33399db5fb4f542df36a706d6642a3ba1fab3d247da707273a11ef29e39f0705'; \
-         BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.11%2B10/OpenJDK21U-jre_aarch64_alpine-linux_hotspot_21.0.11_10.tar.gz'; \
+         ESUM='a4f70d2be5c55940dd60b6636643a05125e60e6c3dbc2a8402032b0346744dfa'; \
+         BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12%2B8/OpenJDK21U-jre_aarch64_alpine-linux_hotspot_21.0.12_8.tar.gz'; \
          ;; \
        x86_64) \
-         ESUM='b75c9f0dd052adfd213f0c2c1cc0c8a6d4539a8de9f7947d2b8fc45d18289975'; \
-         BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.11%2B10/OpenJDK21U-jre_x64_alpine-linux_hotspot_21.0.11_10.tar.gz'; \
+         ESUM='9a7f8712a2741bb14e2452eed2de99f62d02e05617e27d59f1861a0cdad58486'; \
+         BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12%2B8/OpenJDK21U-jre_x64_alpine-linux_hotspot_21.0.12_8.tar.gz'; \
          ;; \
        *) \
          echo "Unsupported arch: ${ARCH}"; \
@@ -86,7 +86,7 @@ RUN sed -i -e '/ rahla-logging.*/d' -i -e '/ framework.*/d'  /app/rahla/etc/org.
 
 ENV PATH=$PATH:/app/rahla/bin
 ENV KARAF_EXEC=exec
-ENV KARAF_SYSTEM_OPTS="-javaagent:./lib/jmx_prometheus_javaagent-1.0.1.jar=9001:etc/config.yaml -javaagent:./lib/opentelemetry-javaagent-2.26.1.jar"
+ENV KARAF_SYSTEM_OPTS="-javaagent:./lib/jmx_prometheus_javaagent-1.0.1.jar=9001:etc/config.yaml -javaagent:./lib/opentelemetry-javaagent-2.30.0.jar"
 ENV OTEL_LOGS_EXPORTER=none
 ENV OTEL_METRICS_EXPORTER=none
 ENV OTEL_TRACES_EXPORTER=none

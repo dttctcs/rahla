@@ -3,6 +3,12 @@
 ### Dependency Updates
 
 * Loki appender (`pl.tkowalcz.tjahzi`): `0.9.42 > 0.9.43`
+* JRE (Temurin): `jdk-21.0.11+10 > jdk-21.0.12+8`
+* opentelemetry agent: `2.26.1 > 2.30.0`
+* opentelemetry-sdk-extension-autoconfigure: `1.63.0 > 1.64.0`
+* Groovy: `4.0.32 > 4.0.33`
+* Jackson: `2.22.0 > 2.22.1`
+* Undertow (pax-web hotfix pin): `2.2.39.Final > 2.2.40.Final`
 
 ### Deprecations
 
