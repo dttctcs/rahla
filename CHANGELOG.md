@@ -1,8 +1,17 @@
 # 1.3.5 (unreleased)
 
+### Improvements
+
+* `features/rahla`: dropped the Undertow HOTFIX pin — pax-web `8.0.35` ships `2.2.39.Final` itself, so the assembly no longer stages two Undertow versions side by side
+
 ### Dependency Updates
 
 * Loki appender (`pl.tkowalcz.tjahzi`): `0.9.42 > 0.9.43`
+* JRE (Temurin): `jdk-21.0.11+10 > jdk-21.0.12+8`
+* opentelemetry agent: `2.26.1 > 2.30.0`
+* opentelemetry-sdk-extension-autoconfigure: `1.63.0 > 1.64.0`
+* Groovy: `4.0.32 > 4.0.33`
+* Jackson: `2.22.0 > 2.22.1`
 
 ### Deprecations
 
