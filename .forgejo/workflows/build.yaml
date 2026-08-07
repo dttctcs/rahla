@@ -115,7 +115,8 @@ jobs:
     name: Trivy SBOM -> Dependency Track
     runs-on: docker
     needs: build
-    # only on a release tag (release:prepare runs locally and pushes a vX.Y.Z tag)
+    # only on a release tag (pushed by release.yaml's "Run workflow" button, or
+    # by a local `mvn release:prepare`)
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Set version & filename
