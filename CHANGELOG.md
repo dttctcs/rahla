@@ -2,6 +2,7 @@
 
 ### Improvements
 
+* CI: new `forgejo-release` job in `.forgejo/workflows/build.yaml` creates a release on `repo.datatactics.dev` from the matching `CHANGELOG.md` section on every `v*` tag — until now only the GitHub mirror got a release object, since Forgejo ignores `.github/workflows/` while `.forgejo/` exists
 * `features/rahla`: dropped the Undertow HOTFIX pin — pax-web `8.0.35` ships `2.2.39.Final` itself, so the assembly no longer stages two Undertow versions side by side
 
 ### Dependency Updates

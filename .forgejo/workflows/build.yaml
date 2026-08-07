@@ -60,6 +60,57 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+  forgejo-release:
+    name: Forgejo Release
+    runs-on: docker
+    needs: build
+    # Counterpart to .github/workflows/release.yaml, which only ever runs on the
+    # GitHub mirror: Forgejo ignores .github/ entirely while .forgejo/ exists, so
+    # without this job the Releases tab on repo.datatactics.dev stays empty.
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Extract changelog section for this tag
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          apt update -qq && apt install -qq -y jq
+          VERSION="${REF_NAME#v}"               # v1.3.5 -> 1.3.5
+          # Pull the block under "# <version> ..." up to the next "# " heading.
+          awk -v ver="$VERSION" '
+            $0 ~ /^# / { if (inblk) exit; if ($0 ~ ("^# " ver "([ ]|$)")) { inblk=1; next } }
+            inblk { print }
+          ' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "Release ${REF_NAME}. See CHANGELOG.md for details." > release-notes.md
+          fi
+          echo "----- release notes -----"; cat release-notes.md
+
+      - name: Create Forgejo release
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          SERVER_URL: ${{ github.server_url }}
+          REPOSITORY: ${{ github.repository }}
+          TOKEN: ${{ github.token }}
+        run: |
+          jq -Rs --arg tag "$REF_NAME" \
+            '{tag_name: $tag, name: $tag, body: ., draft: false, prerelease: false}' \
+            release-notes.md > payload.json
+          CODE=$(curl -sS -o response.json -w '%{http_code}' \
+            -X POST "${SERVER_URL}/api/v1/repos/${REPOSITORY}/releases" \
+            -H "Authorization: token ${TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d @payload.json)
+          echo "HTTP ${CODE}"; cat response.json
+          # 201 created; 409 means the release already exists (e.g. re-run) -> not a failure
+          case "$CODE" in
+            201|409) ;;
+            *) exit 1 ;;
+          esac
+
   trivy-scan:
     name: Trivy SBOM -> Dependency Track
     runs-on: docker
