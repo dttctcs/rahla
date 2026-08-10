@@ -1,4 +1,6 @@
-# 1.3.5 (unreleased)
+# 1.3.6 (unreleased)
+
+# 1.3.5 (2026-08-10)
 
 ### Improvements
 
