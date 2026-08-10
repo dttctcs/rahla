@@ -94,18 +94,8 @@ jobs:
           echo "dev=${DEV}" >> $GITHUB_OUTPUT
           echo "${CURRENT}  ->  release ${RELEASE}, tag v${RELEASE}, next ${DEV}"
 
-      - name: Warn on a missing changelog section
+      - name: Configure git
         env:
-          RELEASE: ${{ steps.versions.outputs.release }}
-        run: |
-          grep -qE "^# ${RELEASE}([ ]|\$)" CHANGELOG.md \
-            || echo "::warning::CHANGELOG.md has no '# ${RELEASE}' section — both release objects will fall back to a one-line note"
-
-      - name: mvn release:prepare
-        env:
-          RELEASE: ${{ steps.versions.outputs.release }}
-          DEV: ${{ steps.versions.outputs.dev }}
-          DRY_RUN: ${{ github.event.inputs.dryRun }}
           SERVER_URL: ${{ github.server_url }}
           ACTOR: ${{ github.actor }}
           RELEASE_USER: ${{ vars.RELEASE_USER }}
@@ -126,6 +116,47 @@ jobs:
           git config --global user.email "${ACTOR}@noreply.datatactics.de"
           git config --global --add safe.directory "$PWD"
 
+      # Mirrors what was done by hand until now, e.g. cfc0729 "docs: finalize
+      # 1.3.4 changelog (date 2026-07-06)" sitting right before the release
+      # commit: date the section being released and open one for the next
+      # version. Committed before release:prepare, which requires a clean tree
+      # and pushes this commit along with its own two.
+      - name: Date the changelog section
+        env:
+          RELEASE: ${{ steps.versions.outputs.release }}
+          DEV: ${{ steps.versions.outputs.dev }}
+        run: |
+          set -eu
+          DATE=$(date -u +%F)
+          NEXT="${DEV%-SNAPSHOT}"
+          ESC=$(printf '%s' "$RELEASE" | sed 's/\./\\./g')
+
+          if grep -qE "^# ${ESC}([ ]|\$)" CHANGELOG.md; then
+            sed -i -E "s|^# ${ESC}([ ].*)?\$|# ${RELEASE} (${DATE})|" CHANGELOG.md
+          else
+            echo "::warning::CHANGELOG.md has no '# ${RELEASE}' section — both release objects will fall back to a one-line note"
+          fi
+
+          if ! grep -qE "^# $(printf '%s' "$NEXT" | sed 's/\./\\./g')([ ]|\$)" CHANGELOG.md; then
+            { printf '# %s (unreleased)\n\n' "$NEXT"; cat CHANGELOG.md; } > CHANGELOG.next
+            mv CHANGELOG.next CHANGELOG.md
+          fi
+
+          git --no-pager diff -- CHANGELOG.md | head -20
+          git add CHANGELOG.md
+          if git diff --cached --quiet; then
+            echo "nothing to stamp"
+          else
+            git commit -m "docs: finalize ${RELEASE} changelog (date ${DATE})"
+          fi
+
+      - name: mvn release:prepare
+        env:
+          RELEASE: ${{ steps.versions.outputs.release }}
+          DEV: ${{ steps.versions.outputs.dev }}
+          DRY_RUN: ${{ github.event.inputs.dryRun }}
+        run: |
+          set -eu
           # -Dtag is mandatory: the pom sets no <tagNameFormat>, so the plugin
           # default would produce `reactor-1.3.5` instead of `v1.3.5`.
           mvn --batch-mode release:clean release:prepare \

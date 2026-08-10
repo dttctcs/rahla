@@ -2,7 +2,7 @@
 
 ### Improvements
 
-* CI: releases can be cut from the Forgejo UI — `.forgejo/workflows/release.yaml` is a `workflow_dispatch` workflow (inputs: release version, next development version, dry run) that runs `mvn release:prepare` and pushes the `vX.Y.Z` tag; requires the secret `RELEASE_TOKEN` (a PAT), because Forgejo does not trigger workflows from pushes authored with the built-in token. Running `mvn release:prepare` locally still works unchanged
+* CI: releases can be cut from the Forgejo UI — `.forgejo/workflows/release.yaml` is a `workflow_dispatch` workflow (inputs: release version, next development version, dry run) that dates the `CHANGELOG.md` section being released (`# 1.3.5 (unreleased)` → `# 1.3.5 (YYYY-MM-DD)`, plus a fresh `(unreleased)` section for the next version), then runs `mvn release:prepare` and pushes the `vX.Y.Z` tag; requires the secret `RELEASE_TOKEN` (a PAT), because Forgejo does not trigger workflows from pushes authored with the built-in token. Running `mvn release:prepare` locally still works unchanged
 * CI: new `forgejo-release` job in `.forgejo/workflows/build.yaml` creates a release on `repo.datatactics.dev` from the matching `CHANGELOG.md` section on every `v*` tag — until now only the GitHub mirror got a release object, since Forgejo ignores `.github/workflows/` while `.forgejo/` exists
 * `features/rahla`: dropped the Undertow HOTFIX pin — pax-web `8.0.35` ships `2.2.39.Final` itself, so the assembly no longer stages two Undertow versions side by side
 
