@@ -42,15 +42,22 @@ jobs:
       - name: Guard — main only, RELEASE_TOKEN present
         env:
           REF: ${{ github.ref }}
+          DRY_RUN: ${{ github.event.inputs.dryRun }}
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           if [ "$REF" != "refs/heads/main" ]; then
             echo "::error::releases are cut from main only (got ${REF})"
             exit 1
           fi
+          # A dry run pushes nothing, so it is allowed to run without the token —
+          # that way the whole pipeline can be tested before the PAT exists.
           if [ -z "$RELEASE_TOKEN" ]; then
-            echo "::error::secret RELEASE_TOKEN is missing — without it the tag push would not trigger build.yaml"
-            exit 1
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "::warning::no RELEASE_TOKEN — fine for a dry run, but a real release needs it"
+            else
+              echo "::error::secret RELEASE_TOKEN is missing — without it the tag push would not trigger build.yaml"
+              exit 1
+            fi
           fi
 
       - uses: actions/checkout@v5
@@ -107,10 +114,13 @@ jobs:
           set -eu
           # Credentials via the store, not on the maven command line or in the
           # remote URL — keeps the token out of process args and push output.
-          git config --global credential.helper store
-          printf 'https://%s:%s@%s\n' \
-            "${RELEASE_USER:-$ACTOR}" "$RELEASE_TOKEN" "${SERVER_URL#https://}" > "$HOME/.git-credentials"
-          chmod 600 "$HOME/.git-credentials"
+          # Skipped when there is no token, which only happens on a dry run.
+          if [ -n "$RELEASE_TOKEN" ]; then
+            git config --global credential.helper store
+            printf 'https://%s:%s@%s\n' \
+              "${RELEASE_USER:-$ACTOR}" "$RELEASE_TOKEN" "${SERVER_URL#https://}" > "$HOME/.git-credentials"
+            chmod 600 "$HOME/.git-credentials"
+          fi
           git config --global user.name "$ACTOR"
           # matches the noreply domain Forgejo already uses for merge commits
           git config --global user.email "${ACTOR}@noreply.datatactics.de"
