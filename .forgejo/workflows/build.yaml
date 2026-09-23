@@ -66,7 +66,7 @@ jobs:
     needs: build
     # Counterpart to .github/workflows/release.yaml, which only ever runs on the
     # GitHub mirror: Forgejo ignores .github/ entirely while .forgejo/ exists, so
-    # without this job the Releases tab on repo.datatactics.dev stays empty.
+    # without this job the Releases tab on repo.priv.datatactics.de stays empty.
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write

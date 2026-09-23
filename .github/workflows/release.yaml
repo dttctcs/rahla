@@ -1,6 +1,6 @@
 name: GitHub Release
 
-# This repo lives on Forgejo (repo.datatactics.dev/oss/rahla) and is
+# This repo lives on Forgejo (repo.priv.datatactics.de/oss/rahla) and is
 # push-mirrored to github.com/dttctcs/rahla. Both platforms read
 # .github/workflows/, so the job-level `github.server_url` guard keeps this
 # workflow inert on Forgejo and only creates the release on GitHub.
