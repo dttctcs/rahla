@@ -744,7 +744,7 @@
         <lombok.version>1.18.46</lombok.version>
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
         <janusgraph-driver.version>1.1.0</janusgraph-driver.version>
-        <gremlin-groovy.version>3.8.1</gremlin-groovy.version>
+        <gremlin-groovy.version>3.8.2</gremlin-groovy.version>
         <jedis.version>7.5.3</jedis.version>
         <disruptor.version>3.4.4</disruptor.version>
 
