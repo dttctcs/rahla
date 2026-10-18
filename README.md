@@ -30,7 +30,6 @@ Current release ships **Karaf 4.4.11 + Camel 4.18.2** on JDK 21.
 * **Camel route templates** — define reusable templates in YAML.
 * **GraphSource** — pooled Gremlin/TinkerPop client (e.g. JanusGraph) as an OSGi service.
 * **JedisSource** — pooled Redis (Jedis) client as an OSGi service *(deprecated)*.
-* **Fradi** — Siddhi complex-event-processing as a Camel component *(EOL — see below)*.
 * **Loki appender** — pax-logging-compatible Log4j2 appender for Grafana Loki *(deprecated — prefer the OpenTelemetry logs exporter)*.
 * **Monitoring** — Prometheus JMX Exporter and OpenTelemetry agent built in.
 * **Air-gapped images** — bake a project's full dependency closure into the image; no startup downloads.
@@ -82,7 +81,6 @@ Rahla dispatches each file in `/config/deploy` by extension:
 | `*.yaml`     | turned into **Camel route templates** by `TemplateFileInstaller` |
 | `*.jar`      | installed as an **OSGi bundle** |
 | `*.kar`      | installed as a **feature archive** (Karaf KAR) |
-| `*.siddhi`   | loaded by the Fradi CEP component *(EOL)* |
 
 If a file is rejected (bad XML, missing service reference, …), Rahla logs it and moves on — always
 check the logs after dropping something new.
@@ -179,33 +177,6 @@ public interface JedisSource {
 }
 ```
 
-### Fradi — Siddhi CEP component *(EOL)*
-
-> **Deprecated / end-of-life.** Prefer `camel-mybatis`, `camel-stream`, or another supported Camel
-> component for new work. Documented here for existing deployments only.
-
-[Siddhi](https://siddhi.io/) brings SQL-like complex event processing to streams. Wrap a plan as a
-Camel component:
-
-```xml
-<bean id="siddhiPlan" class="rahla.components.fradi.FradiComponent">
-  <property name="plan" value="file:///config/deploy/siddhiPlan.siddhi"/>
-</bean>
-```
-
-```sql
-define stream foo(valueA int);
-from foo select valueA as valueB insert into bar;
-```
-
-```xml
-<route><from uri="direct:foo"/><to uri="siddhiPlan:foo"/></route>
-<route><from uri="siddhiPlan:bar"/><to uri="log:bar"/></route>
-```
-
-The component accepts a map of stream field name→value (or a correctly laid-out array); send an
-`Iterable` for batches.
-
 ### Loki Log4j2 appender
 
 > **Deprecated.** The Loki appender is retained for backward compatibility and still receives
@@ -235,7 +206,7 @@ Pax-Web HTTP feature at a time.
 For dev you just mount `deploy/`. For an **air-gapped** image (no downloads at startup) you bake the
 whole dependency closure in by letting the *real Karaf* install it once at build time, then shipping
 its caches. No KAR, no closure resolver, no stubs — Karaf resolves everything itself, including
-`wrap:` bundles and rahla's own features (`fradi`, …).
+`wrap:` bundles and rahla's own features (`graphsource`, …).
 
 How it works:
 

@@ -50,7 +50,7 @@ Releases use `maven-release-plugin` (the recent commits `[maven-release-plugin] 
 - **Forgejo** (`repo.datatactics.dev`): job `forgejo-release` in `.forgejo/workflows/build.yaml`, tag-gated, `POST /api/v1/repos/${{ github.repository }}/releases` with `${{ github.token }}` (HTTP 409 = release already exists, treated as success so re-runs are safe).
 - **GitHub mirror** (<https://github.com/dttctcs/rahla>): `.github/workflows/release.yaml` — no build runs there; the release exists so Renovate consumers can track rahla via the `github-releases` datasource.
 
-Keep the two changelog-extraction `awk` snippets in sync when you touch either. The Maven artifact repo `https://mvn.datatactics.dev` (id `dtacs`) is required for some non-public Siddhi artifacts (`siddhi-store-rdbms` `7.0.16-dtacs`, `siddhi` `5.1.24-dt`).
+Keep the two changelog-extraction `awk` snippets in sync when you touch either. All dependencies come from Maven Central — there is no extra repository (the `dtacs` repo for the patched Siddhi artifacts went with Fradi in 1.3.6).
 
 **On every version bump (incl. Renovate updates), hand-update the version strings that are NOT derived from the pom:** the `README.md` lines `Current release ships **Karaf … + Camel …**` and `Rahla x.y.z ships **Camel …**`, and add a `CHANGELOG.md` entry. Also keep **`camel.version` capped at the latest published `org.apache.camel.karaf:apache-camel` features release** — `assembly/pom.xml` pulls the Karaf `apache-camel` features descriptor by `${camel.version}` (no explicit version), and the Karaf distribution lags camel-core, so don't take Renovate's camel-core version blindly (e.g. use `4.18.2`, not `4.20.0`). Always `mvn package` after a Camel bump. `renovate.json` enforces this automatically for bot PRs: updates for `org.apache.camel:*` (base camel) are disabled so the shared `${camel.version}` property tracks only `org.apache.camel.karaf` (<https://github.com/apache/camel-karaf>) — a "missing" camel PR is intentional; the cap rule above still applies to manual bumps. It also restricts `janusgraph-driver` to clean `X.Y.Z` releases (upstream ships only timestamped dev builds past 1.1.0) and sets `dependencyDashboard: true` (the global self-hosted config disables the dashboard; without the re-enable the approval-gated JRE update would surface nowhere).
 
@@ -75,7 +75,6 @@ Logs land in `assembly/target/assembly/data/log/karaf.log`. Note this layout dif
 The root `pom.xml` is `<packaging>pom</packaging>` and lists modules in `<modules>`. Each bundle module has a sibling `features/<name>` module that emits a Karaf feature XML referencing it.
 
 - **`rahla/`** — main OSGi bundle. Embeds Groovy 4 (private-packaged + exported, since Karaf's stock Groovy is blacklisted in the assembly) and provides `rahla.api.GroovyBeanFactory` (compiles a Groovy class from any URL into a bean usable from a Camel context). Also contributes a Karaf shell command (`log:logs`, see `rahla/commands/ShowCommand.java`).
-- **`fradi/`** — custom Camel component (`fradi:`) wrapping the Siddhi CEP engine. Uses the `camel-package-maven-plugin` to generate `*Configurer.java` under `src/generated/`. Marked EOL — prefer `camel-mybatis` for new work.
 - **`graphsource/`** — OSGi component, factory PID `rahla.graphsource`. Each `rahla.graphsource-<name>.cfg` becomes a `rahla.graphsource.GraphSource` service (TinkerPop/Gremlin client + GraphTraversalSource), filterable by `graphSourceName`.
 - **`jedissource/`** — OSGi component, factory PID `rahla.jedissource`. Each `rahla.jedissource-<name>.cfg` becomes a `rahla.jedissource.JedisSource` service (pooled Jedis), filterable by `jedisSourceName`.
 - **`camel-osgi-route-templates/`** — implements `org.apache.felix.fileinstall.ArtifactInstaller` to translate route-template YAML files dropped in `/config/deploy` into `camel.route.template` factory configurations (see `TemplateFileInstaller.java`). YAML schema: `templateId`, `sharedConfigPid` (optional), `routes[].id`, `routes[].parameters` (a flat map of template parameters).
@@ -84,7 +83,7 @@ The root `pom.xml` is `<packaging>pom</packaging>` and lists modules in `<module
 - **`assembly/`** — `<packaging>karaf-assembly</packaging>`; produces the Karaf distro. This is where Rahla's runtime profile is decided, and several things deserve attention before changing dependencies:
   - **`<startupFeatures>`**: `rahla-logging` (so Rahla's pax-logging replacements load before anything else), `wrap`.
   - **`<bootFeatures>`**: `standard`, `scr`, `spifly`, `pax-web-http-undertow`, `jolokia`, `rahla` — note Camel is NOT preinstalled (1.2.0 change) and `pax-web-http-undertow` replaces Jetty (1.3.0 change).
-  - **`<installedFeatures>`**: `fradi`, `graphsource`, `jedissource`, `camel-route-templates` — present in the kar but not auto-started.
+  - **`<installedFeatures>`**: `graphsource`, `jedissource`, `camel-route-templates` — present in the kar but not auto-started.
   - **`<blacklistedBundles>`**: Groovy 4.x (Rahla embeds its own), Woodstox 7.0.0, Undertow 2.2.37, pax-logging 2.3.0. Touch this list whenever a feature transitively pulls a conflicting version.
   - `<javase>17</javase>` is the OSGi execution-environment header for the assembly even though everything compiles to 21.
 
@@ -92,13 +91,13 @@ The root `pom.xml` is `<packaging>pom</packaging>` and lists modules in `<module
 
 - Components use OSGi DS annotations (`@Component`, `@Activate`, `@Reference`) — no Blueprint inside Rahla's own code. The `karaf-services-maven-plugin`'s `service-metadata-generate` goal runs in `process-classes` to emit DS XML.
 - Configuration-driven services use `configurationPid = "rahla.<name>"` with `ConfigurationPolicy.REQUIRE`, so they instantiate per `.cfg` file dropped in `/config/deploy` (felix.fileinstall picks them up).
-- User-deployed Camel contexts are XML/YAML files in `/config/deploy` and reference services via `<reference interface="..." filter="..."/>`. The README has working examples for `GroovyBeanFactory`, `GraphSource`, `JedisSource`, `FradiComponent`.
+- User-deployed Camel contexts are XML/YAML files in `/config/deploy` and reference services via `<reference interface="..." filter="..."/>`. The README has working examples for `GroovyBeanFactory`, `GraphSource`, `JedisSource`.
 - Lombok is used widely (`@Log4j2`, etc.); `maven.compiler.proc=full` is set in the parent POM so annotation processors run.
 
 ## Deprecated / removed (stay out unless intentionally restoring)
 
 - `RAHLA_DEPLOY_PATH` env var — gone; use `org.apache.felix.fileinstall-*.cfg` instead.
 - `/rahla/deploy` and `/deploy` paths — only `/config/deploy` is monitored; the s6 init script under `root/etc/s6-overlay/s6-rc.d/init-rahla/run` warns on the legacy paths.
-- `resource:file:` URL prefix in `GroovyBeanFactoryImpl` and `FradiComponent` — deprecated; new code should pass real URLs (`file://`, `http://`).
-- The Fradi/Siddhi component is marked EOL.
+- `resource:file:` URL prefix in `GroovyBeanFactoryImpl` — deprecated; new code should pass real URLs (`file://`, `http://`).
+- The Fradi/Siddhi CEP component (`fradi/`, `features/fradi`, `*.siddhi` in `/config/deploy`) — removed in 1.3.6 after being EOL since 1.2.0. Use `camel-mybatis`, `camel-stream` or another supported Camel component.
 - The `loki-appender` (Grafana Loki Log4j2 appender) is deprecated (1.3.5) — kept working and still version-bumped, but new/additional log shipping should use the OpenTelemetry logs exporter (`OTEL_LOGS_EXPORTER`), not the `<Loki/>` appender.

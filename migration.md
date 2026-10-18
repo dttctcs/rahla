@@ -6,9 +6,9 @@ mit Quelle belegt (Commit-Hash, `CHANGELOG.md`-Eintrag oder Datei). Nicht aus de
 ist als **„aus Repo nicht belegt"** bzw. **„zu verifizieren"** markiert — nichts davon raten.
 
 Begriffe wie in `rahla-developer/SKILL.md` und `CLAUDE.md`: das Deploy-Verzeichnis ist die API
-(`*.xml` Camel-Blueprint, `*.groovy`, `*.cfg`, `*.yaml` Route-Templates, `*.jar`, `*.siddhi`),
+(`*.xml` Camel-Blueprint, `*.groovy`, `*.cfg`, `*.yaml` Route-Templates, `*.jar`),
 OSGi-DS statt Blueprint im Rahla-eigenen Code, `rahla.api.GroovyBeanFactory`, Faktor-PIDs
-`rahla.graphsource` / `rahla.jedissource`, `TemplateFileInstaller`, Fradi/Siddhi = EOL.
+`rahla.graphsource` / `rahla.jedissource`, `TemplateFileInstaller`. Fradi/Siddhi ist ab 1.3.6 entfernt.
 
 ---
 
@@ -270,7 +270,7 @@ loki-appender 0.9.41→0.9.42, otel-sdk-extension-autoconfigure 1.59.0→1.61.0.
   vor. Für **manuelle** Bumps gilt die Deckel-Regel unverändert.
 - Renovate-Policy: nur Minor/Patch werden als PR geöffnet, keine Major; Temurin-JRE wird via
   customManager nur **überwacht** (Dependency-Dashboard, approval-gated — Renovate kann die
-  ESUM-Checksums nicht neu berechnen). Siddhi (EOL) und `wagon-ssh-external` werden ignoriert.
+  ESUM-Checksums nicht neu berechnen). `wagon-ssh-external` wird ignoriert (Siddhi ist seit 1.3.6 raus).
   Quelle: `CHANGELOG.md` 1.3.3; `CLAUDE.md`. **Update 2026-07:** zusätzlich ist
   `org.janusgraph:janusgraph-driver` per `allowedVersions` auf saubere `X.Y.Z`-Releases beschränkt
   (Upstream published nur Timestamped-Dev-Builds jenseits 1.1.0), und `dependencyDashboard: true`

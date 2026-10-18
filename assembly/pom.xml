@@ -87,13 +87,6 @@
       <type>xml</type>
     </dependency>
 
-    <dependency>
-      <artifactId>fradi</artifactId>
-      <classifier>features</classifier>
-      <groupId>rahla.feature</groupId>
-      <scope>runtime</scope>
-      <type>xml</type>
-    </dependency>
 
     <dependency>
       <artifactId>graphsource</artifactId>
@@ -162,7 +155,6 @@
             <feature>rahla</feature>
           </bootFeatures>
           <installedFeatures>
-            <feature>fradi</feature>
             <feature>graphsource</feature>
             <feature>jedissource</feature>
             <feature>camel-route-templates</feature>

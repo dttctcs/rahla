@@ -1,5 +1,12 @@
 # 1.3.6 (unreleased)
 
+### Removals
+
+* **Fradi / Siddhi removed** (EOL since 1.2.0): the `fradi` module, the `fradi` Karaf feature and all `io.siddhi` dependencies are gone. `*.siddhi` files in `/config/deploy` are no longer loaded and `rahla.components.fradi.FradiComponent` no longer exists — migrate to `camel-mybatis`, `camel-stream` or another supported Camel component
+* The extra Maven repository `dtacs` (`https://mvn.datatactics.dev`, only needed for the patched Siddhi artifacts) is gone; everything resolves from Maven Central. The old host no longer existed — every lookup there returned 404
+* `guava` dropped from the parent's dependency management — only Fradi used it
+
+
 # 1.3.5 (2026-08-10)
 
 ### Improvements

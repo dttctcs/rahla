@@ -8,7 +8,7 @@ description: >-
   with REST endpoints / routes / OSGi `<reference>` wiring (incl. multi-file
   routeContexts), `features.xml` feature installs, Groovy classes via
   `rahla.api.GroovyBeanFactory`, OSGi `*.cfg` files (datasources, factory PIDs), Camel
-  route-template YAMLs, or legacy `*.siddhi` (Fradi). Also for building service images
+  route-template YAMLs. Also for building service images
   `FROM datatactics/rahla` (incl. air-gapped/offline builds), migrating a service
   between Rahla versions, Karaf shell debugging, and why a file dropped into deploy
   isn't picking up (bundle Waiting / GracePeriod, empty camel:context-list). Prefer this
@@ -37,7 +37,6 @@ Rahla's `org.apache.felix.fileinstall` configuration polls one directory and dis
 | `*.yaml` | If it parses as a Rahla route-template doc, becomes Camel route templates via `TemplateFileInstaller` |
 | `*.jar`  | Installed as an OSGi bundle |
 | `*.kar`  | Installed as a Karaf feature archive |
-| `*.siddhi` | Loaded by the Fradi CEP component — **legacy, do not use for new work** |
 
 Removing a file uninstalls the corresponding artifact; editing a file updates it. There is no need to "restart" anything — but if Rahla refuses a file (typo in XML, missing service reference) it logs the failure and does nothing, so always check `data/log/karaf.log` (local) or the container logs after dropping a new file.
 
@@ -430,7 +429,7 @@ When a Blueprint context refuses to start, `bundle:diag` on the relevant bundle 
 - **Unpinned Jetty.** Jetty is still usable on Rahla 1.3+ (it's just no longer the boot default), but the version that comes with Karaf 4.4.x's `pax-web-http-jetty` has a known zero-day — pin a fixed version via `<blacklistedBundles>` or a feature override before relying on it.
 - **New `JedisSource` consumers** — `JedisSource`/`JedisServiceImpl` are `@Deprecated` since 1.3.1 (EOL). Maintain existing ones; don't add new ones.
 - **KAR-based offline packaging** — removed in 1.3.3. Air-gapped images use the boot-once cache-priming pattern (see above).
-- **Fradi / Siddhi (`*.siddhi` files, `<bean class="rahla.components.fradi.FradiComponent"/>`)** — marked EOL. New CEP/CRUD work should use `camel-mybatis`, `camel-stream`, or another supported Camel component.
+- **Fradi / Siddhi (`*.siddhi` files, `<bean class="rahla.components.fradi.FradiComponent"/>`)** — removed in 1.3.6. A `*.siddhi` file in `/config/deploy` is no longer loaded and a `FradiComponent` bean fails to resolve; migrate to `camel-mybatis`, `camel-stream`, or another supported Camel component.
 - **Karaf-bundled Groovy** — the assembly blacklists `org.apache.groovy/groovy/[4,5)` and ships its own embedded Groovy 4 inside the `rahla` bundle. Do not declare a separate Groovy feature; if a feature pulls one in, add it to `<blacklistedBundles>` in `assembly/pom.xml`.
 - **Karaf-bundled pax-logging** — replaced by the `rahla-logging` feature so the Loki appender (`Fragment-Host: pax-logging-log4j2`) loads correctly. Don't re-pin pax-logging from elsewhere.
 - **Hardcoded `/rahla/deploy` or `/deploy` paths in container artifacts** — only `/config/deploy` is monitored on 1.3+; the s6 init script warns on the legacy paths.
