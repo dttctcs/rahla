@@ -87,11 +87,6 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <artifactId>fradi</artifactId>
-                <groupId>rahla</groupId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
                 <artifactId>graphsource</artifactId>
                 <groupId>rahla</groupId>
                 <version>${project.version}</version>
@@ -113,14 +108,6 @@
             </dependency>
             <dependency>
                 <artifactId>rahla</artifactId>
-                <classifier>features</classifier>
-                <groupId>rahla.feature</groupId>
-                <scope>runtime</scope>
-                <type>xml</type>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>fradi</artifactId>
                 <classifier>features</classifier>
                 <groupId>rahla.feature</groupId>
                 <scope>runtime</scope>
@@ -592,363 +579,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <artifactId>siddhi-core</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>jakarta.xml.bind</groupId>
-                        <artifactId>jakarta.xml.bind-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.checkerframework</groupId>
-                        <artifactId>checker-compat-qual</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.google.code.gson</groupId>
-                        <artifactId>gson</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.yaml</groupId>
-                        <artifactId>snakeyaml</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.mvel</groupId>
-                        <artifactId>mvel2</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.antlr</groupId>
-                        <artifactId>antlr4-runtime</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>org.apache.log4j.wso2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-simple</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>io.dropwizard.metrics</groupId>
-                        <artifactId>metrics-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>json-path</artifactId>
-                        <groupId>com.jayway.jsonpath</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>disruptor</artifactId>
-                        <groupId>org.wso2.orbit.com.lmax</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>org.eclipse.osgi.services</artifactId>
-                        <groupId>org.eclipse.osgi</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>org.eclipse.osgi</artifactId>
-                        <groupId>org.eclipse.osgi</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>org.eclipse.osgi.services</artifactId>
-                        <groupId>org.wso2.eclipse.osgi</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>Log4j2-simple</artifactId>
-                        <groupId>org.Log4j2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>Log4j2-api</artifactId>
-                        <groupId>org.Log4j2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>log4j</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>quartz</artifactId>
-                        <groupId>org.quartz-scheduler</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jsr305</artifactId>
-                        <groupId>com.google.code.findbugs</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>error_prone_annotations</artifactId>
-                        <groupId>com.google.errorprone</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>j2objc-annotations</artifactId>
-                        <groupId>com.google.j2objc</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>animal-sniffer-annotations</artifactId>
-                        <groupId>org.codehaus.mojo</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>org.osgi.core</artifactId>
-                        <groupId>org.osgi</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>log4j</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-api</artifactId>
-                    </exclusion>
-                </exclusions>
-                <groupId>io.siddhi</groupId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>siddhi-query-api</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>log4j</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>org.apache.log4j.wso2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-core</artifactId>
-                    </exclusion>
-                </exclusions>
-                <groupId>io.siddhi</groupId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>siddhi-query-compiler</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>log4j</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>org.apache.log4j.wso2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.mvel</groupId>
-                        <artifactId>mvel2</artifactId>
-                    </exclusion>
-                </exclusions>
-                <groupId>io.siddhi</groupId>
-                <version>${siddhi.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>siddhi-annotations</artifactId>
-                <groupId>io.siddhi</groupId>
-                <version>${siddhi.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId> org.atteo.classindex</groupId>
-                        <artifactId>classindex</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <artifactId>siddhi-execution-string</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>org.apache.log4j.wso2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-core</artifactId>
-                    </exclusion>
-
-                </exclusions>
-                <groupId>io.siddhi.extension.execution.string</groupId>
-                <version>${siddhi-execution-string.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>siddhi-execution-unique</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>org.apache.log4j.wso2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-core</artifactId>
-                    </exclusion>
-                </exclusions>
-                <groupId>io.siddhi.extension.execution.unique</groupId>
-                <version>${siddhi-execution-unique.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>siddhi-execution-regex</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>org.apache.log4j.wso2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-core</artifactId>
-                    </exclusion>
-                </exclusions>
-                <groupId>io.siddhi.extension.execution.regex</groupId>
-                <version>${siddhi-execution-regex.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>siddhi-store-rdbms</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>jaxb-api</artifactId>
-                        <groupId>javax.xml.bind</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jaxb-core</artifactId>
-                        <groupId>com.sun.xml.bind</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jaxb-impl</artifactId>
-                        <groupId>com.sun.xml.bind</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.logging.log4j</groupId>
-                        <artifactId>log4j-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jakarta.xml.bind-api</artifactId>
-                        <groupId>jakarta.xml.bind</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>org.apache.log4j.wso2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>org.eclipse.osgi</artifactId>
-                        <groupId>org.eclipse.osgi</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>org.eclipse.osgi</artifactId>
-                        <groupId>org.wso2.eclipse.osgi</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>org.eclipse.osgi.services</artifactId>
-                        <groupId>org.wso2.eclipse.osgi</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>org.wso2.carbon.core</artifactId>
-                        <groupId>org.wso2.carbon</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-io</artifactId>
-                        <groupId>commons-io.wso2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>org.wso2.carbon.jndi</artifactId>
-                        <groupId>org.wso2.carbon.jndi</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>Log4j2-api</artifactId>
-                        <groupId>org.Log4j2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>activation</artifactId>
-                        <groupId>javax.activation</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>org.wso2.carbon.secvault</artifactId>
-                        <groupId>org.wso2.carbon.secvault</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>org.wso2.carbon.utils</artifactId>
-                        <groupId>org.wso2.carbon.utils</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>org.wso2.carbon.datasource.core</artifactId>
-                        <groupId>org.wso2.carbon.datasources</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>HikariCP</artifactId>
-                        <groupId>com.zaxxer</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.wso2.carbon.metrics</groupId>
-                        <artifactId>org.wso2.carbon.metrics.core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.wso2.carbon.analytics</groupId>
-                        <artifactId>org.wso2.carbon.si.metrics.core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.oracle</groupId>
-                        <artifactId>ojdbc6</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.oracle.ojdbc</groupId>
-                        <artifactId>ojdbc8</artifactId>
-                    </exclusion>
-
-                    <exclusion>
-                        <groupId>org.wso2.msf4j</groupId>
-                        <artifactId>msf4j-core</artifactId>
-                    </exclusion>
-
-
-                </exclusions>
-                <groupId>io.siddhi.extension.store.rdbms</groupId>
-                <version>${siddhi-store-rdbms.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
                 <scope>provided</scope>
@@ -1058,13 +688,11 @@
     <modules>
         <module>rahla</module>
         <module>loki-appender</module>
-        <module>fradi</module>
         <module>graphsource</module>
         <module>jedissource</module>
         <module>camel-osgi-route-templates</module>
         <module>features/rahla</module>
         <module>features/logging</module>
-        <module>features/fradi</module>
         <module>features/jedissource</module>
         <module>features/graphsource</module>
         <module>features/camel-route-templates</module>
@@ -1118,7 +746,6 @@
         <janusgraph-driver.version>1.1.0</janusgraph-driver.version>
         <gremlin-groovy.version>3.8.1</gremlin-groovy.version>
         <jedis.version>7.5.3</jedis.version>
-        <guava.version>23.6.1-jre</guava.version>
         <disruptor.version>3.4.4</disruptor.version>
 
         <!-- Observability -->
@@ -1126,12 +753,6 @@
         <opentelemetry_agent.version>2.30.0</opentelemetry_agent.version>
         <opentelemetry-sdk-extension-autoconfigure.version>1.64.0</opentelemetry-sdk-extension-autoconfigure.version>
 
-        <!-- Siddhi (EOL — fradi component) -->
-        <siddhi.version>5.1.24-dt</siddhi.version>
-        <siddhi-store-rdbms.version>7.0.16-dtacs</siddhi-store-rdbms.version>
-        <siddhi-execution-regex.version>5.0.7</siddhi-execution-regex.version>
-        <siddhi-execution-string.version>5.0.12</siddhi-execution-string.version>
-        <siddhi-execution-unique.version>5.0.5</siddhi-execution-unique.version>
 
         <!-- Maven plugins -->
         <maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
@@ -1141,13 +762,6 @@
         <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
         <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>dtacs</id>
-            <url>https://mvn.datatactics.dev</url>
-        </repository>
-    </repositories>
 
     <scm>
         <connection>scm:git:https://repo.datatactics.dev/oss/rahla.git</connection>

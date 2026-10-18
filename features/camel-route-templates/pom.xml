@@ -48,7 +48,7 @@
     <groupId>rahla.feature</groupId>
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Fradi Feature</name>
+    <name>Camel Route Templates Feature</name>
 
     <packaging>feature</packaging>
 
