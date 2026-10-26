@@ -342,6 +342,17 @@ Jedis 7.5.0→7.5.2, OTel-SDK-extension-autoconfigure 1.61.0→1.63.0, Agrona 1.
   Bei künftigen Karaf-Bumps `etc/startup.properties` der gebauten Assembly auf doppelte
   pax-logging-Einträge prüfen.
 
+- **Blacklist neu (Bundle-Duplikate):** Die `<blacklistedBundles>` in `assembly/pom.xml` stammten
+  von Karaf 4.4.11 und matchten nichts mehr. Deshalb liefen beim Installieren von Camel-Features
+  Karafs `jackson`-Feature (2.22.2) neben Rahlas Jackson und Groovy 4.0.32 (camel-groovy) neben
+  4.0.33. Jetzt per Versions-Range: Es startet nur Rahlas Jackson/Woodstox/stax2/Groovy. Quelle:
+  dieser PR; Runtime-Check `bundle:list | grep -i jackson` zeigt nur eine Version.
+- **`camel-undertow` bricht pax-web (bekannt, nicht gefixt):** camel-undertow (Camel 4) braucht
+  Undertow 2.3.x (jakarta), pax-web 8 braucht 2.2.x (javax). Nach `camel-undertow`-Install verdrahtet
+  der Feature-Refresh `pax-web-undertow` (`io.undertow.*;version="[2.2,3)"`) auf 2.3.24 →
+  `Default404Servlet does not implement jakarta.servlet.Servlet`, Port 8181/Jolokia antwortet 404.
+  Camel-Routen laufen weiter. Betrifft weather-service → REST auf `camel-jetty` umstellen.
+
 **Verifikation (2026-10-26):** `mvn --batch-mode --update-snapshots clean package` grün; lokale
 Assembly + Container (`docker build`) booten Karaf 4.4.12, ein `deploy/features.xml` mit `camel`,
 `camel-blueprint`, `camel-jetty`, `camel-groovy`, `camel-mail`, `camel-http`, `camel-jackson`

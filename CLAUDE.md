@@ -84,7 +84,7 @@ The root `pom.xml` is `<packaging>pom</packaging>` and lists modules in `<module
   - **`<startupFeatures>`**: `rahla-logging` (so Rahla's pax-logging replacements load before anything else), `wrap`.
   - **`<bootFeatures>`**: `standard`, `scr`, `spifly`, `pax-web-http-undertow`, `jolokia`, `rahla` — note Camel is NOT preinstalled (1.2.0 change) and `pax-web-http-undertow` replaces Jetty (1.3.0 change).
   - **`<installedFeatures>`**: `graphsource`, `jedissource`, `camel-route-templates` — present in the kar but not auto-started.
-  - **`<blacklistedBundles>`**: Groovy 4.x (Rahla embeds its own), Woodstox 7.0.0, Undertow 2.2.37, pax-logging 2.3.0. Touch this list whenever a feature transitively pulls a conflicting version.
+  - **`<blacklistedBundles>`** (also written to `etc/org.apache.karaf.features.xml`, so it applies to runtime feature installs too): version **ranges** that leave exactly Rahla's own Jackson (`${jackson2.version}`; annotations `2.22`), woodstox-core (7.2.0), stax2-api (`${stax2-api.version}`) and Groovy (`${groovy.version}`) installable — Karaf's specs `jackson` feature, pax-web and camel-karaf otherwise start their own copies next to Rahla's. After a Karaf/Camel/Jackson bump, check `bundle:list | grep -i jackson` shows one version. Undertow cannot be blacklisted: pax-web 8 needs 2.2.x (javax), `camel-undertow` needs 2.3.x (jakarta) — and installing `camel-undertow` rewires pax-web to 2.3.x (8181/Jolokia breaks), so prefer `camel-jetty` for REST.
   - `<javase>17</javase>` is the OSGi execution-environment header for the assembly even though everything compiles to 21.
 
 ## OSGi runtime conventions
