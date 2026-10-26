@@ -7,6 +7,7 @@
 
 ### Dependency Updates
 
+* Dependencies: stax2-api `4.3.0 > 4.3.2`, gremlin (groovy/driver/core/shaded) `3.8.1 > 3.8.2`, commons-collections4 `4.5.0 > 4.6.0`, opentelemetry-sdk-extension-autoconfigure `1.64.0 > 1.67.0`, lombok `1.18.46 > 1.18.48`, maven-compiler-plugin `3.15.0 > 3.16.0`, maven-install-plugin `3.1.4 > 3.2.0`, maven-deploy-plugin `3.1.4 > 3.2.0` (Jackson stays at `2.22.1`: with `2.22.4`, installing Camel features pulls Karaf's own `jackson` feature `2.22.2` in parallel and the resulting refresh leaves pax-logging and pax-web bundles `Installed`)
 * pax-logging: `2.3.4 > 2.3.5` (aligned with Karaf 4.4.12, which ships 2.3.5 itself — otherwise `etc/startup.properties` starts two pax-logging-api/-log4j2 versions side by side)
 * `etc/custom.properties`: the `org.osgi.framework.system.packages.extra` versions of `org.apache.karaf.jaas.boot*` / `org.apache.karaf.diagnostic.core*` follow Karaf (`4.4.12`)
 
