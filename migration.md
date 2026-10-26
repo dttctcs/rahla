@@ -24,6 +24,9 @@ OSGi-DS statt Blueprint im Rahla-eigenen Code, `rahla.api.GroovyBeanFactory`, Fa
 | 1.3.1   | 2026-04-30   | **4.18.1** | 4.4.9 | `linuxserver/baseimage-alpine:3.23`          | **Camel-Sprung 4.10 → 4.18**; viele Component-Bugfixes; Jedis `@Deprecated` |
 | 1.3.2   | 2026-05-02   | 4.18.1   | **4.4.11** | `linuxserver/baseimage-alpine:3.23`        | Karaf 4.4.11; Fix `org.ops4j.pax.url.mvn.cfg` Repo-Eintrag |
 | 1.3.3   | 2026-06-10   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.23`          | Cert-Import-Service, pax-url-Repo nach `/config/.m2` gepinnt, KAR-Offline-Packaging entfernt |
+| 1.3.4   | 2026-07-06   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.24`          | Forgejo-CI, GitHub-Mirror-Releases, Base-Image 3.23 → 3.24 |
+| 1.3.5   | 2026-08-10   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.24`          | Release aus der Forgejo-UI, Undertow-Pin entfernt, Loki-Appender deprecated |
+| 1.3.6   | *unreleased* | **4.18.4** | **4.4.12** | `linuxserver/baseimage-alpine:3.24`      | **Security:** Karaf-CVEs vom 2026-09-28, Camel-CVEs bis 4.18.4; Fradi/Siddhi entfernt |
 
 Quelle Camel/Karaf-Spalte: `git show <tag>:pom.xml` (`<camel.version>` / `<karaf.version>`).
 Quelle Tag-Daten: `git log -1 --format=%ci <tag>`.
@@ -287,6 +290,67 @@ Jedis 7.5.0→7.5.2, OTel-SDK-extension-autoconfigure 1.61.0→1.63.0, Agrona 1.
 > darüber liegt jetzt `# 1.3.4 (unreleased)` mit den ersten Renovate-Bumps (Jedis `7.5.2 > 7.5.3`,
 > Log4j2 `2.26.0 > 2.26.1` — Build + lokaler Karaf-Boot verifiziert).
 
+### 1.3.6 (unreleased) — Security: Karaf 4.4.12 + Camel 4.18.4, Fradi/Siddhi entfernt
+
+**Breaking Changes**
+- **Fradi/Siddhi entfernt** (Modul, Karaf-Feature `fradi`, alle `io.siddhi`-Deps; `*.siddhi` im
+  Deploy werden nicht mehr geladen, `rahla.components.fradi.FradiComponent` existiert nicht mehr).
+  Ein `deploy/features.xml` mit `<feature>fradi</feature>` lässt sich auf 1.3.6 **nicht mehr
+  auflösen** → das ganze Service-Feature bleibt uninstalliert. Quelle: `CHANGELOG.md` 1.3.6
+  „Removals"; Commit `7ba0551`.
+- **Karaf 4.4.12 verschärft die mitgelieferten ACLs** (Quelle: Diff `etc/` der Upstream-Distributionen
+  `apache-karaf-4.4.11` vs. `4.4.12`): `jmx.acl.cfg` → `createMBean`/`registerMBean`/`unregisterMBean
+  = admin`; `org.apache.karaf.command.acl.config.cfg` → `install = admin`;
+  `org.apache.karaf.command.acl.feature.cfg` → `repo-add -i` / `repo-remove -u` nur noch `admin`;
+  neu `org.apache.karaf.command.acl.instance.cfg` (alle mutierenden `instance:*` = `admin`); das
+  `jdbc`-Feature installiert jetzt `org.apache.karaf.command.acl.jdbc.cfg` (`ds-create`,
+  `ds-delete`, `execute`, `query` = `admin`). Rahla selbst definiert in `users.properties` nur den
+  User `admin` (alle Rollen) — wer eigene Viewer/Manager-User angelegt hat, verliert diese Rechte.
+
+**Migrationsschritte**
+- Image auf `datatactics/rahla:1.3.6` heben, `deploy/` unverändert lassen — außer:
+  - Services mit `<feature>fradi</feature>` / `FradiComponent`-Beans / `*.siddhi` müssen **vorher**
+    auf `camel-mybatis` o. ä. migriert sein (s. Breaking Changes).
+  - Deployments, die `/config/etc` (oder ganz `/config`) persistent mounten, behalten die
+    `etc/`-Dateien des alten Images: `org.apache.karaf.features.cfg` zeigt dann weiter auf die
+    4.4.11-Feature-Repos, und die neuen/verschärften ACL-Dateien fehlen — die Security-Fixes, die als
+    Konfiguration ausgeliefert werden, greifen dann nicht. `/config/etc` beim Upgrade aus dem neuen
+    Image neu befüllen (eigene Änderungen danach wieder einspielen).
+- Kein Routen-Change für Camel 4.18.2 → 4.18.4 nötig (Patch-Releases innerhalb der 4.18-LTS).
+
+**Stolpersteine**
+- **Camel 4.18.5 ist für Karaf noch nicht verfügbar.** Die Camel-Advisories vom 2026-10-16
+  (u. a. CVE-2026-78162 camel-hazelcast, CVE-2026-83531 dynamic-router, CVE-2026-78165
+  spring-redis, CVE-2026-78164 HTTP-Placeholder-Expansion, CVE-2026-85250 XPath-XXE,
+  CVE-2026-85251 HTTP-Credentials bei Redirects, CVE-2026-85313 Jetty `enableCORS`,
+  CVE-2026-85314 Mail-Header-Injection) sind erst in Camel **4.18.5** gefixt; `camel-core` 4.18.5
+  liegt auf Maven Central, `org.apache.camel.karaf:apache-camel` aber nur bis 4.18.4 (Stand
+  2026-10-26; Upstream-Ticket apache/camel-karaf#760, Milestone 4.18.5 offen). Ein Overlay
+  einzelner 4.18.5-Jars wurde geprüft und verworfen: die Karaf-Features referenzieren
+  camel-karaf-eigene Bundles (`mvn:org.apache.camel.karaf/camel-http/4.18.4` usw.), von denen es
+  keine 4.18.5 gibt; ein `wrap:` des Upstream-Jars müsste deren OSGi-Manifest (Exports,
+  Service-Registrierung) nachbauen und mit 4.18.4-`camel-support` mischen — nicht sauber testbar.
+  Bis dahin die Workarounds der Advisories anwenden (z. B. `followRedirects=false` bei
+  Endpunkten mit Credentials, `removeHeader("CamelHttpUri")`/`removeHeader("CamelRestHttpUri")`
+  an der Vertrauensgrenze, `enableCORS` bei Jetty nur mit expliziter Origin-Liste,
+  `removeHeaders("mail.smtp*")` nach MimeMultipart-Unmarshal).
+- `assembly/src/main/resources/assembly/etc/custom.properties` enthält hartkodierte
+  `version=4.4.x`-Exporte (`org.apache.karaf.jaas.boot*`, `org.apache.karaf.diagnostic.core*`) —
+  bei jedem Karaf-Bump mitziehen (Renovate tut das nicht). Quelle: dieser Commit.
+- pax-logging: Karaf 4.4.12 bringt 2.3.5 in `startup.properties` mit; `rahla-logging` stand auf
+  2.3.4 → beide Versionen wurden gestartet. `pax-logging.version` deshalb auf 2.3.5 angeglichen.
+  Bei künftigen Karaf-Bumps `etc/startup.properties` der gebauten Assembly auf doppelte
+  pax-logging-Einträge prüfen.
+
+**Verifikation (2026-10-26):** `mvn --batch-mode --update-snapshots clean package` grün; lokale
+Assembly + Container (`docker build`) booten Karaf 4.4.12, ein `deploy/features.xml` mit `camel`,
+`camel-blueprint`, `camel-jetty`, `camel-groovy`, `camel-mail`, `camel-http`, `camel-jackson`
+installiert sich automatisch, eine Blueprint-Route (Jetty-REST + Groovy + XPath + Timer) startet
+und antwortet (`pong camel=4.18.4`). Zusätzlich löst die Feature-Union der FLT-Services (ohne
+`fradi`/Camunda-Wraps: `jdbc`, `pax-jdbc-*`, `camel-mybatis`, `camel-elasticsearch`,
+`camel-jdbc`, `camel-openapi-java`, `camel-metrics`, `camel-undertow`, `camel-netty`,
+`camel-opentelemetry`, `camel-quartz`, `camel-cron`, `camel-exec`, …) ohne `Installed`/`Waiting`-Bundles auf.
+
 ---
 
 ## 3. Querschnitt: Camel-Upgrade-Pfad (4.10 → 4.18)
@@ -300,6 +364,8 @@ Jedis 7.5.0→7.5.2, OTel-SDK-extension-autoconfigure 1.61.0→1.63.0, Agrona 1.
 | 1.3.1       | 4.18.1 |
 | 1.3.2       | 4.18.1 |
 | 1.3.3       | 4.18.2 |
+| 1.3.4–1.3.5 | 4.18.2 |
+| 1.3.6 (unreleased) | 4.18.4 |
 
 - Innerhalb 4.10.x (`4.10.3 → 4.10.7`, in 1.2.4): reiner Patch-Bump.
 - **Der relevante Sprung ist 4.10.7 → 4.18.1 in 1.3.1** (sieben Minor-Versionen auf einmal,
@@ -492,3 +558,6 @@ Bugfixes in 1.2.4 (OTel-Drift) und 1.3.3 (`92d32ae`)
    auf 21 (`CLAUDE.md`). **Geklärt** (s. 3.3): konsistent mit der Camel-4-Baseline (min. Java 17,
    Quelle: Camel-4-Migration-Guide); rahla läuft auf JDK 21 (≥17, ok). Absicht; bei einer Java-
    Migration prüfen, ob anzuheben.
+7. **Camel 4.18.5 für Karaf (offen, Stand 2026-10-26):** `org.apache.camel.karaf:apache-camel:4.18.5`
+   noch nicht published (apache/camel-karaf#760). Sobald verfügbar: `camel.version` → 4.18.5,
+   `mvn package`, Smoke-Test, README/CHANGELOG — schließt die Camel-Advisories vom 2026-10-16.

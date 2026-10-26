@@ -712,8 +712,8 @@
         <getRevisionOnce>false</getRevisionOnce>
 
         <!-- Core platform -->
-        <karaf.version>4.4.11</karaf.version>
-        <camel.version>4.18.2</camel.version>
+        <karaf.version>4.4.12</karaf.version>
+        <camel.version>4.18.4</camel.version>
         <groovy.version>4.0.33</groovy.version>
 
         <!-- OSGi APIs -->
@@ -732,7 +732,7 @@
         <org.osgi.util.promise.version>1.3.0</org.osgi.util.promise.version>
 
         <!-- Logging -->
-        <pax-logging.version>2.3.4</pax-logging.version>
+        <pax-logging.version>2.3.5</pax-logging.version>
         <log4j2.version>2.26.1</log4j2.version>
         <log4j2-appender-loki.version>0.9.43</log4j2-appender-loki.version>
         <stax2-api.version>4.3.0</stax2-api.version>

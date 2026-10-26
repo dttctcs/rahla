@@ -1,5 +1,15 @@
 # 1.3.6 (unreleased)
 
+### Security
+
+* **Karaf `4.4.11 > 4.4.12`** — fixes the Karaf advisories of 2026-09-28: CVE-2026-92142 (JMX RBAC bypass via MBean lifecycle operations), CVE-2026-91012 (path traversal in the config service / `config:*`), CVE-2026-91085 (shell ACLs fail open for unmatched commands), CVE-2026-91048 (`jdbc:ds-create` → RCE for viewer-role users), CVE-2026-91006 (shell injection via `instance` `javaOpts`), CVE-2026-90979 (LDAP filter injection in the JAAS LDAP module). 4.4.12 tightens the shipped ACLs (`jmx.acl.cfg`: `createMBean`/`registerMBean`/`unregisterMBean = admin`; `config:install`, `feature:repo-add -i`/`repo-remove -u` and all mutating `instance:*` commands now need `admin`; new `org.apache.karaf.command.acl.instance.cfg`; the `jdbc` feature now ships `org.apache.karaf.command.acl.jdbc.cfg`)
+* **Apache Camel `4.18.2 > 4.18.4`** — the newest release with a published Karaf features descriptor (`org.apache.camel.karaf:apache-camel`). Fixes the 4.18.3/4.18.4 advisories, among them CVE-2026-59230 (camel-mail MIME header injection), CVE-2026-78329 (camel-undertow header filter), CVE-2026-46584 (camel-mail SMTP session properties), CVE-2026-46453 (camel-elasticsearch header bypass), CVE-2026-56139 (camel-undertow `muteException` default), CVE-2026-42527 (permissive `ObjectInputFilter`). **Not yet fixed:** the 2026-10-16 batch (CVE-2026-78162, -83531, -78165, -78164, -85250, -85251, -85313, -85314, …) needs Camel 4.18.5, for which camel-karaf has not published features yet (apache/camel-karaf#760) — follow-up bump once `org.apache.camel.karaf:apache-camel:4.18.5` is on Maven Central
+
+### Dependency Updates
+
+* pax-logging: `2.3.4 > 2.3.5` (aligned with Karaf 4.4.12, which ships 2.3.5 itself — otherwise `etc/startup.properties` starts two pax-logging-api/-log4j2 versions side by side)
+* `etc/custom.properties`: the `org.osgi.framework.system.packages.extra` versions of `org.apache.karaf.jaas.boot*` / `org.apache.karaf.diagnostic.core*` follow Karaf (`4.4.12`)
+
 ### Removals
 
 * **Fradi / Siddhi removed** (EOL since 1.2.0): the `fradi` module, the `fradi` Karaf feature and all `io.siddhi` dependencies are gone. `*.siddhi` files in `/config/deploy` are no longer loaded and `rahla.components.fradi.FradiComponent` no longer exists — migrate to `camel-mybatis`, `camel-stream` or another supported Camel component
