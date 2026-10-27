@@ -26,7 +26,7 @@ Current release ships **Karaf 4.4.12 + Camel 4.18.4** on JDK 21.
 ## Key features
 
 * **Dynamic deployment** — monitors `/config/deploy` and loads resources on the fly.
-* **Groovy bean factory** — compile Groovy processors/beans into Camel routes at runtime.
+* **Groovy beans** — drop a `.groovy` into the deploy directory; it becomes an OSGi bundle and its classes are plain `<bean class="…"/>`.
 * **Camel route templates** — define reusable templates in YAML.
 * **Monitoring** — Prometheus JMX Exporter and OpenTelemetry agent built in.
 * **Air-gapped images** — bake a project's full dependency closure into the image; no startup downloads.
@@ -73,7 +73,7 @@ Rahla dispatches each file in `/config/deploy` by extension:
 | File         | What happens |
 |--------------|--------------|
 | `*.xml`      | loaded as a **Camel Blueprint context** (routes, REST, beans, OSGi `<reference>`s) |
-| `*.groovy`   | compiled into an **OSGi bundle** `rahla.groovy.<name>` (classes usable as `<bean class="…"/>`); legacy: referenced by URL via `rahla.api.GroovyBeanFactory` |
+| `*.groovy`   | compiled into an **OSGi bundle** `rahla.groovy.<name>` (classes usable as `<bean class="…"/>`); the URL-based `rahla.api.GroovyBeanFactory` is deprecated |
 | `*.cfg`      | registered as an **OSGi configuration** (factory PIDs split on the `-` in the filename) |
 | `*.yaml`     | turned into **Camel route templates** by `TemplateFileInstaller` |
 | `*.jar`      | installed as an **OSGi bundle** |
@@ -88,24 +88,9 @@ check the logs after dropping something new.
 
 ## Special features
 
-### Groovy bean factory
+### Groovy beans
 
-Compile a Groovy class from any URL into a Camel `Processor`/bean at runtime — no bundle needed:
-
-```xml
-<reference id="beanFactory" interface="rahla.api.GroovyBeanFactory"/>
-
-<bean id="myProcessor" factory-ref="beanFactory" factory-method="createBean">
-  <argument value="file:///config/deploy/processors/MyProcessor.groovy"/>
-</bean>
-```
-
-`createBean` tries a constructor taking `org.osgi.framework.BundleContext`, then a no-arg one. Use a
-real URL (`file://`, `http://`); the old `resource:` prefix is deprecated.
-
-### Groovy files as bundles
-
-Since 1.3.6 every `*.groovy` dropped into `/config/deploy` is also compiled into a real OSGi bundle
+Since 1.3.6 every `*.groovy` dropped into `/config/deploy` is compiled into a real OSGi bundle
 (`rahla.groovy.GroovyBundleDeployer`, a fileinstall `ArtifactUrlTransformer` plus `rahla-groovy:` URL
 handler, the same mechanism Karaf's blueprint deployer uses). The classes then need no factory:
 
@@ -125,7 +110,7 @@ class MyProcessor implements Processor {
 <bean id="myProcessor" class="processors.MyProcessor"/>
 ```
 
-What you get, compared to the factory:
+What you get:
 
 * `bundle:list` shows `rahla.groovy.MyProcessor`; the version qualifier is a hash of the source, so
   you can see which revision is live. `bundle:headers` shows `Rahla-Groovy-Source`.
@@ -147,8 +132,26 @@ at deploy time with an explicit message.
 A complete, runnable example (features + multi-class Groovy + REST routes, no Docker) lives in
 [`examples/local/`](examples/local/).
 
-The factory path is unchanged: an XML that references the same file via `createBean` keeps working
-(it compiles its own copy of the class, so the two do not share static state).
+A bean that needs the OSGi `BundleContext` (the old factory passed it to a matching constructor)
+gets it with `org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext()`.
+
+#### Legacy: `GroovyBeanFactory` *(deprecated since 1.3.6)*
+
+`rahla.api.GroovyBeanFactory` still works, but every `createBean` call logs a deprecation warning
+with the URL, and it will be removed in a future release. Migrate by moving the `.groovy` file into
+the deploy directory (add a `package` if it has none) and replacing
+
+```xml
+<reference id="beanFactory" interface="rahla.api.GroovyBeanFactory"/>
+<bean id="myProcessor" factory-ref="beanFactory" factory-method="createBean">
+  <argument value="file:///config/deploy/processors/MyProcessor.groovy"/>
+</bean>
+```
+
+with `<bean id="myProcessor" class="processors.MyProcessor"/>`. Note that files in subdirectories of
+the deploy directory (like `processors/` above) are not picked up by the bundle deployer — move them
+to the top level. The factory compiles its own copy of the class, so a factory bean and a bundle bean
+of the same source do not share static state.
 
 ### Camel route templates
 

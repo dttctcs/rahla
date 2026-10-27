@@ -333,6 +333,13 @@ Jedis 7.5.0→7.5.2, OTel-SDK-extension-autoconfigure 1.61.0→1.63.0, Agrona 1.
     Konfiguration ausgeliefert werden, greifen dann nicht. `/config/etc` beim Upgrade aus dem neuen
     Image neu befüllen (eigene Änderungen danach wieder einspielen).
 - Kein Routen-Change für Camel 4.18.2 → 4.18.4 nötig (Patch-Releases innerhalb der 4.18-LTS).
+- **`GroovyBeanFactory` ist deprecated** (jeder `createBean`-Aufruf loggt ein WARN mit der URL; Entfernung
+  in einem späteren Release). Umstellen: `.groovy` auf die oberste Ebene des Deploy-Verzeichnisses legen
+  (Unterordner wie `processors/` greift der Bundle-Deployer nicht), `package` deklarieren, und
+  `<reference id="beanFactory" …/>` + `<bean factory-ref="beanFactory" factory-method="createBean">`
+  durch `<bean id="…" class="paket.Klasse"/>` ersetzen. `BundleContext`-Konstruktor →
+  `FrameworkUtil.getBundle(getClass()).getBundleContext()`. Achtung: Eine Bundle-Bean-Klasse hat einen
+  eigenen Classloader — `static`-Zustand wird nicht mit einer per Factory kompilierten Kopie geteilt.
 
 **Stolpersteine**
 - **Camel 4.18.5 ist für Karaf noch nicht verfügbar.** Die Camel-Advisories vom 2026-10-16

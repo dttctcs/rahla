@@ -12,6 +12,10 @@
 * New `examples/local/`: a runnable, Docker-free example (features descriptor + one Groovy file holding four classes + a Blueprint REST context) with a README covering start, hot reload, deploy order and the Karaf shell commands to inspect the generated bundle
 * `rahla-developer` skill: the REST DSL snippet used the Camel 3 attribute `<get uri="…">`, which Camel 4 rejects with `cvc-complex-type.3.2.2` — corrected to `path`
 
+### Deprecations
+
+* `rahla.api.GroovyBeanFactory` (and `GroovyBeanFactoryImpl`) is `@Deprecated`: every `createBean(url)` call now logs a warning naming the URL. Replacement: put the `.groovy` file at the top level of the deploy directory (with a `package`) and wire the class as `<bean class="…"/>` — the bundle deployer compiles it. Beans that relied on the `BundleContext` constructor get the context via `FrameworkUtil.getBundle(getClass()).getBundleContext()`. README examples now use `<bean class>`
+
 ### Bug Fixes
 
 * `assembly/pom.xml` `<blacklistedBundles>` rewritten for Karaf 4.4.12 / camel-karaf 4.18.4: the old entries (jackson 2.20/2.20.1, undertow 2.2.37, pax-logging 2.3.0, woodstox 7.0.0) matched nothing any more, so installing any Camel feature started Karaf's `jackson` feature (2.22.2) next to Rahla's Jackson, and `camel-groovy` started Groovy 4.0.32 next to Rahla's 4.0.33. The list now blacklists every jackson-core/-databind/-dataformat-xml/-dataformat-yaml/-datatype-jsr310 version except `${jackson2.version}` (by range, both sides), jackson-annotations below 2.22, woodstox-core below 7.2.0, stax2-api below `${stax2-api.version}` and groovy/groovy-xml below `${groovy.version}` — at runtime exactly one copy of each is active. pax-logging needs no entry (Karaf 4.4.12 and Rahla both ship 2.3.5)
