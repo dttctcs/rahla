@@ -8,6 +8,8 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.extern.log4j.Log4j2;
@@ -58,6 +60,14 @@ public class GroovyBundleDeployer extends AbstractURLStreamHandlerService
   private BundleContext context;
   private ExecutorService retries;
 
+  /**
+   * Placeholder location -> hash of the source revision whose recompile failed. Bundle events keep
+   * coming, and a placeholder whose imports are satisfiable stays satisfiable; without this the
+   * same broken revision would be recompiled (and logged) on every event. A changed file has a new
+   * hash and is tried again.
+   */
+  private final Map<String, String> failedRevisions = new ConcurrentHashMap<>();
+
   /** Used by Declarative Services; the builder is created in {@link #activate}. */
   public GroovyBundleDeployer() {}
 
@@ -97,21 +107,44 @@ public class GroovyBundleDeployer extends AbstractURLStreamHandlerService
   void compileResolvablePlaceholders() {
     FrameworkWiring wiring = context.getBundle(0).adapt(FrameworkWiring.class);
     for (Bundle bundle : context.getBundles()) {
+      if (!isPlaceholder(bundle)) {
+        continue;
+      }
+      String location = bundle.getLocation();
+      String revision = sourceRevision(location);
+      if (revision != null && revision.equals(failedRevisions.get(location))) {
+        continue; // this revision already failed to compile; wait for the file to change
+      }
       try {
-        if (!isPlaceholder(bundle) || !wiring.resolveBundles(List.of(bundle))) {
+        if (!wiring.resolveBundles(List.of(bundle))) {
           continue;
         }
         log.info(
             "Packages {} are available now, compiling {}",
             bundle.getHeaders("").get("Import-Package"),
-            bundle.getLocation());
+            location);
         bundle.update();
+        failedRevisions.remove(location);
         if (bundle.getState() != Bundle.ACTIVE) {
           bundle.start();
         }
       } catch (Exception e) {
-        log.warn("Recompiling {} failed", bundle.getLocation(), e);
+        if (revision != null) {
+          failedRevisions.put(location, revision);
+        }
+        log.warn(
+            "Recompiling {} failed; not retrying until the file changes", location, e);
       }
+    }
+  }
+
+  /** Hash of the current source behind a {@code rahla-groovy:} location, null if unreadable. */
+  static String sourceRevision(String location) {
+    try {
+      URL source = URI.create(location.substring(PROTOCOL.length() + 1)).toURL();
+      return GroovyBundleBuilder.sha256(GroovyBundleBuilder.read(source));
+    } catch (Exception e) {
+      return null;
     }
   }
 

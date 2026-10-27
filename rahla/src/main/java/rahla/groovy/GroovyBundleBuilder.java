@@ -224,13 +224,13 @@ public class GroovyBundleBuilder {
     return path.substring(path.lastIndexOf('/') + 1);
   }
 
-  private static String read(URL source) throws IOException {
+  static String read(URL source) throws IOException {
     try (InputStream in = source.openStream()) {
       return new String(in.readAllBytes(), StandardCharsets.UTF_8);
     }
   }
 
-  private static String sha256(String text) {
+  static String sha256(String text) {
     try {
       byte[] digest = MessageDigest.getInstance("SHA-256").digest(text.getBytes(StandardCharsets.UTF_8));
       return HexFormat.of().formatHex(digest);

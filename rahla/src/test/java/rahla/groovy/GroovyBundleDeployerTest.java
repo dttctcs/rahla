@@ -42,4 +42,17 @@ class GroovyBundleDeployerTest {
           in.getManifest().getMainAttributes().getValue("Bundle-SymbolicName"));
     }
   }
+
+  @Test
+  void sourceRevisionFollowsTheFileContent() throws Exception {
+    Path source = Files.writeString(dir.resolve("Broken.groovy"), "package p\nclass Broken { void x( }\n");
+    String location = GroovyBundleDeployer.PROTOCOL + ":" + source.toUri().toURL();
+
+    String first = GroovyBundleDeployer.sourceRevision(location);
+    assertEquals(first, GroovyBundleDeployer.sourceRevision(location));
+
+    Files.writeString(source, "package p\nclass Broken { void x() {} }\n");
+    assertFalse(first.equals(GroovyBundleDeployer.sourceRevision(location)));
+    assertEquals(null, GroovyBundleDeployer.sourceRevision(GroovyBundleDeployer.PROTOCOL + ":file:/does/not/exist.groovy"));
+  }
 }
