@@ -52,13 +52,6 @@
         "/^org\\.apache\\.camel:/"
       ],
       "enabled": false
-    },
-    {
-      "description": "janusgraph-driver publishes only timestamped dev builds past 1.1.0 (e.g. 1.2.0-20250607-200526.4379014); accept only clean X.Y.Z releases",
-      "matchPackageNames": [
-        "org.janusgraph:janusgraph-driver"
-      ],
-      "allowedVersions": "/^\\d+\\.\\d+\\.\\d+$/"
     }
   ]
 }

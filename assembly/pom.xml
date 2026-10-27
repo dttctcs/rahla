@@ -88,21 +88,7 @@
     </dependency>
 
 
-    <dependency>
-      <artifactId>graphsource</artifactId>
-      <classifier>features</classifier>
-      <groupId>rahla.feature</groupId>
-      <scope>runtime</scope>
-      <type>xml</type>
-    </dependency>
 
-    <dependency>
-      <artifactId>jedissource</artifactId>
-      <classifier>features</classifier>
-      <groupId>rahla.feature</groupId>
-      <scope>runtime</scope>
-      <type>xml</type>
-    </dependency>
     <dependency>
       <artifactId>camel-route-templates</artifactId>
       <classifier>features</classifier>
@@ -155,8 +141,6 @@
             <feature>rahla</feature>
           </bootFeatures>
           <installedFeatures>
-            <feature>graphsource</feature>
-            <feature>jedissource</feature>
             <feature>camel-route-templates</feature>
           </installedFeatures>
           <libraries>
@@ -164,19 +148,32 @@
             <library>mvn:io.opentelemetry.javaagent/opentelemetry-javaagent/${opentelemetry_agent.version}</library>
           </libraries>
           <blacklistedBundles>
-<!--            <bundle>mvn:org.apache.groovy/groovy/[4,5)</bundle>-->
-            <bundle>mvn:com.fasterxml.woodstox/woodstox-core/7.0.0</bundle>
-            <bundle>mvn:io.undertow/undertow-core/2.2.37.Final</bundle>
-            <bundle>mvn:io.undertow/undertow-servlet/2.2.37.Final</bundle>
-            <bundle>mvn:org.ops4j.pax.logging/pax-logging-api/2.3.0</bundle>
-            <bundle>mvn:org.ops4j.pax.logging/pax-logging-log4j2/2.3.0</bundle>
-            <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.20</bundle>
-            <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.20.1</bundle>
-            <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.20.1</bundle>
-            <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.20.1</bundle>
-            <!--<bundle>mvn:org.codehaus.woodstox/stax2-api/4.2.1</bundle>
-            <bundle>mvn:org.codehaus.woodstox/woodstox-core-asl/4.4.1</bundle>
-            <bundle>mvn:org.yaml/snakeyaml/1.30</bundle>-->
+            <!-- Exactly one version of each shared library may start: Rahla's own (rahla /
+                 rahla-logging features). Everything that Karaf's specs/enterprise features
+                 (jackson 2.22.2 / 2.18.10, woodstox 6.4.0, stax2 4.3.0), pax-web (jackson 2.21.1)
+                 or camel-karaf (jackson 2.21.4, groovy 4.0.32, woodstox 7.1.1, stax2 4.2.2) bring
+                 along is blacklisted by version range, so a Karaf/Camel bump cannot silently
+                 reintroduce a second copy. Ranges are applied at runtime too
+                 (etc/org.apache.karaf.features.xml). Undertow is deliberately NOT listed:
+                 pax-web 8 needs 2.2.x (javax.servlet), camel-undertow 4.x needs 2.3.x (jakarta). -->
+            <bundle>mvn:com.fasterxml.jackson.core/jackson-core/[2,${jackson2.version})</bundle>
+            <bundle>mvn:com.fasterxml.jackson.core/jackson-core/(${jackson2.version},3)</bundle>
+            <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/[2,${jackson2.version})</bundle>
+            <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/(${jackson2.version},3)</bundle>
+            <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-xml/[2,${jackson2.version})</bundle>
+            <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-xml/(${jackson2.version},3)</bundle>
+            <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/[2,${jackson2.version})</bundle>
+            <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/(${jackson2.version},3)</bundle>
+            <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/[2,${jackson2.version})</bundle>
+            <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/(${jackson2.version},3)</bundle>
+            <!-- jackson-annotations is versioned per minor since 2.20 (Rahla and Karaf 4.4.12: 2.22) -->
+            <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/[2,2.22)</bundle>
+            <!-- woodstox-core comes transitively with jackson-dataformat-xml (7.2.0 for 2.22.x) -->
+            <bundle>mvn:com.fasterxml.woodstox/woodstox-core/[6,7.2.0)</bundle>
+            <bundle>mvn:org.codehaus.woodstox/stax2-api/[4,${stax2-api.version})</bundle>
+            <!-- Rahla ships Groovy ${groovy.version} via the rahla feature; camel-groovy pulls its own 4.0.x -->
+            <bundle>mvn:org.apache.groovy/groovy/[4,${groovy.version})</bundle>
+            <bundle>mvn:org.apache.groovy/groovy-xml/[4,${groovy.version})</bundle>
           </blacklistedBundles>
           <javase>17</javase>
         </configuration>

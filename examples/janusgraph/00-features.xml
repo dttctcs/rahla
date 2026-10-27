@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  TinkerPop Gremlin driver + JanusGraph serializers for Rahla >= 1.3.6 (replacement for the removed
+  graphsource bundle).
+
+  Why it looks like this: none of the TinkerPop/JanusGraph jars is an OSGi bundle, and they split
+  packages between jars (org.apache.tinkerpop.gremlin.util lives in gremlin-core AND gremlin-util,
+  org.apache.tinkerpop.gremlin.language.grammar in gremlin-core AND gremlin-language). The old
+  graphsource bundle solved that by copying everything into one jar (Private-Package). Here the same
+  "one classloader" is built at runtime: gremlin-core is wrapped as host bundle "tinkerpop.client",
+  every other non-OSGi jar is wrapped as a FRAGMENT of that host. Fragments are merged into the
+  host's classloader, so split packages are whole again, and Class.forName() inside the driver
+  (serializer / IoRegistry lookup by name) sees JanusGraph's classes.
+
+  - Exports: each fragment exports its own packages except the ones the host already exports
+    (the split ones), otherwise the merged bundle would export them twice.
+  - Imports: everything optional + DynamicImport-Package, like the old bundle; netty is pinned to
+    4.1.x because the driver was built against it (camel-netty brings 4.2.x, both can coexist).
+  - Versions match JanusGraph 1.1.0 (TinkerPop 3.7.3). For another JanusGraph version, take the
+    versions from `mvn dependency:tree` of org.janusgraph:janusgraph-driver.
+-->
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="janusgraph-example">
+
+  <feature name="tinkerpop-janusgraph-client" version="3.7.3">
+    <feature prerequisite="true">wrap</feature>
+
+    <!-- OSGi-ready dependencies -->
+    <bundle>mvn:io.netty/netty-common/4.1.101.Final</bundle>
+    <bundle>mvn:io.netty/netty-buffer/4.1.101.Final</bundle>
+    <bundle>mvn:io.netty/netty-resolver/4.1.101.Final</bundle>
+    <bundle>mvn:io.netty/netty-transport/4.1.101.Final</bundle>
+    <bundle>mvn:io.netty/netty-transport-native-unix-common/4.1.101.Final</bundle>
+    <bundle>mvn:io.netty/netty-codec/4.1.101.Final</bundle>
+    <bundle>mvn:io.netty/netty-handler/4.1.101.Final</bundle>
+    <bundle>mvn:io.netty/netty-codec-http/4.1.101.Final</bundle>
+    <bundle dependency="true">mvn:org.apache.commons/commons-lang3/3.12.0</bundle>
+    <bundle dependency="true">mvn:org.apache.commons/commons-text/1.12.0</bundle>
+    <bundle>mvn:org.apache.commons/commons-configuration2/2.9.0</bundle>
+    <!-- gremlin-core needs commons-collections 3 (IteratorUtils) as soon as a traversal carries an
+         element, e.g. g.V(v).addE(...); with optional imports that only shows up at call time -->
+    <bundle>mvn:commons-collections/commons-collections/3.2.2</bundle>
+    <bundle>mvn:org.antlr/antlr4-runtime/4.9.1</bundle>
+    <bundle>mvn:com.google.guava/failureaccess/1.0.2</bundle>
+    <bundle>mvn:com.google.guava/guava/33.3.0-jre</bundle>
+    <bundle>mvn:org.locationtech.spatial4j/spatial4j/0.8</bundle>
+    <bundle>mvn:org.locationtech.jts/jts-core/1.17.0</bundle>
+
+    <!-- host: gremlin-core -->
+    <bundle>wrap:mvn:org.apache.tinkerpop/gremlin-core/3.7.3$Bundle-SymbolicName=tinkerpop.client&amp;Bundle-Version=3.7.3&amp;Export-Package=org.apache.tinkerpop.*;version=3.7.3&amp;Import-Package=io.netty.*;version="[4.1,4.2)";resolution:=optional,*;resolution:=optional&amp;DynamicImport-Package=*</bundle>
+
+    <!-- fragments: merged into the host's classloader -->
+    <bundle>wrap:mvn:org.apache.tinkerpop/gremlin-util/3.7.3$Bundle-SymbolicName=tinkerpop.client.util&amp;Bundle-Version=3.7.3&amp;Fragment-Host=tinkerpop.client&amp;Export-Package=!org.apache.tinkerpop.gremlin.util,org.apache.tinkerpop.*;version=3.7.3&amp;Import-Package=io.netty.*;version="[4.1,4.2)";resolution:=optional,*;resolution:=optional</bundle>
+    <bundle>wrap:mvn:org.apache.tinkerpop/gremlin-language/3.7.3$Bundle-SymbolicName=tinkerpop.client.language&amp;Bundle-Version=3.7.3&amp;Fragment-Host=tinkerpop.client&amp;Export-Package=!org.apache.tinkerpop.gremlin.language.grammar,org.apache.tinkerpop.*;version=3.7.3&amp;Import-Package=*;resolution:=optional</bundle>
+    <bundle>wrap:mvn:org.apache.tinkerpop/gremlin-driver/3.7.3$Bundle-SymbolicName=tinkerpop.client.driver&amp;Bundle-Version=3.7.3&amp;Fragment-Host=tinkerpop.client&amp;Export-Package=org.apache.tinkerpop.*;version=3.7.3&amp;Import-Package=io.netty.*;version="[4.1,4.2)";resolution:=optional,*;resolution:=optional</bundle>
+    <bundle>wrap:mvn:org.apache.tinkerpop/gremlin-shaded/3.7.3$Bundle-SymbolicName=tinkerpop.client.shaded&amp;Bundle-Version=3.7.3&amp;Fragment-Host=tinkerpop.client&amp;Export-Package=org.apache.tinkerpop.shaded.*;version=3.7.3&amp;Import-Package=*;resolution:=optional</bundle>
+    <bundle>wrap:mvn:org.javatuples/javatuples/1.2$Bundle-SymbolicName=tinkerpop.client.javatuples&amp;Bundle-Version=1.2&amp;Fragment-Host=tinkerpop.client&amp;Export-Package=org.javatuples.*;version=1.2&amp;Import-Package=*;resolution:=optional</bundle>
+    <bundle>wrap:mvn:com.carrotsearch/hppc/0.7.1$Bundle-SymbolicName=tinkerpop.client.hppc&amp;Bundle-Version=0.7.1&amp;Fragment-Host=tinkerpop.client&amp;Export-Package=com.carrotsearch.hppc.*;version=0.7.1&amp;Import-Package=*;resolution:=optional</bundle>
+    <bundle>wrap:mvn:org.noggit/noggit/0.8$Bundle-SymbolicName=tinkerpop.client.noggit&amp;Bundle-Version=0.8&amp;Fragment-Host=tinkerpop.client&amp;Export-Package=org.noggit.*;version=0.8&amp;Import-Package=*;resolution:=optional</bundle>
+    <bundle>wrap:mvn:org.janusgraph/janusgraph-driver/1.1.0$Bundle-SymbolicName=tinkerpop.client.janusgraph&amp;Bundle-Version=1.1.0&amp;Fragment-Host=tinkerpop.client&amp;Export-Package=org.janusgraph.*;version=1.1.0&amp;Import-Package=*;resolution:=optional</bundle>
+  </feature>
+
+  <feature name="janusgraph-example" version="1" install="auto">
+    <feature>camel-blueprint</feature>
+    <feature>camel-jetty</feature>   <!-- REST endpoint of the example only -->
+    <feature>tinkerpop-janusgraph-client</feature>
+  </feature>
+</features>

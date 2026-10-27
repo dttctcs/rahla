@@ -15,8 +15,17 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Legacy implementation of {@link GroovyBeanFactory}.
+ *
+ * @deprecated since 1.3.6, see {@link GroovyBeanFactory}: put the {@code *.groovy} file into the
+ *     deploy directory and use {@code <bean class="..."/>}. Every {@link #createBean} call logs a
+ *     warning naming the URL.
+ */
+@Deprecated
 @Component
 @Log4j2
+@SuppressWarnings("deprecation")
 public class GroovyBeanFactoryImpl implements GroovyBeanFactory {
 
   /**
@@ -40,6 +49,12 @@ public class GroovyBeanFactoryImpl implements GroovyBeanFactory {
 
   @Override
   public Object createBean(String urlSpec) {
+    log.warn(
+        "GroovyBeanFactory.createBean(\"{}\") is deprecated since Rahla 1.3.6 and will be removed:"
+            + " put the .groovy file directly into the deploy directory (it becomes an OSGi bundle)"
+            + " and reference the class as <bean class=\"...\"/> instead of"
+            + " factory-ref=\"beanFactory\" factory-method=\"createBean\"",
+        urlSpec);
     try {
       Class<?> clazz = parseClass(urlSpec);
       Object bean = newBean(clazz);

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
+
+  <!-- $[...] instead of ${...}: keeps Blueprint placeholders apart from Camel's ${header.x} -->
+  <cm:property-placeholder persistent-id="example.redis" update-strategy="reload"
+                           placeholder-prefix="$[" placeholder-suffix="]">
+    <cm:default-properties>
+      <cm:property name="host" value="localhost"/>
+      <cm:property name="port" value="6379"/>
+      <cm:property name="user" value=""/>
+      <cm:property name="password" value=""/>
+      <cm:property name="database" value="0"/>
+      <cm:property name="timeoutMillis" value="2000"/>
+      <cm:property name="maxTotal" value="8"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <!-- example.redis.RedisStore comes from RedisStore.groovy in this directory -->
+  <bean id="redis" class="example.redis.RedisStore" init-method="start" destroy-method="close">
+    <property name="host" value="$[host]"/>
+    <property name="port" value="$[port]"/>
+    <property name="user" value="$[user]"/>
+    <property name="password" value="$[password]"/>
+    <property name="database" value="$[database]"/>
+    <property name="timeoutMillis" value="$[timeoutMillis]"/>
+    <property name="maxTotal" value="$[maxTotal]"/>
+  </bean>
+
+  <camelContext id="redis-example" xmlns="http://camel.apache.org/schema/blueprint">
+    <restConfiguration component="jetty" port="8285" contextPath="/redis" bindingMode="off"/>
+    <rest>
+      <get path="/ping"><to uri="direct:ping"/></get>
+      <post path="/counter/{key}"><to uri="direct:incr"/></post>
+      <get path="/counter/{key}"><to uri="direct:get"/></get>
+    </rest>
+
+    <route id="redis-ping">
+      <from uri="direct:ping"/>
+      <setBody><method ref="redis" method="ping"/></setBody>
+    </route>
+    <route id="redis-incr">
+      <from uri="direct:incr"/>
+      <setBody><method ref="redis" method="incr(${header.key})"/></setBody>
+      <convertBodyTo type="java.lang.String"/>
+    </route>
+    <route id="redis-get">
+      <from uri="direct:get"/>
+      <setBody><method ref="redis" method="get(${header.key})"/></setBody>
+    </route>
+  </camelContext>
+</blueprint>

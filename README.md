@@ -6,7 +6,7 @@ an OSGi container and **hot-loads everything you drop into one directory** — C
 configs, Groovy beans, route-template YAML, bundles and feature archives — with no rebuild and no
 restart.
 
-Current release ships **Karaf 4.4.11 + Camel 4.18.2** on JDK 21.
+Current release ships **Karaf 4.4.12 + Camel 4.18.4** on JDK 21.
 
 ## Contents
 
@@ -26,11 +26,8 @@ Current release ships **Karaf 4.4.11 + Camel 4.18.2** on JDK 21.
 ## Key features
 
 * **Dynamic deployment** — monitors `/config/deploy` and loads resources on the fly.
-* **Groovy bean factory** — compile Groovy processors/beans into Camel routes at runtime.
+* **Groovy beans** — drop a `.groovy` into the deploy directory; it becomes an OSGi bundle and its classes are plain `<bean class="…"/>`.
 * **Camel route templates** — define reusable templates in YAML.
-* **GraphSource** — pooled Gremlin/TinkerPop client (e.g. JanusGraph) as an OSGi service.
-* **JedisSource** — pooled Redis (Jedis) client as an OSGi service *(deprecated)*.
-* **Loki appender** — pax-logging-compatible Log4j2 appender for Grafana Loki *(deprecated — prefer the OpenTelemetry logs exporter)*.
 * **Monitoring** — Prometheus JMX Exporter and OpenTelemetry agent built in.
 * **Air-gapped images** — bake a project's full dependency closure into the image; no startup downloads.
 * **Easy CA certs** — drop PEM/`.crt` into `/config/certs`; they're imported into the JVM truststore on start.
@@ -76,7 +73,7 @@ Rahla dispatches each file in `/config/deploy` by extension:
 | File         | What happens |
 |--------------|--------------|
 | `*.xml`      | loaded as a **Camel Blueprint context** (routes, REST, beans, OSGi `<reference>`s) |
-| `*.groovy`   | compiled at runtime via `rahla.api.GroovyBeanFactory` (referenced by URL from an XML) |
+| `*.groovy`   | compiled into an **OSGi bundle** `rahla.groovy.<name>` (classes usable as `<bean class="…"/>`); the URL-based `rahla.api.GroovyBeanFactory` is deprecated |
 | `*.cfg`      | registered as an **OSGi configuration** (factory PIDs split on the `-` in the filename) |
 | `*.yaml`     | turned into **Camel route templates** by `TemplateFileInstaller` |
 | `*.jar`      | installed as an **OSGi bundle** |
@@ -91,20 +88,70 @@ check the logs after dropping something new.
 
 ## Special features
 
-### Groovy bean factory
+### Groovy beans
 
-Compile a Groovy class from any URL into a Camel `Processor`/bean at runtime — no bundle needed:
+Since 1.3.6 every `*.groovy` dropped into `/config/deploy` is compiled into a real OSGi bundle
+(`rahla.groovy.GroovyBundleDeployer`, a fileinstall `ArtifactUrlTransformer` plus `rahla-groovy:` URL
+handler, the same mechanism Karaf's blueprint deployer uses). The classes then need no factory:
+
+```groovy
+// /config/deploy/MyProcessor.groovy — declare a package, default-package classes cannot be exported
+package processors
+
+import org.apache.camel.Exchange
+import org.apache.camel.Processor
+
+class MyProcessor implements Processor {
+  void process(Exchange exchange) throws Exception { exchange.message.setHeader('seen', true) }
+}
+```
+
+```xml
+<bean id="myProcessor" class="processors.MyProcessor"/>
+```
+
+What you get:
+
+* `bundle:list` shows `rahla.groovy.MyProcessor`; the version qualifier is a hash of the source, so
+  you can see which revision is live. `bundle:headers` shows `Rahla-Groovy-Source`.
+* Editing the file updates the bundle and restarts the Blueprint contexts that use it — no need to
+  touch the XML. Deleting the file uninstalls the bundle.
+* The bundle exports its packages and dynamically imports everything else, so the code sees the same
+  Camel/Groovy/Jackson packages the factory-compiled classes do.
+* Deploy order does not matter. If the source imports packages that are not in the runtime yet
+  (Camel still installing, a feature missing), a class-less **placeholder** bundle with an
+  `Import-Package` on those packages is installed instead; it shows up as `Installed` and
+  `bundle:diag` names the missing package. As soon as the packages appear the deployer recompiles
+  the source in place. Everything else (syntax errors, typos in class names) is a hard error, logged
+  once with file name and line, and retried only when the file changes.
+
+One file may hold several classes — they share the file's `package` and all land in the same bundle.
+A package declaration is required; classes in the default package cannot be exported and are refused
+at deploy time with an explicit message.
+
+A complete, runnable example (features + multi-class Groovy + REST routes, no Docker) lives in
+[`examples/local/`](examples/local/).
+
+A bean that needs the OSGi `BundleContext` (the old factory passed it to a matching constructor)
+gets it with `org.osgi.framework.FrameworkUtil.getBundle(getClass()).getBundleContext()`.
+
+#### Legacy: `GroovyBeanFactory` *(deprecated since 1.3.6)*
+
+`rahla.api.GroovyBeanFactory` still works, but every `createBean` call logs a deprecation warning
+with the URL, and it will be removed in a future release. Migrate by moving the `.groovy` file into
+the deploy directory (add a `package` if it has none) and replacing
 
 ```xml
 <reference id="beanFactory" interface="rahla.api.GroovyBeanFactory"/>
-
 <bean id="myProcessor" factory-ref="beanFactory" factory-method="createBean">
   <argument value="file:///config/deploy/processors/MyProcessor.groovy"/>
 </bean>
 ```
 
-`createBean` tries a constructor taking `org.osgi.framework.BundleContext`, then a no-arg one. Use a
-real URL (`file://`, `http://`); the old `resource:` prefix is deprecated.
+with `<bean id="myProcessor" class="processors.MyProcessor"/>`. Note that files in subdirectories of
+the deploy directory (like `processors/` above) are not picked up by the bundle deployer — move them
+to the top level. The factory compiles its own copy of the class, so a factory bean and a bundle bean
+of the same source do not share static state.
 
 ### Camel route templates
 
@@ -124,69 +171,14 @@ routes:
 The Camel context must define a matching `<routeTemplate id="my-route-template">`; the YAML supplies
 the parameter values.
 
-### GraphSource (Gremlin / JanusGraph)
+### Redis and JanusGraph clients
 
-Each `rahla.graphsource-<name>.cfg` publishes a `rahla.graphsource.GraphSource` service, filterable by name:
-
-```ini
-hosts=janusgraph
-port=8182
-graphSourceName=aGraphSource
-graphTraversalSourceName=graph_traversal
-serializer=org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1
-serializerConfig={"ioRegistries": ["org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry"]}
-```
-
-```xml
-<reference id="myGraph" interface="rahla.graphsource.GraphSource" filter="(graphSourceName=aGraphSource)"/>
-```
-
-```java
-public interface GraphSource<T, V> {
-  List<String> getHosts();
-  String getUser();
-  V getClient();                 // Gremlin client
-  T getGraphTraversalSource();   // g
-}
-```
-
-### JedisSource (Redis) *(deprecated)*
-
-> The `JedisSource` interface is marked `@Deprecated`. Still functional, but avoid for new work.
-
-Each `rahla.jedissource-<name>.cfg` publishes a pooled `rahla.jedissource.JedisSource`:
-
-```ini
-host=redis
-port=6379
-db=0
-jedisSourceName=myJedisSource
-```
-
-```xml
-<reference id="myRedis" interface="rahla.jedissource.JedisSource" filter="(jedisSourceName=myJedisSource)"/>
-```
-
-```java
-package rahla.jedissource;
-
-@Deprecated
-public interface JedisSource {
-  Jedis getResource();
-  void returnResource(Jedis jedis);
-}
-```
-
-### Loki Log4j2 appender
-
-> **Deprecated.** The Loki appender is retained for backward compatibility and still receives
-> dependency bumps, but new or additional log shipping should go through the OpenTelemetry logs
-> exporter (`OTEL_LOGS_EXPORTER`, see Monitoring) rather than the `<Loki .../>` appender.
-
-A pax-logging-compatible appender for Grafana Loki ships in the `rahla-logging` feature.
-
-> You must add `<Configuration packages="pl.tkowalcz.tjahzi.log4j2">` to `log4j2.xml` for the
-> `<Loki .../>` appender to resolve.
+The `jedissource` (`JedisSource`) and `graphsource` (`GraphSource`) bundles were removed in 1.3.6.
+Bring the client yourself: a `features.xml` installs the library, a Groovy class in the deploy
+directory builds the client from a `.cfg`, and Blueprint wires it as a `<bean class>`. Two tested
+recipes with runnable examples: [`examples/redis/`](examples/redis/) (Jedis) and
+[`examples/janusgraph/`](examples/janusgraph/) (TinkerPop driver + JanusGraph serializers); the
+migration steps are in [`migration.md`](migration.md) (1.3.6).
 
 ## HTTP / REST
 
@@ -198,15 +190,20 @@ The boot HTTP runtime is **Undertow** (`pax-web-http-undertow`); the OSGi/Pax-We
 ```
 
 Jetty is **not** the default. `camel-jetty` / `pax-web-http-jetty` still work, but the Jetty version
-pulled by Karaf 4.4.x has known CVEs — pin a fixed version (or just stay on Undertow). Run one
-Pax-Web HTTP feature at a time.
+pulled by Karaf 4.4.x has known CVEs — pin a fixed version. Run one Pax-Web HTTP feature at a time.
+
+> **Known issue (1.3.6):** `camel-undertow` (Camel 4, jakarta) brings Undertow 2.3.x next to pax-web's
+> 2.2.x; installing it rewires pax-web to 2.3 and breaks port 8181 (Jolokia answers 404,
+> `Default404Servlet does not implement jakarta.servlet.Servlet`). Camel routes keep working. For a
+> Camel REST endpoint prefer `camel-jetty` (`<restConfiguration component="jetty" …/>`); all examples
+> in `examples/` do.
 
 ## Air-gapped / offline images
 
 For dev you just mount `deploy/`. For an **air-gapped** image (no downloads at startup) you bake the
 whole dependency closure in by letting the *real Karaf* install it once at build time, then shipping
 its caches. No KAR, no closure resolver, no stubs — Karaf resolves everything itself, including
-`wrap:` bundles and rahla's own features (`graphsource`, …).
+`wrap:` bundles and rahla's own features.
 
 How it works:
 
@@ -299,7 +296,7 @@ wiring problems without the container layer.
 ## FAQ
 
 **Which Camel version, and how do I migrate routes?**
-Rahla 1.3.3 ships **Camel 4.18.2**. Coming from Camel 3.x, read the official
+Rahla 1.3.6 ships **Camel 4.18.4**. Coming from Camel 3.x, read the official
 [Camel 4 migration guide](https://camel.apache.org/manual/camel-4-migration-guide.html) (and the
 [Camel 4.x upgrade notes](https://camel.apache.org/manual/camel-4x-upgrade-guide.html)).
 

@@ -8,7 +8,8 @@ ist als **„aus Repo nicht belegt"** bzw. **„zu verifizieren"** markiert — 
 Begriffe wie in `rahla-developer/SKILL.md` und `CLAUDE.md`: das Deploy-Verzeichnis ist die API
 (`*.xml` Camel-Blueprint, `*.groovy`, `*.cfg`, `*.yaml` Route-Templates, `*.jar`),
 OSGi-DS statt Blueprint im Rahla-eigenen Code, `rahla.api.GroovyBeanFactory`, Faktor-PIDs
-`rahla.graphsource` / `rahla.jedissource`, `TemplateFileInstaller`. Fradi/Siddhi ist ab 1.3.6 entfernt.
+`rahla.graphsource` / `rahla.jedissource` (bis 1.3.5), `TemplateFileInstaller`. Ab 1.3.6 entfernt: Fradi/Siddhi,
+jedissource/graphsource, Loki-Appender.
 
 ---
 
@@ -24,6 +25,9 @@ OSGi-DS statt Blueprint im Rahla-eigenen Code, `rahla.api.GroovyBeanFactory`, Fa
 | 1.3.1   | 2026-04-30   | **4.18.1** | 4.4.9 | `linuxserver/baseimage-alpine:3.23`          | **Camel-Sprung 4.10 → 4.18**; viele Component-Bugfixes; Jedis `@Deprecated` |
 | 1.3.2   | 2026-05-02   | 4.18.1   | **4.4.11** | `linuxserver/baseimage-alpine:3.23`        | Karaf 4.4.11; Fix `org.ops4j.pax.url.mvn.cfg` Repo-Eintrag |
 | 1.3.3   | 2026-06-10   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.23`          | Cert-Import-Service, pax-url-Repo nach `/config/.m2` gepinnt, KAR-Offline-Packaging entfernt |
+| 1.3.4   | 2026-07-06   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.24`          | Forgejo-CI, GitHub-Mirror-Releases, Base-Image 3.23 → 3.24 |
+| 1.3.5   | 2026-08-10   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.24`          | Release aus der Forgejo-UI, Undertow-Pin entfernt, Loki-Appender deprecated |
+| 1.3.6   | *unreleased* | **4.18.4** | **4.4.12** | `linuxserver/baseimage-alpine:3.24`      | **Security:** Karaf-CVEs vom 2026-09-28, Camel-CVEs bis 4.18.4; Fradi/Siddhi, jedis-/graphsource, Loki-Appender entfernt; Groovy-Dateien als Bundles |
 
 Quelle Camel/Karaf-Spalte: `git show <tag>:pom.xml` (`<camel.version>` / `<karaf.version>`).
 Quelle Tag-Daten: `git log -1 --format=%ci <tag>`.
@@ -164,7 +168,7 @@ Markiert in `CHANGELOG.md` ausdrücklich als **„Changes *BREAKING*"**.
   `org.apachle.felix` → `org.apache.felix`.) Quelle: `git show HEAD:root/.../init-rahla/run`.
 - Camel ist (seit 1.2.0) weiterhin **nicht** vorinstalliert — ein gedropptes `*.xml` ohne Camel-
   Feature bleibt `Waiting` (`bundle:diag <id>`). Quelle: `README.md` FAQ; `rahla-developer/SKILL.md`.
-- Loki-Appender braucht die `rahla-logging`-pax-logging-Bundles; pax-logging **nicht** von
+- Loki-Appender (bis 1.3.5; in 1.3.6 entfernt) braucht die `rahla-logging`-pax-logging-Bundles; pax-logging **nicht** von
   woanders re-pinnen. Quelle: `CLAUDE.md` / `rahla-developer/SKILL.md`.
 
 ---
@@ -287,6 +291,162 @@ Jedis 7.5.0→7.5.2, OTel-SDK-extension-autoconfigure 1.61.0→1.63.0, Agrona 1.
 > darüber liegt jetzt `# 1.3.4 (unreleased)` mit den ersten Renovate-Bumps (Jedis `7.5.2 > 7.5.3`,
 > Log4j2 `2.26.0 > 2.26.1` — Build + lokaler Karaf-Boot verifiziert).
 
+### 1.3.6 (unreleased) — Security: Karaf 4.4.12 + Camel 4.18.4, Fradi/Siddhi entfernt
+
+**Breaking Changes**
+- **Fradi/Siddhi entfernt** (Modul, Karaf-Feature `fradi`, alle `io.siddhi`-Deps; `*.siddhi` im
+  Deploy werden nicht mehr geladen, `rahla.components.fradi.FradiComponent` existiert nicht mehr).
+  Ein `deploy/features.xml` mit `<feature>fradi</feature>` lässt sich auf 1.3.6 **nicht mehr
+  auflösen** → das ganze Service-Feature bleibt uninstalliert. Quelle: `CHANGELOG.md` 1.3.6
+  „Removals"; Commit `7ba0551`.
+- **`jedissource` und `graphsource` entfernt**: Module, Karaf-Features (`jedissource`, `graphsource`)
+  und die Abhängigkeiten `jedis`, `janusgraph-driver`, `gremlin-*`, `commons-configuration2`.
+  `rahla.jedissource-*.cfg` / `rahla.graphsource-*.cfg` erzeugen keinen Service mehr; ein
+  `<reference interface="rahla.jedissource.JedisSource" …>` bzw. `rahla.graphsource.GraphSource`
+  löst nie auf → der Blueprint-Kontext hängt in `GracePeriod` und stirbt nach ~5 min. **Ersatz:**
+  Client als Groovy-Bean im Deploy-Verzeichnis, Bibliothek per `features.xml` — siehe die Rezepte
+  „Redis ohne JedisSource" und „GraphSource per Groovy-Bean" unten. Quelle: `CHANGELOG.md` 1.3.6.
+- **Loki-Appender entfernt** (deprecated seit 1.3.5): Modul `loki-appender`, das Bundle im
+  `rahla-logging`-Feature, die `pl.tkowalcz.tjahzi`-Abhängigkeiten und der (auskommentierte)
+  `<Loki>`-Block samt `packages="pl.tkowalcz.tjahzi.log4j2"` und `rahla.log.loki.*`-Properties in
+  `etc/log4j2.xml`. Ein eigenes `log4j2.xml` mit `<Loki …/>` oder `packages="pl.tkowalcz…"` startet
+  auf 1.3.6 nicht mehr sauber (log4j2 kennt das Plugin nicht) → Block entfernen. **Ersatz:**
+  OpenTelemetry-Logs-Exporter (`OTEL_LOGS_EXPORTER=otlp` + `OTEL_EXPORTER_OTLP_ENDPOINT`, Agent ist im
+  Image) oder das JSON-Console-Log von der Plattform einsammeln lassen (Promtail/Alloy,
+  `loki.io/parser`-Annotation). Quelle: `CHANGELOG.md` 1.3.6 „Removals".
+- **Karaf 4.4.12 verschärft die mitgelieferten ACLs** (Quelle: Diff `etc/` der Upstream-Distributionen
+  `apache-karaf-4.4.11` vs. `4.4.12`): `jmx.acl.cfg` → `createMBean`/`registerMBean`/`unregisterMBean
+  = admin`; `org.apache.karaf.command.acl.config.cfg` → `install = admin`;
+  `org.apache.karaf.command.acl.feature.cfg` → `repo-add -i` / `repo-remove -u` nur noch `admin`;
+  neu `org.apache.karaf.command.acl.instance.cfg` (alle mutierenden `instance:*` = `admin`); das
+  `jdbc`-Feature installiert jetzt `org.apache.karaf.command.acl.jdbc.cfg` (`ds-create`,
+  `ds-delete`, `execute`, `query` = `admin`). Rahla selbst definiert in `users.properties` nur den
+  User `admin` (alle Rollen) — wer eigene Viewer/Manager-User angelegt hat, verliert diese Rechte.
+
+**Migrationsschritte**
+- Image auf `datatactics/rahla:1.3.6` heben, `deploy/` unverändert lassen — außer:
+  - Services mit `<feature>fradi</feature>` / `FradiComponent`-Beans / `*.siddhi` müssen **vorher**
+    auf `camel-mybatis` o. ä. migriert sein (s. Breaking Changes).
+  - Deployments, die `/config/etc` (oder ganz `/config`) persistent mounten, behalten die
+    `etc/`-Dateien des alten Images: `org.apache.karaf.features.cfg` zeigt dann weiter auf die
+    4.4.11-Feature-Repos, und die neuen/verschärften ACL-Dateien fehlen — die Security-Fixes, die als
+    Konfiguration ausgeliefert werden, greifen dann nicht. `/config/etc` beim Upgrade aus dem neuen
+    Image neu befüllen (eigene Änderungen danach wieder einspielen).
+- Kein Routen-Change für Camel 4.18.2 → 4.18.4 nötig (Patch-Releases innerhalb der 4.18-LTS).
+- **`GroovyBeanFactory` ist deprecated** (jeder `createBean`-Aufruf loggt ein WARN mit der URL; Entfernung
+  in einem späteren Release). Umstellen: `.groovy` auf die oberste Ebene des Deploy-Verzeichnisses legen
+  (Unterordner wie `processors/` greift der Bundle-Deployer nicht), `package` deklarieren, und
+  `<reference id="beanFactory" …/>` + `<bean factory-ref="beanFactory" factory-method="createBean">`
+  durch `<bean id="…" class="paket.Klasse"/>` ersetzen. `BundleContext`-Konstruktor →
+  `FrameworkUtil.getBundle(getClass()).getBundleContext()`. Achtung: Eine Bundle-Bean-Klasse hat einen
+  eigenen Classloader — `static`-Zustand wird nicht mit einer per Factory kompilierten Kopie geteilt.
+
+#### Rezept: Redis ohne JedisSource
+
+Lauffähiges Beispiel: [`examples/redis/`](examples/redis/) (getestet gegen Valkey 8 im Container).
+
+1. **Bibliothek per `features.xml`.** Jedis ist ein echtes OSGi-Bundle, braucht aber seine
+   Laufzeit-Deps daneben: `commons-pool2` (≥ 2.12), `gson` (≥ 2.13), `org.json` (exakt die
+   Version aus dem Jedis-Manifest, bei 7.5.3 `20251224`) und `redis-authx-core` (0.1.x).
+   `dependency="true"` für commons-pool2/gson, damit eine schon vorhandene Version (Camel)
+   wiederverwendet wird. Kein `wrap:` nötig.
+2. **Client als Groovy-Klasse** im Deploy-Verzeichnis (`RedisStore.groovy`, mit `package`): Felder
+   für die Config, `start()` baut `redis.clients.jedis.RedisClient` (Jedis-7-Nachfolger von
+   `JedisPooled`, gepoolt), `close()` schließt ihn.
+3. **Config aus `.cfg`** per `cm:property-placeholder persistent-id="…"` mit
+   `placeholder-prefix="$["` / `placeholder-suffix="]"` (sonst kollidiert `${…}` mit Camels
+   `${header.x}` in derselben Datei); `update-strategy="reload"` baut den Kontext bei Änderung neu.
+4. **Bean statt Reference:** `<bean id="myRedis" class="…RedisStore" init-method="start"
+   destroy-method="close">` mit `<property>`s ersetzt `<reference interface="rahla.jedissource.JedisSource"
+   filter="(jedisSourceName=…)"/>`. Aufrufer: statt `getResource()`/`returnResource()` direkt
+   `myRedis.client.get(k)` — `RedisClient` leiht/gibt Pool-Verbindungen selbst zurück.
+5. Config-Keys alt → neu: `db` → `database`, `pass` → `password`, `jedisSourceName` entfällt.
+
+Verifiziert: alle Bundles `Active`; `.cfg`-Änderung (`database=1`) wirkt nach Reload; Redis weg →
+HTTP 500, Kontext bleibt oben, danach automatisch wieder ok; Entfernen der XML schließt den Pool
+(`CLIENT LIST` leer).
+
+#### Rezept: GraphSource per Groovy-Bean
+
+Lauffähiges Beispiel: [`examples/janusgraph/`](examples/janusgraph/) (getestet gegen
+`docker.io/janusgraph/janusgraph:1.1.0`, inkl. Edge-Anlage → `RelationIdentifier`, d. h.
+`JanusGraphIoRegistry` greift).
+
+1. **Bibliotheken als ein Classloader.** TinkerPop/JanusGraph-Jars sind keine Bundles und splitten
+   Packages (`org.apache.tinkerpop.gremlin.util` in gremlin-core **und** gremlin-util,
+   `…language.grammar` in gremlin-core **und** gremlin-language); zudem lädt der Driver Serializer
+   und IoRegistry per Klassenname. Das alte graphsource-Bundle hat deshalb alles per `Private-Package`
+   in ein Jar kopiert. Das Rezept macht dasselbe zur Laufzeit nur mit `wrap:`: `gremlin-core` als
+   Host-Bundle `tinkerpop.client`, gremlin-util/-language/-driver/-shaded, janusgraph-driver,
+   javatuples, hppc, noggit als **Fragmente** (`Fragment-Host=tinkerpop.client`). Fragmente
+   exportieren die Split-Packages nicht noch einmal (`Export-Package=!…,org.apache.tinkerpop.*`),
+   Imports sind optional + `DynamicImport-Package=*`, netty auf `[4.1,4.2)` gepinnt (netty 4.1.101 als
+   eigene Bundles, kann neben Camels netty 4.2 laufen). Dazu als normale Bundles: guava +
+   failureaccess, commons-lang3/-text/-configuration2, **commons-collections 3.2.2**, antlr4-runtime,
+   spatial4j, jts-core.
+2. **Client als Groovy-Klasse** (`GraphClient.groovy`): gleiche Keys wie die alte
+   `rahla.graphsource-<name>.cfg` (`hosts`, `port`, `user`, `pass`, `graphTraversalSourceName`,
+   `serializer`; `serializerConfig`-JSON → `ioRegistries` als Komma-Liste, Pool-Größen). Serializer und
+   Registry **über `Cluster.classLoader`** laden, nicht über den eigenen Classloader. `g()` liefert
+   eine Remote-`GraphTraversalSource`, `client` den `Client`.
+3. **Bean statt Reference:** `<bean id="myGraph" class="…GraphClient" init-method="start"
+   destroy-method="close">` ersetzt `<reference interface="rahla.graphsource.GraphSource"
+   filter="(graphSourceName=…)"/>`; `getGraphTraversalSource()` → `g()`, `getClient()` → `client`.
+4. `start()` lässt den Kontext nie scheitern: Host nicht auflösbar/Server down → WARN
+   `Gremlin server … not reachable yet`, Verbindung beim ersten Aufruf. (`GraphSourceImpl` scheiterte
+   in `activate`, Blueprint versucht eine gescheiterte Bean nicht erneut.)
+
+**Was umständlich bleibt:** Optionale Imports verstecken fehlende Jars bis zum Aufruf — die erste
+Fassung lief für `count()`/`addV()` und scheiterte erst bei `g.V(v).addE(…)` an
+`NoClassDefFoundError: org/apache/commons/collections/IteratorUtils`. Nicht enthalten sind u. a.
+`exp4j` (clientseitiges `math()`) und `gremlin-groovy` (Script-Übersetzung) — die eigenen Traversals
+testen. Die Versionsliste ist Handarbeit (`mvn dependency:tree` von `org.janusgraph:janusgraph-driver`);
+TinkerPop muss zur Server-Minor passen (JanusGraph 1.1 → TinkerPop 3.7).
+
+**Stolpersteine**
+- **Camel 4.18.5 ist für Karaf noch nicht verfügbar.** Die Camel-Advisories vom 2026-10-16
+  (u. a. CVE-2026-78162 camel-hazelcast, CVE-2026-83531 dynamic-router, CVE-2026-78165
+  spring-redis, CVE-2026-78164 HTTP-Placeholder-Expansion, CVE-2026-85250 XPath-XXE,
+  CVE-2026-85251 HTTP-Credentials bei Redirects, CVE-2026-85313 Jetty `enableCORS`,
+  CVE-2026-85314 Mail-Header-Injection) sind erst in Camel **4.18.5** gefixt; `camel-core` 4.18.5
+  liegt auf Maven Central, `org.apache.camel.karaf:apache-camel` aber nur bis 4.18.4 (Stand
+  2026-10-26; Upstream-Ticket apache/camel-karaf#760, Milestone 4.18.5 offen). Ein Overlay
+  einzelner 4.18.5-Jars wurde geprüft und verworfen: die Karaf-Features referenzieren
+  camel-karaf-eigene Bundles (`mvn:org.apache.camel.karaf/camel-http/4.18.4` usw.), von denen es
+  keine 4.18.5 gibt; ein `wrap:` des Upstream-Jars müsste deren OSGi-Manifest (Exports,
+  Service-Registrierung) nachbauen und mit 4.18.4-`camel-support` mischen — nicht sauber testbar.
+  Bis dahin die Workarounds der Advisories anwenden (z. B. `followRedirects=false` bei
+  Endpunkten mit Credentials, `removeHeader("CamelHttpUri")`/`removeHeader("CamelRestHttpUri")`
+  an der Vertrauensgrenze, `enableCORS` bei Jetty nur mit expliziter Origin-Liste,
+  `removeHeaders("mail.smtp*")` nach MimeMultipart-Unmarshal).
+- `assembly/src/main/resources/assembly/etc/custom.properties` enthält hartkodierte
+  `version=4.4.x`-Exporte (`org.apache.karaf.jaas.boot*`, `org.apache.karaf.diagnostic.core*`) —
+  bei jedem Karaf-Bump mitziehen (Renovate tut das nicht). Quelle: dieser Commit.
+- pax-logging: Karaf 4.4.12 bringt 2.3.5 in `startup.properties` mit; `rahla-logging` stand auf
+  2.3.4 → beide Versionen wurden gestartet. `pax-logging.version` deshalb auf 2.3.5 angeglichen.
+  Bei künftigen Karaf-Bumps `etc/startup.properties` der gebauten Assembly auf doppelte
+  pax-logging-Einträge prüfen.
+
+- **Blacklist neu (Bundle-Duplikate):** Die `<blacklistedBundles>` in `assembly/pom.xml` stammten
+  von Karaf 4.4.11 und matchten nichts mehr. Deshalb liefen beim Installieren von Camel-Features
+  Karafs `jackson`-Feature (2.22.2) neben Rahlas Jackson und Groovy 4.0.32 (camel-groovy) neben
+  4.0.33. Jetzt per Versions-Range: Es startet nur Rahlas Jackson/Woodstox/stax2/Groovy. Quelle:
+  dieser PR; Runtime-Check `bundle:list | grep -i jackson` zeigt nur eine Version.
+- **`camel-undertow` bricht pax-web (bekannt, nicht gefixt):** camel-undertow (Camel 4) braucht
+  Undertow 2.3.x (jakarta), pax-web 8 braucht 2.2.x (javax). Nach `camel-undertow`-Install verdrahtet
+  der Feature-Refresh `pax-web-undertow` (`io.undertow.*;version="[2.2,3)"`) auf 2.3.24 →
+  `Default404Servlet does not implement jakarta.servlet.Servlet`, Port 8181/Jolokia antwortet 404.
+  Camel-Routen laufen weiter. Betrifft weather-service → REST auf `camel-jetty` umstellen.
+
+**Verifikation (2026-10-26):** `mvn --batch-mode --update-snapshots clean package` grün; lokale
+Assembly + Container (`docker build`) booten Karaf 4.4.12, ein `deploy/features.xml` mit `camel`,
+`camel-blueprint`, `camel-jetty`, `camel-groovy`, `camel-mail`, `camel-http`, `camel-jackson`
+installiert sich automatisch, eine Blueprint-Route (Jetty-REST + Groovy + XPath + Timer) startet
+und antwortet (`pong camel=4.18.4`). Zusätzlich löst die Feature-Union der FLT-Services (ohne
+`fradi`/Camunda-Wraps: `jdbc`, `pax-jdbc-*`, `camel-mybatis`, `camel-elasticsearch`,
+`camel-jdbc`, `camel-openapi-java`, `camel-metrics`, `camel-undertow`, `camel-netty`,
+`camel-opentelemetry`, `camel-quartz`, `camel-cron`, `camel-exec`, …) ohne `Installed`/`Waiting`-Bundles auf.
+
 ---
 
 ## 3. Querschnitt: Camel-Upgrade-Pfad (4.10 → 4.18)
@@ -300,6 +460,8 @@ Jedis 7.5.0→7.5.2, OTel-SDK-extension-autoconfigure 1.61.0→1.63.0, Agrona 1.
 | 1.3.1       | 4.18.1 |
 | 1.3.2       | 4.18.1 |
 | 1.3.3       | 4.18.2 |
+| 1.3.4–1.3.5 | 4.18.2 |
+| 1.3.6 (unreleased) | 4.18.4 |
 
 - Innerhalb 4.10.x (`4.10.3 → 4.10.7`, in 1.2.4): reiner Patch-Bump.
 - **Der relevante Sprung ist 4.10.7 → 4.18.1 in 1.3.1** (sieben Minor-Versionen auf einmal,
@@ -445,8 +607,8 @@ Zeitliche Abfolge der Base-Image-/Deployment-Brüche (alle mit Quelle):
   nur eine Pax-Web-HTTP-Feature gleichzeitig. Quelle: `README.md` HTTP/REST; `rahla-developer/SKILL.md`.
 
 **(e) pax-logging via `rahla-logging` (1.3.0)** — Quelle `CHANGELOG.md` 1.3.0; `e600d75`
-- Karaf-Default-pax-logging ersetzt; Loki-Appender (`Fragment-Host: pax-logging-log4j2`) hängt daran.
-  pax-logging nicht von anderswo re-pinnen.
+- Karaf-Default-pax-logging ersetzt; pax-logging nicht von anderswo re-pinnen. (Bis 1.3.5 hing der
+  Loki-Appender als `Fragment-Host: pax-logging-log4j2` daran; in 1.3.6 entfernt.)
 
 **(f) Kubernetes (1.3.0)** — Quelle `CHANGELOG.md` 1.3.0; `fb10df6`/`b357d08`
 - `manifests/rahla.yaml` als Sample (Ports SSH 8101, HTTP 8181, Prometheus 9001; Volumes).
@@ -492,3 +654,6 @@ Bugfixes in 1.2.4 (OTel-Drift) und 1.3.3 (`92d32ae`)
    auf 21 (`CLAUDE.md`). **Geklärt** (s. 3.3): konsistent mit der Camel-4-Baseline (min. Java 17,
    Quelle: Camel-4-Migration-Guide); rahla läuft auf JDK 21 (≥17, ok). Absicht; bei einer Java-
    Migration prüfen, ob anzuheben.
+7. **Camel 4.18.5 für Karaf (offen, Stand 2026-10-26):** `org.apache.camel.karaf:apache-camel:4.18.5`
+   noch nicht published (apache/camel-karaf#760). Sobald verfügbar: `camel.version` → 4.18.5,
+   `mvn package`, Smoke-Test, README/CHANGELOG — schließt die Camel-Advisories vom 2026-10-16.

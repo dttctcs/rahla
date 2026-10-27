@@ -6,8 +6,8 @@ description: >-
   (`deploy/` locally, `/config/deploy/` in the container). Use whenever the user writes
   or edits files destined for a Rahla deploy directory: Camel Blueprint XML (`*.xml`)
   with REST endpoints / routes / OSGi `<reference>` wiring (incl. multi-file
-  routeContexts), `features.xml` feature installs, Groovy classes via
-  `rahla.api.GroovyBeanFactory`, OSGi `*.cfg` files (datasources, factory PIDs), Camel
+  routeContexts), `features.xml` feature installs, Groovy classes (`*.groovy` in deploy →
+  OSGi bundle, `<bean class>`; legacy `rahla.api.GroovyBeanFactory`), OSGi `*.cfg` files (datasources, factory PIDs), Camel
   route-template YAMLs. Also for building service images
   `FROM datatactics/rahla` (incl. air-gapped/offline builds), migrating a service
   between Rahla versions, Karaf shell debugging, and why a file dropped into deploy
@@ -21,7 +21,7 @@ description: >-
      plugin, skills/rahla-developer/SKILL.md). This in-repo copy exists so contributors get the
      skill when working on the rahla repo itself — keep both in sync when editing. -->
 
-Author Camel integration artifacts for the Rahla Karaf appliance. Rahla is a packaged Karaf 4.4 + Camel 4.x distribution (1.3.4 ships Karaf 4.4.11 + Camel 4.18.2 on JDK 21 — see the README for current versions) that monitors a single directory and hot-loads anything dropped into it. Almost all user-facing development in Rahla happens by writing files into that directory — there is no application code to recompile, no service to restart. Understanding how Rahla wires those files together is the whole job of this skill.
+Author Camel integration artifacts for the Rahla Karaf appliance. Rahla is a packaged Karaf 4.4 + Camel 4.x distribution (1.3.6 ships Karaf 4.4.12 + Camel 4.18.4 on JDK 21 — see the README for current versions) that monitors a single directory and hot-loads anything dropped into it. Almost all user-facing development in Rahla happens by writing files into that directory — there is no application code to recompile, no service to restart. Understanding how Rahla wires those files together is the whole job of this skill.
 
 When **upgrading a service between Rahla versions** (path moves in 1.3.0, the Camel 4.10 → 4.18 jump in 1.3.1, …), don't reconstruct the deltas — the rahla repo ships `migration.md`, a sourced per-version migration reference from 1.2.1 onward, including the relevant upstream Camel breaking changes.
 
@@ -32,7 +32,7 @@ Rahla's `org.apache.felix.fileinstall` configuration polls one directory and dis
 | File ext | What happens when it lands |
 |----------|----------------------------|
 | `*.xml`  | Loaded as a **Camel Blueprint context** (routes, REST, beans, OSGi `<reference>`s) |
-| `*.groovy` | Compiled at runtime, available as a bean via `rahla.api.GroovyBeanFactory` |
+| `*.groovy` | Compiled into an OSGi bundle `rahla.groovy.<file>` (Rahla ≥ 1.3.6, classes usable as `<bean class="…"/>`); legacy: referenced by URL via `rahla.api.GroovyBeanFactory` |
 | `*.cfg`  | Registered as an **OSGi configuration** (factory PIDs split on the `-` in the filename) |
 | `*.yaml` | If it parses as a Rahla route-template doc, becomes Camel route templates via `TemplateFileInstaller` |
 | `*.jar`  | Installed as an OSGi bundle |
@@ -101,20 +101,19 @@ A typical Rahla Blueprint XML has four parts: namespace declaration, OSGi servic
            xmlns:camel="http://camel.apache.org/schema/blueprint">
 
     <!-- 1. OSGi service references — wire what other bundles published -->
-    <reference id="beanFactory" interface="rahla.api.GroovyBeanFactory"/>
+    <reference id="myDS" interface="javax.sql.DataSource" filter="(dataSourceName=my-oracle)"/>
 
-    <!-- 2. Beans created in this context — your processors, components, etc. -->
-    <bean id="myProcessor" factory-ref="beanFactory" factory-method="createBean">
-        <argument value="file:///config/deploy/processors/MyProcessor.groovy"/>
-    </bean>
+    <!-- 2. Beans created in this context — your processors, components, etc.
+            processors.MyProcessor comes from /config/deploy/MyProcessor.groovy (bundle deployer) -->
+    <bean id="myProcessor" class="processors.MyProcessor"/>
 
     <!-- 3. Camel context — REST configuration and routes -->
     <camelContext id="my-context" xmlns="http://camel.apache.org/schema/blueprint">
         <restConfiguration component="undertow" port="8183" contextPath="/my-app" enableCORS="true"/>
 
         <rest>
-            <post uri="/push"><to uri="direct:in"/></post>
-            <get  uri="/health"><to uri="direct:health"/></get>
+            <post path="/push"><to uri="direct:in"/></post>
+            <get  path="/health"><to uri="direct:health"/></get>
         </rest>
 
         <route id="in">
@@ -126,9 +125,11 @@ A typical Rahla Blueprint XML has four parts: namespace declaration, OSGi servic
 </blueprint>
 ```
 
-### REST components: `undertow` is the default, `jetty` still works
+### REST components: `jetty` (recommended) or `undertow`
 
 Since Rahla 1.3 the boot HTTP runtime is `pax-web-http-undertow` (serving the OSGi/Pax-Web port **8181**), and `<restConfiguration component="undertow" .../>` is the default choice. The Camel REST components (`camel-undertow`, `camel-jetty`) run their own listener on the port you configure — pick a service-specific port (commonly **8183**) so it doesn't clash with 8181. `component="jetty"` still works fine on Rahla 1.3+ when you install the `camel-jetty` feature via your deploy `features.xml` (this is what the FLT fuel-service runs); the pax-web boot feature being Undertow doesn't prevent that.
+
+**Prefer `camel-jetty` for Camel REST endpoints (1.3.6 known issue):** installing `camel-undertow` (Camel 4, jakarta, Undertow 2.3.x) makes the feature refresh rewire pax-web's Undertow (2.2.x, javax) to 2.3 — port 8181/Jolokia then answers 404 and Karaf logs `Default404Servlet does not implement jakarta.servlet.Servlet`; the Camel routes themselves keep working.
 
 If you bring in Jetty (via `camel-jetty` or `pax-web-http-jetty`), pin a fixed version via `<blacklistedBundles>` (or a feature override) — the Jetty version transitively pulled on Karaf 4.4.x has known CVEs. Run only one Pax-Web HTTP feature at a time.
 
@@ -137,15 +138,8 @@ If you bring in Jetty (via `camel-jetty` or `pax-web-http-jetty`), pin a fixed v
 Several Rahla components publish their service per-`.cfg`-file and tag it with a name property — you reference them by interface plus a filter on that name:
 
 ```xml
-<reference id="myGraph" interface="rahla.graphsource.GraphSource"
-           filter="(graphSourceName=aGraphSource)"/>
-
 <reference id="myDS" interface="javax.sql.DataSource"
            filter="(dataSourceName=my-oracle)"/>
-
-<!-- deprecated since 1.3.1 — existing consumers only, no new work -->
-<reference id="myRedis" interface="rahla.jedissource.JedisSource"
-           filter="(jedisSourceName=myJedisSource)"/>
 ```
 
 The filter value must match a property set in the corresponding `.cfg` file (see [OSGi config files](#osgi-config-files-cfg) below). When `<reference>` blocks fail to satisfy, Blueprint will park the entire context in `GraceTimeoutException` and tear it down after ~5 minutes — `karaf@root()> bundle:list -s` will show your bundle as `Waiting`.
@@ -222,26 +216,14 @@ One XML file = one Blueprint container, but a big service doesn't have to be one
 
 The service interface is `java.util.List` (that's all a `<routeContext>` exports), matched on the Blueprint component name — so keep `routeContext id`, the `filter` value, and the local `reference id` identical. Processor beans, error handlers, and `direct:` endpoints used inside the sub-file's routes resolve against the **importing** camelContext's registry at route start-up, so define shared beans once in the master file. This is how the FLT fuel-service composes ~10 deploy XMLs into one `fuel` context. Caveat: the master context only starts once all referenced route lists are published — a broken sub-file parks the whole service (`bundle:diag` shows which reference is missing).
 
-## Groovy bean compilation
+## Groovy beans
 
-`rahla.api.GroovyBeanFactory` compiles a Groovy source file (or any URL the JVM can `openStream()`) into a class at runtime and instantiates it. This is how custom Camel processors are added to Rahla without producing a bundle.
+Since Rahla 1.3.6 a `*.groovy` file placed **directly** in the deploy dir is compiled into an OSGi bundle by `rahla.groovy.GroovyBundleDeployer`; its classes are wired as plain `<bean class="…"/>`. This is the way to add custom Camel processors without building a jar. The older URL-based `rahla.api.GroovyBeanFactory` is **deprecated** (see the end of this section).
 
-For small expressions you don't need a class at all — with the `camel-groovy` feature installed, inline `<groovy>...</groovy>` works anywhere Camel accepts an expression (`<setHeader>`, `<filter>`, `<transform>`, …). Use the bean factory for real processors, inline Groovy for one-liners.
-
-### Wiring a Groovy class as a Camel `Processor`
-
-```xml
-<reference id="beanFactory" interface="rahla.api.GroovyBeanFactory"/>
-
-<bean id="MyProcessor" factory-ref="beanFactory" factory-method="createBean">
-    <argument value="file:///config/deploy/processors/MyProcessor.groovy"/>
-</bean>
-```
-
-Then reference it in routes via `<process ref="MyProcessor"/>`.
+For small expressions you don't need a class at all — with the `camel-groovy` feature installed, inline `<groovy>...</groovy>` works anywhere Camel accepts an expression (`<setHeader>`, `<filter>`, `<transform>`, …). Use Groovy classes for real processors, inline Groovy for one-liners.
 
 ```groovy
-// /config/deploy/processors/MyProcessor.groovy
+// /config/deploy/MyProcessor.groovy — a package declaration is required
 package processors
 
 import org.apache.camel.Exchange
@@ -249,14 +231,42 @@ import org.apache.camel.Processor
 
 class MyProcessor implements Processor {
     void process(Exchange exchange) throws Exception {
-        def body = exchange.in.body
-        // ... transform ...
         exchange.message.body = [field: "value"]
     }
 }
 ```
 
-### How `createBean` instantiates the class
+### How the bundle deployer behaves
+
+```xml
+<bean id="MyProcessor" class="processors.MyProcessor"/>   <!-- no <reference> to the factory needed -->
+```
+
+Rules of thumb:
+
+* The class **must declare a package** — default-package classes cannot be exported, so the XML cannot see them. Rahla rejects such a file at deploy time with an explicit message rather than installing an unusable bundle.
+* **Several classes per file are fine.** Groovy allows one `package` per file, so they share it and all land in the same bundle; the *file* name decides the bundle name, not the class names.
+* One file = one bundle `rahla.groovy.<filename>`; `bundle:list -s` shows it, `bundle:headers` shows `Rahla-Groovy-Source`. Version qualifier = hash of the source.
+* Editing the file → `bundle.update()` → every Blueprint context using the class restarts (Camel routes included). Deleting the file uninstalls the bundle; the XML then parks in `GracePeriod` until the class returns.
+* **Missing packages are not an error.** If the source imports something the runtime does not provide yet (Camel still installing, feature missing), a class-less *placeholder* bundle with `Import-Package` on those packages is installed; `bundle:list` shows it `Installed`, `bundle:headers` says `Rahla-Groovy-Status: unresolved`, `bundle:diag` names the package. Once the package appears the deployer recompiles in place (log: `Packages [...] are available now, compiling ...`). So deploy order between `features.xml`, `.groovy` and `.xml` does not matter.
+* Real compile errors (syntax, a class name that is nowhere imported) land once per revision in the log (`Compilation of MyProcessor.groovy failed: … @ line N`) and no bundle is installed. Fix the file, fileinstall retries on the next checksum change.
+* Files in **subdirectories** (`deploy/processors/…`) are not picked up by fileinstall as artifacts (default `subdir.mode`), so existing factory-loaded processors in subfolders are untouched. A `.groovy` directly in `deploy/` that is also referenced via `createBean` simply exists twice: once as bundle class, once as factory-compiled class.
+
+### Legacy: `GroovyBeanFactory` (deprecated since 1.3.6)
+
+Existing services may still wire Groovy classes through the factory. It keeps working, but **every `createBean` call logs a deprecation warning** with the URL, and it will be removed. Don't write new factory beans; migrate old ones by moving the file to the top level of the deploy dir (add a `package`) and replacing the factory bean with `<bean class>`. A bean that used the `BundleContext` constructor gets the context via `FrameworkUtil.getBundle(getClass()).getBundleContext()`.
+
+```xml
+<!-- old, deprecated -->
+<reference id="beanFactory" interface="rahla.api.GroovyBeanFactory"/>
+<bean id="MyProcessor" factory-ref="beanFactory" factory-method="createBean">
+    <argument value="file:///config/deploy/processors/MyProcessor.groovy"/>
+</bean>
+<!-- new -->
+<bean id="MyProcessor" class="processors.MyProcessor"/>
+```
+
+#### How `createBean` instantiates the class
 
 `GroovyBeanFactoryImpl` first tries to call a constructor accepting `org.osgi.framework.BundleContext`; if that constructor doesn't exist it falls back to the no-arg constructor. Use the `BundleContext` constructor when the processor needs to look up other OSGi services by hand:
 
@@ -272,7 +282,7 @@ class MyProcessor implements Processor {
 
 For most processors, the no-arg constructor is enough — pass dependencies in via Blueprint setters or `<argument>` blocks added to the `<bean>` definition.
 
-### URL forms (and the deprecated one)
+#### URL forms (and the deprecated one)
 
 `createBean` accepts any URL its `URL.openStream()` understands. The conventional choices:
 
@@ -280,7 +290,7 @@ For most processors, the no-arg constructor is enough — pass dependencies in v
 - `http://host/Class.groovy` — works, occasionally useful for pulling beans from a config server.
 - `resource:file:relative/path` — **deprecated.** Logs a warning on every load. Replace with `file://` and a fully qualified path. The deprecated form will be removed.
 
-### Compilation failures
+#### Compilation failures
 
 Groovy compilation errors are thrown out of `createBean` and bubble up as a `RuntimeException` during Blueprint initialization, which fails the whole context. The Karaf log shows a `MultipleCompilationErrorsException` with the source file path and line number — fix the Groovy file and Rahla will rebuild the context automatically.
 
@@ -289,35 +299,11 @@ Groovy compilation errors are thrown out of `createBean` and bubble up as a `Run
 Filenames map to OSGi PIDs:
 
 - `<pid>.cfg` → singleton config for PID `<pid>`
-- `<pid>-<name>.cfg` → factory config for `<pid>`, instance name = `<name>`. The instance name is **not** automatically a service property; if the bundle treats configs as factories (graphsource, jedissource), it usually publishes one service per instance and exposes a name property you wrote inside the file.
+- `<pid>-<name>.cfg` → factory config for `<pid>`, instance name = `<name>`. The instance name is **not** automatically a service property; if a bundle treats configs as factories (pax-jdbc datasources, for example), it usually publishes one service per instance and exposes a name property you wrote inside the file.
 
-### Example: GraphSource (Gremlin / JanusGraph)
+### Redis / JanusGraph clients (JedisSource / GraphSource removed in 1.3.6)
 
-`rahla.graphsource-aGraphSource.cfg`:
-
-```ini
-hosts=janusgraph
-port=8182
-user=
-pass=
-graphSourceName=aGraphSource
-graphTraversalSourceName=graph_traversal
-serializer=org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1
-serializerConfig={"ioRegistries": ["org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry"]}
-```
-
-### Example: JedisSource (Redis) — deprecated
-
-**`JedisSource` is `@Deprecated` since Rahla 1.3.1 (EOL).** Don't build new integrations on it; the rahla repo names no drop-in successor, so for new Redis work bring your own client (Camel component or wrapped library) via `features.xml`. For maintaining an existing consumer, `rahla.jedissource-myJedisSource.cfg`:
-
-```ini
-host=redis
-port=6379
-db=0
-user=
-pass=
-jedisSourceName=myJedisSource
-```
+The `rahla.jedissource-*.cfg` / `rahla.graphsource-*.cfg` services no longer exist. Build the client in a Groovy class in the deploy dir, feed it from a `.cfg` via `cm:property-placeholder`, and wire it as `<bean class="…" init-method destroy-method>`; the library comes in via `features.xml`. Tested recipes: `examples/redis/` and `examples/janusgraph/` in the rahla repo, steps in `migration.md` (1.3.6).
 
 ### Example: pax-jdbc datasource
 
@@ -414,7 +400,7 @@ Useful from the karaf shell:
 | `bundle:diag <id>` | Why the bundle is stuck. Lists missing capabilities / services. |
 | `scr:list` | Declarative-services components and whether they're SATISFIED / UNSATISFIED. |
 | `scr:info <name>` | What references a component is waiting on. |
-| `config:list "(service.pid=rahla.graphsource)"` | Inspect a factory PID's instances. |
+| `config:list "(service.factoryPid=org.ops4j.datasource)"` | Inspect a factory PID's instances. |
 | `camel:context-list` | All Camel contexts loaded from XML. |
 | `camel:route-list` | Per-context route status. |
 | `log:logs -n 200 -l ERROR` | Last 200 ERROR-level log entries (Rahla's own pretty `log:logs` — see `rahla/commands/ShowCommand.java`). |
@@ -427,11 +413,13 @@ When a Blueprint context refuses to start, `bundle:diag` on the relevant bundle 
 - **`resource:file:` and `resource:deploy:` prefixes** — deprecated. Use real URLs (`file://`, `http://`).
 - **`RAHLA_DEPLOY_PATH`** — removed in 1.3. Add a `org.apache.felix.fileinstall-<name>.cfg` instead if a second watch directory is needed.
 - **Unpinned Jetty.** Jetty is still usable on Rahla 1.3+ (it's just no longer the boot default), but the version that comes with Karaf 4.4.x's `pax-web-http-jetty` has a known zero-day — pin a fixed version via `<blacklistedBundles>` or a feature override before relying on it.
-- **New `JedisSource` consumers** — `JedisSource`/`JedisServiceImpl` are `@Deprecated` since 1.3.1 (EOL). Maintain existing ones; don't add new ones.
+- **New `GroovyBeanFactory` beans** (`factory-ref="beanFactory" factory-method="createBean"`) — deprecated since 1.3.6, warns on every call. Put the `.groovy` at the top level of the deploy dir and use `<bean class>`.
+- **`JedisSource` / `GraphSource`** — removed in 1.3.6; `<reference interface="rahla.jedissource.JedisSource">` / `rahla.graphsource.GraphSource` never resolves. Use the Groovy-bean recipes (`examples/redis/`, `examples/janusgraph/`).
 - **KAR-based offline packaging** — removed in 1.3.3. Air-gapped images use the boot-once cache-priming pattern (see above).
 - **Fradi / Siddhi (`*.siddhi` files, `<bean class="rahla.components.fradi.FradiComponent"/>`)** — removed in 1.3.6. A `*.siddhi` file in `/config/deploy` is no longer loaded and a `FradiComponent` bean fails to resolve; migrate to `camel-mybatis`, `camel-stream`, or another supported Camel component.
 - **Karaf-bundled Groovy** — the assembly blacklists `org.apache.groovy/groovy/[4,5)` and ships its own embedded Groovy 4 inside the `rahla` bundle. Do not declare a separate Groovy feature; if a feature pulls one in, add it to `<blacklistedBundles>` in `assembly/pom.xml`.
-- **Karaf-bundled pax-logging** — replaced by the `rahla-logging` feature so the Loki appender (`Fragment-Host: pax-logging-log4j2`) loads correctly. Don't re-pin pax-logging from elsewhere.
+- **Karaf-bundled pax-logging** — replaced by the `rahla-logging` feature. Don't re-pin pax-logging from elsewhere.
+- **Loki appender (`<Loki/>`, `rahla.log.loki.*`)** — removed in 1.3.6. Ship logs via the OpenTelemetry logs exporter (`OTEL_LOGS_EXPORTER`) or scrape the JSON console log.
 - **Hardcoded `/rahla/deploy` or `/deploy` paths in container artifacts** — only `/config/deploy` is monitored on 1.3+; the s6 init script warns on the legacy paths.
 
 ## Constraints

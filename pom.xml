@@ -24,6 +24,11 @@
                     <version>${maven-install-plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <version>${maven-surefire-plugin.version}</version>
+                </plugin>
+                <plugin>
                     <artifactId>maven-bundle-plugin</artifactId>
                     <extensions>true</extensions>
                     <groupId>org.apache.felix</groupId>
@@ -87,43 +92,12 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <artifactId>graphsource</artifactId>
-                <groupId>rahla</groupId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>jedissource</artifactId>
-                <groupId>rahla</groupId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
                 <artifactId>camel-osgi-route-templates</artifactId>
                 <groupId>rahla</groupId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <artifactId>loki-appender</artifactId>
-                <groupId>rahla</groupId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
                 <artifactId>rahla</artifactId>
-                <classifier>features</classifier>
-                <groupId>rahla.feature</groupId>
-                <scope>runtime</scope>
-                <type>xml</type>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>graphsource</artifactId>
-                <classifier>features</classifier>
-                <groupId>rahla.feature</groupId>
-                <scope>runtime</scope>
-                <type>xml</type>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>jedissource</artifactId>
                 <classifier>features</classifier>
                 <groupId>rahla.feature</groupId>
                 <scope>runtime</scope>
@@ -416,6 +390,12 @@
                 <version>${org.apache.felix.fileinstall.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
 
 
             <dependency>
@@ -552,21 +532,6 @@
 
 
             <dependency>
-                <artifactId>jedis</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>slf4j-api</artifactId>
-                        <groupId>org.slf4j</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.squareup.okhttp3</groupId>
-                        <artifactId>okhttp</artifactId>
-                    </exclusion>
-                </exclusions>
-                <groupId>redis.clients</groupId>
-                <version>${jedis.version}</version>
-            </dependency>
-            <dependency>
                 <artifactId>pax-logging-api</artifactId>
                 <groupId>org.ops4j.pax.logging</groupId>
                 <version>${pax-logging.version}</version>
@@ -591,85 +556,7 @@
                 <version>${log4j2.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-configuration2</artifactId>
-                <version>${commons-configuration2.version}</version>
-            </dependency>
 
-            <dependency>
-                <artifactId>janusgraph-driver</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>Log4j2-api</artifactId>
-                        <groupId>org.Log4j2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jcl-over-Log4j2</artifactId>
-                        <groupId>org.Log4j2</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>gremlin-driver</artifactId>
-                        <groupId>org.apache.tinkerpop</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>gremlin-core</artifactId>
-                        <groupId>org.apache.tinkerpop</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>gremlin-shaded</artifactId>
-                        <groupId>org.apache.tinkerpop</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>gremlin-groovy</artifactId>
-                        <groupId>org.apache.tinkerpop</groupId>
-                    </exclusion>
-                </exclusions>
-                <groupId>org.janusgraph</groupId>
-                <version>${janusgraph-driver.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>gremlin-groovy</artifactId>
-                <groupId>org.apache.tinkerpop</groupId>
-                <version>${gremlin-groovy.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>gremlin-driver</artifactId>
-                <groupId>org.apache.tinkerpop</groupId>
-                <version>${gremlin-groovy.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>gremlin-core</artifactId>
-                <groupId>org.apache.tinkerpop</groupId>
-                <version>${gremlin-groovy.version}</version>
-            </dependency>
-            <dependency>
-                <artifactId>gremlin-shaded</artifactId>
-                <groupId>org.apache.tinkerpop</groupId>
-                <version>${gremlin-groovy.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>pl.tkowalcz.tjahzi</groupId>
-                <artifactId>log4j2-appender-nodep</artifactId>
-                <version>${log4j2-appender-loki.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>pl.tkowalcz.tjahzi</groupId>
-                <artifactId>core</artifactId>
-                <version>${log4j2-appender-loki.version}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.lmax</groupId>
-                <artifactId>disruptor</artifactId>
-                <version>${disruptor.version}</version>
-            </dependency>
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
@@ -687,14 +574,9 @@
 
     <modules>
         <module>rahla</module>
-        <module>loki-appender</module>
-        <module>graphsource</module>
-        <module>jedissource</module>
         <module>camel-osgi-route-templates</module>
         <module>features/rahla</module>
         <module>features/logging</module>
-        <module>features/jedissource</module>
-        <module>features/graphsource</module>
         <module>features/camel-route-templates</module>
         <module>assembly</module>
     </modules>
@@ -712,8 +594,8 @@
         <getRevisionOnce>false</getRevisionOnce>
 
         <!-- Core platform -->
-        <karaf.version>4.4.11</karaf.version>
-        <camel.version>4.18.2</camel.version>
+        <karaf.version>4.4.12</karaf.version>
+        <camel.version>4.18.4</camel.version>
         <groovy.version>4.0.33</groovy.version>
 
         <!-- OSGi APIs -->
@@ -732,35 +614,31 @@
         <org.osgi.util.promise.version>1.3.0</org.osgi.util.promise.version>
 
         <!-- Logging -->
-        <pax-logging.version>2.3.4</pax-logging.version>
+        <pax-logging.version>2.3.5</pax-logging.version>
         <log4j2.version>2.26.1</log4j2.version>
-        <log4j2-appender-loki.version>0.9.43</log4j2-appender-loki.version>
-        <stax2-api.version>4.3.0</stax2-api.version>
+        <stax2-api.version>4.3.2</stax2-api.version>
 
         <!-- Libraries -->
-        <jackson2.version>2.22.1</jackson2.version>
-        <commons-collections4.version>4.5.0</commons-collections4.version>
-        <commons-configuration2.version>2.15.1</commons-configuration2.version>
-        <lombok.version>1.18.46</lombok.version>
+        <jackson2.version>2.22.4</jackson2.version>
+        <commons-collections4.version>4.6.0</commons-collections4.version>
+        <lombok.version>1.18.48</lombok.version>
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
-        <janusgraph-driver.version>1.1.0</janusgraph-driver.version>
-        <gremlin-groovy.version>3.8.1</gremlin-groovy.version>
-        <jedis.version>7.5.3</jedis.version>
-        <disruptor.version>3.4.4</disruptor.version>
+        <junit-jupiter.version>5.14.4</junit-jupiter.version>
 
         <!-- Observability -->
         <jmx_exporter.version>1.0.1</jmx_exporter.version>
         <opentelemetry_agent.version>2.30.0</opentelemetry_agent.version>
-        <opentelemetry-sdk-extension-autoconfigure.version>1.64.0</opentelemetry-sdk-extension-autoconfigure.version>
+        <opentelemetry-sdk-extension-autoconfigure.version>1.67.0</opentelemetry-sdk-extension-autoconfigure.version>
 
 
         <!-- Maven plugins -->
         <maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
         <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
-        <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
+        <maven-deploy-plugin.version>3.2.0</maven-deploy-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-        <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
-        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+        <maven-install-plugin.version>3.2.0</maven-install-plugin.version>
+        <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
     </properties>
 
     <scm>
