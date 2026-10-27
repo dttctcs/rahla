@@ -8,7 +8,8 @@ ist als **„aus Repo nicht belegt"** bzw. **„zu verifizieren"** markiert — 
 Begriffe wie in `rahla-developer/SKILL.md` und `CLAUDE.md`: das Deploy-Verzeichnis ist die API
 (`*.xml` Camel-Blueprint, `*.groovy`, `*.cfg`, `*.yaml` Route-Templates, `*.jar`),
 OSGi-DS statt Blueprint im Rahla-eigenen Code, `rahla.api.GroovyBeanFactory`, Faktor-PIDs
-`rahla.graphsource` / `rahla.jedissource`, `TemplateFileInstaller`. Fradi/Siddhi ist ab 1.3.6 entfernt.
+`rahla.graphsource` / `rahla.jedissource` (bis 1.3.5), `TemplateFileInstaller`. Ab 1.3.6 entfernt: Fradi/Siddhi,
+jedissource/graphsource, Loki-Appender.
 
 ---
 
@@ -26,7 +27,7 @@ OSGi-DS statt Blueprint im Rahla-eigenen Code, `rahla.api.GroovyBeanFactory`, Fa
 | 1.3.3   | 2026-06-10   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.23`          | Cert-Import-Service, pax-url-Repo nach `/config/.m2` gepinnt, KAR-Offline-Packaging entfernt |
 | 1.3.4   | 2026-07-06   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.24`          | Forgejo-CI, GitHub-Mirror-Releases, Base-Image 3.23 → 3.24 |
 | 1.3.5   | 2026-08-10   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.24`          | Release aus der Forgejo-UI, Undertow-Pin entfernt, Loki-Appender deprecated |
-| 1.3.6   | *unreleased* | **4.18.4** | **4.4.12** | `linuxserver/baseimage-alpine:3.24`      | **Security:** Karaf-CVEs vom 2026-09-28, Camel-CVEs bis 4.18.4; Fradi/Siddhi und Loki-Appender entfernt; Groovy-Dateien als Bundles |
+| 1.3.6   | *unreleased* | **4.18.4** | **4.4.12** | `linuxserver/baseimage-alpine:3.24`      | **Security:** Karaf-CVEs vom 2026-09-28, Camel-CVEs bis 4.18.4; Fradi/Siddhi, jedis-/graphsource, Loki-Appender entfernt; Groovy-Dateien als Bundles |
 
 Quelle Camel/Karaf-Spalte: `git show <tag>:pom.xml` (`<camel.version>` / `<karaf.version>`).
 Quelle Tag-Daten: `git log -1 --format=%ci <tag>`.
@@ -298,6 +299,13 @@ Jedis 7.5.0→7.5.2, OTel-SDK-extension-autoconfigure 1.61.0→1.63.0, Agrona 1.
   Ein `deploy/features.xml` mit `<feature>fradi</feature>` lässt sich auf 1.3.6 **nicht mehr
   auflösen** → das ganze Service-Feature bleibt uninstalliert. Quelle: `CHANGELOG.md` 1.3.6
   „Removals"; Commit `7ba0551`.
+- **`jedissource` und `graphsource` entfernt**: Module, Karaf-Features (`jedissource`, `graphsource`)
+  und die Abhängigkeiten `jedis`, `janusgraph-driver`, `gremlin-*`, `commons-configuration2`.
+  `rahla.jedissource-*.cfg` / `rahla.graphsource-*.cfg` erzeugen keinen Service mehr; ein
+  `<reference interface="rahla.jedissource.JedisSource" …>` bzw. `rahla.graphsource.GraphSource`
+  löst nie auf → der Blueprint-Kontext hängt in `GracePeriod` und stirbt nach ~5 min. **Ersatz:**
+  Client als Groovy-Bean im Deploy-Verzeichnis, Bibliothek per `features.xml` — siehe die Rezepte
+  „Redis ohne JedisSource" und „GraphSource per Groovy-Bean" unten. Quelle: `CHANGELOG.md` 1.3.6.
 - **Loki-Appender entfernt** (deprecated seit 1.3.5): Modul `loki-appender`, das Bundle im
   `rahla-logging`-Feature, die `pl.tkowalcz.tjahzi`-Abhängigkeiten und der (auskommentierte)
   `<Loki>`-Block samt `packages="pl.tkowalcz.tjahzi.log4j2"` und `rahla.log.loki.*`-Properties in

@@ -28,8 +28,6 @@ Current release ships **Karaf 4.4.12 + Camel 4.18.4** on JDK 21.
 * **Dynamic deployment** — monitors `/config/deploy` and loads resources on the fly.
 * **Groovy bean factory** — compile Groovy processors/beans into Camel routes at runtime.
 * **Camel route templates** — define reusable templates in YAML.
-* **GraphSource** — pooled Gremlin/TinkerPop client (e.g. JanusGraph) as an OSGi service.
-* **JedisSource** — pooled Redis (Jedis) client as an OSGi service *(deprecated)*.
 * **Monitoring** — Prometheus JMX Exporter and OpenTelemetry agent built in.
 * **Air-gapped images** — bake a project's full dependency closure into the image; no startup downloads.
 * **Easy CA certs** — drop PEM/`.crt` into `/config/certs`; they're imported into the JVM truststore on start.
@@ -170,58 +168,14 @@ routes:
 The Camel context must define a matching `<routeTemplate id="my-route-template">`; the YAML supplies
 the parameter values.
 
-### GraphSource (Gremlin / JanusGraph)
+### Redis and JanusGraph clients
 
-Each `rahla.graphsource-<name>.cfg` publishes a `rahla.graphsource.GraphSource` service, filterable by name:
-
-```ini
-hosts=janusgraph
-port=8182
-graphSourceName=aGraphSource
-graphTraversalSourceName=graph_traversal
-serializer=org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1
-serializerConfig={"ioRegistries": ["org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry"]}
-```
-
-```xml
-<reference id="myGraph" interface="rahla.graphsource.GraphSource" filter="(graphSourceName=aGraphSource)"/>
-```
-
-```java
-public interface GraphSource<T, V> {
-  List<String> getHosts();
-  String getUser();
-  V getClient();                 // Gremlin client
-  T getGraphTraversalSource();   // g
-}
-```
-
-### JedisSource (Redis) *(deprecated)*
-
-> The `JedisSource` interface is marked `@Deprecated`. Still functional, but avoid for new work.
-
-Each `rahla.jedissource-<name>.cfg` publishes a pooled `rahla.jedissource.JedisSource`:
-
-```ini
-host=redis
-port=6379
-db=0
-jedisSourceName=myJedisSource
-```
-
-```xml
-<reference id="myRedis" interface="rahla.jedissource.JedisSource" filter="(jedisSourceName=myJedisSource)"/>
-```
-
-```java
-package rahla.jedissource;
-
-@Deprecated
-public interface JedisSource {
-  Jedis getResource();
-  void returnResource(Jedis jedis);
-}
-```
+The `jedissource` (`JedisSource`) and `graphsource` (`GraphSource`) bundles were removed in 1.3.6.
+Bring the client yourself: a `features.xml` installs the library, a Groovy class in the deploy
+directory builds the client from a `.cfg`, and Blueprint wires it as a `<bean class>`. Two tested
+recipes with runnable examples: [`examples/redis/`](examples/redis/) (Jedis) and
+[`examples/janusgraph/`](examples/janusgraph/) (TinkerPop driver + JanusGraph serializers); the
+migration steps are in [`migration.md`](migration.md) (1.3.6).
 
 ## HTTP / REST
 
@@ -241,7 +195,7 @@ Pax-Web HTTP feature at a time.
 For dev you just mount `deploy/`. For an **air-gapped** image (no downloads at startup) you bake the
 whole dependency closure in by letting the *real Karaf* install it once at build time, then shipping
 its caches. No KAR, no closure resolver, no stubs — Karaf resolves everything itself, including
-`wrap:` bundles and rahla's own features (`graphsource`, …).
+`wrap:` bundles and rahla's own features.
 
 How it works:
 

@@ -88,21 +88,7 @@
     </dependency>
 
 
-    <dependency>
-      <artifactId>graphsource</artifactId>
-      <classifier>features</classifier>
-      <groupId>rahla.feature</groupId>
-      <scope>runtime</scope>
-      <type>xml</type>
-    </dependency>
 
-    <dependency>
-      <artifactId>jedissource</artifactId>
-      <classifier>features</classifier>
-      <groupId>rahla.feature</groupId>
-      <scope>runtime</scope>
-      <type>xml</type>
-    </dependency>
     <dependency>
       <artifactId>camel-route-templates</artifactId>
       <classifier>features</classifier>
@@ -155,8 +141,6 @@
             <feature>rahla</feature>
           </bootFeatures>
           <installedFeatures>
-            <feature>graphsource</feature>
-            <feature>jedissource</feature>
             <feature>camel-route-templates</feature>
           </installedFeatures>
           <libraries>

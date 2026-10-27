@@ -137,15 +137,8 @@ If you bring in Jetty (via `camel-jetty` or `pax-web-http-jetty`), pin a fixed v
 Several Rahla components publish their service per-`.cfg`-file and tag it with a name property — you reference them by interface plus a filter on that name:
 
 ```xml
-<reference id="myGraph" interface="rahla.graphsource.GraphSource"
-           filter="(graphSourceName=aGraphSource)"/>
-
 <reference id="myDS" interface="javax.sql.DataSource"
            filter="(dataSourceName=my-oracle)"/>
-
-<!-- deprecated since 1.3.1 — existing consumers only, no new work -->
-<reference id="myRedis" interface="rahla.jedissource.JedisSource"
-           filter="(jedisSourceName=myJedisSource)"/>
 ```
 
 The filter value must match a property set in the corresponding `.cfg` file (see [OSGi config files](#osgi-config-files-cfg) below). When `<reference>` blocks fail to satisfy, Blueprint will park the entire context in `GraceTimeoutException` and tear it down after ~5 minutes — `karaf@root()> bundle:list -s` will show your bundle as `Waiting`.
@@ -307,35 +300,11 @@ Groovy compilation errors are thrown out of `createBean` and bubble up as a `Run
 Filenames map to OSGi PIDs:
 
 - `<pid>.cfg` → singleton config for PID `<pid>`
-- `<pid>-<name>.cfg` → factory config for `<pid>`, instance name = `<name>`. The instance name is **not** automatically a service property; if the bundle treats configs as factories (graphsource, jedissource), it usually publishes one service per instance and exposes a name property you wrote inside the file.
+- `<pid>-<name>.cfg` → factory config for `<pid>`, instance name = `<name>`. The instance name is **not** automatically a service property; if a bundle treats configs as factories (pax-jdbc datasources, for example), it usually publishes one service per instance and exposes a name property you wrote inside the file.
 
-### Example: GraphSource (Gremlin / JanusGraph)
+### Redis / JanusGraph clients (JedisSource / GraphSource removed in 1.3.6)
 
-`rahla.graphsource-aGraphSource.cfg`:
-
-```ini
-hosts=janusgraph
-port=8182
-user=
-pass=
-graphSourceName=aGraphSource
-graphTraversalSourceName=graph_traversal
-serializer=org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1
-serializerConfig={"ioRegistries": ["org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry"]}
-```
-
-### Example: JedisSource (Redis) — deprecated
-
-**`JedisSource` is `@Deprecated` since Rahla 1.3.1 (EOL).** Don't build new integrations on it; the rahla repo names no drop-in successor, so for new Redis work bring your own client (Camel component or wrapped library) via `features.xml`. For maintaining an existing consumer, `rahla.jedissource-myJedisSource.cfg`:
-
-```ini
-host=redis
-port=6379
-db=0
-user=
-pass=
-jedisSourceName=myJedisSource
-```
+The `rahla.jedissource-*.cfg` / `rahla.graphsource-*.cfg` services no longer exist. Build the client in a Groovy class in the deploy dir, feed it from a `.cfg` via `cm:property-placeholder`, and wire it as `<bean class="…" init-method destroy-method>`; the library comes in via `features.xml`. Tested recipes: `examples/redis/` and `examples/janusgraph/` in the rahla repo, steps in `migration.md` (1.3.6).
 
 ### Example: pax-jdbc datasource
 
@@ -432,7 +401,7 @@ Useful from the karaf shell:
 | `bundle:diag <id>` | Why the bundle is stuck. Lists missing capabilities / services. |
 | `scr:list` | Declarative-services components and whether they're SATISFIED / UNSATISFIED. |
 | `scr:info <name>` | What references a component is waiting on. |
-| `config:list "(service.pid=rahla.graphsource)"` | Inspect a factory PID's instances. |
+| `config:list "(service.factoryPid=org.ops4j.datasource)"` | Inspect a factory PID's instances. |
 | `camel:context-list` | All Camel contexts loaded from XML. |
 | `camel:route-list` | Per-context route status. |
 | `log:logs -n 200 -l ERROR` | Last 200 ERROR-level log entries (Rahla's own pretty `log:logs` — see `rahla/commands/ShowCommand.java`). |
@@ -445,7 +414,7 @@ When a Blueprint context refuses to start, `bundle:diag` on the relevant bundle 
 - **`resource:file:` and `resource:deploy:` prefixes** — deprecated. Use real URLs (`file://`, `http://`).
 - **`RAHLA_DEPLOY_PATH`** — removed in 1.3. Add a `org.apache.felix.fileinstall-<name>.cfg` instead if a second watch directory is needed.
 - **Unpinned Jetty.** Jetty is still usable on Rahla 1.3+ (it's just no longer the boot default), but the version that comes with Karaf 4.4.x's `pax-web-http-jetty` has a known zero-day — pin a fixed version via `<blacklistedBundles>` or a feature override before relying on it.
-- **New `JedisSource` consumers** — `JedisSource`/`JedisServiceImpl` are `@Deprecated` since 1.3.1 (EOL). Maintain existing ones; don't add new ones.
+- **`JedisSource` / `GraphSource`** — removed in 1.3.6; `<reference interface="rahla.jedissource.JedisSource">` / `rahla.graphsource.GraphSource` never resolves. Use the Groovy-bean recipes (`examples/redis/`, `examples/janusgraph/`).
 - **KAR-based offline packaging** — removed in 1.3.3. Air-gapped images use the boot-once cache-priming pattern (see above).
 - **Fradi / Siddhi (`*.siddhi` files, `<bean class="rahla.components.fradi.FradiComponent"/>`)** — removed in 1.3.6. A `*.siddhi` file in `/config/deploy` is no longer loaded and a `FradiComponent` bean fails to resolve; migrate to `camel-mybatis`, `camel-stream`, or another supported Camel component.
 - **Karaf-bundled Groovy** — the assembly blacklists `org.apache.groovy/groovy/[4,5)` and ships its own embedded Groovy 4 inside the `rahla` bundle. Do not declare a separate Groovy feature; if a feature pulls one in, add it to `<blacklistedBundles>` in `assembly/pom.xml`.
