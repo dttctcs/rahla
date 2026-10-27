@@ -1,5 +1,9 @@
 # 1.3.7 (unreleased)
 
+### Improvements
+
+* README/skill: how to keep Groovy classes in a deploy subdirectory — a dedicated `org.apache.felix.fileinstall-<name>.cfg` for that folder (filter `.*\\.groovy`), optionally `subdir.mode=skip` on the parent. Documented why `subdir.mode=recurse` is not the default and should not be used: XML/features bundles are named after the file, so same-named files in two folders replace each other (tested: a sub-`features.xml` replaced the top-level one and uninstalled Camel); and that fileinstall's default `subdir.mode=jar` installs each subdirectory as a useless exploded-jar bundle
+
 ### Bug Fixes
 
 * `GroovyBundleDeployer`: a Blueprint XML that landed in an earlier fileinstall scan than the Groovy classes it uses could stay `INSTALLED` for good. Placeholder bundles are recompiled asynchronously; when that happened while fileinstall's scan was still running, the scan cleared its "state changed" flag afterwards and never retried the XML (only a `touch` helped). After recompiling placeholders the deployer now resolves and starts every bundle that is `INSTALLED`, persistently started, within the start level and not a fragment or placeholder. The gap came with the deployer in 1.3.6; `GroovyBeanFactory` XMLs only waited for an OSGi service and were not affected
