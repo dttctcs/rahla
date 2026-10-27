@@ -27,7 +27,7 @@ jedissource/graphsource, Loki-Appender.
 | 1.3.3   | 2026-06-10   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.23`          | Cert-Import-Service, pax-url-Repo nach `/config/.m2` gepinnt, KAR-Offline-Packaging entfernt |
 | 1.3.4   | 2026-07-06   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.24`          | Forgejo-CI, GitHub-Mirror-Releases, Base-Image 3.23 → 3.24 |
 | 1.3.5   | 2026-08-10   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.24`          | Release aus der Forgejo-UI, Undertow-Pin entfernt, Loki-Appender deprecated |
-| 1.3.6   | *unreleased* | **4.18.4** | **4.4.12** | `linuxserver/baseimage-alpine:3.24`      | **Security:** Karaf-CVEs vom 2026-09-28, Camel-CVEs bis 4.18.4; Fradi/Siddhi, jedis-/graphsource, Loki-Appender entfernt; Groovy-Dateien als Bundles |
+| 1.3.6   | 2026-10-27   | **4.18.4** | **4.4.12** | `linuxserver/baseimage-alpine:3.24`      | **Security:** Karaf-CVEs vom 2026-09-28, Camel-CVEs bis 4.18.4; Fradi/Siddhi, jedis-/graphsource, Loki-Appender entfernt; Groovy-Dateien als Bundles |
 
 Quelle Camel/Karaf-Spalte: `git show <tag>:pom.xml` (`<camel.version>` / `<karaf.version>`).
 Quelle Tag-Daten: `git log -1 --format=%ci <tag>`.
@@ -291,7 +291,7 @@ Jedis 7.5.0→7.5.2, OTel-SDK-extension-autoconfigure 1.61.0→1.63.0, Agrona 1.
 > darüber liegt jetzt `# 1.3.4 (unreleased)` mit den ersten Renovate-Bumps (Jedis `7.5.2 > 7.5.3`,
 > Log4j2 `2.26.0 > 2.26.1` — Build + lokaler Karaf-Boot verifiziert).
 
-### 1.3.6 (unreleased) — Security: Karaf 4.4.12 + Camel 4.18.4, Fradi/Siddhi entfernt
+### 1.3.6 (2026-10-27) — Security: Karaf 4.4.12 + Camel 4.18.4, Fradi/Siddhi entfernt
 
 **Breaking Changes**
 - **Fradi/Siddhi entfernt** (Modul, Karaf-Feature `fradi`, alle `io.siddhi`-Deps; `*.siddhi` im
@@ -461,7 +461,7 @@ und antwortet (`pong camel=4.18.4`). Zusätzlich löst die Feature-Union der FLT
 | 1.3.2       | 4.18.1 |
 | 1.3.3       | 4.18.2 |
 | 1.3.4–1.3.5 | 4.18.2 |
-| 1.3.6 (unreleased) | 4.18.4 |
+| 1.3.6 (2026-10-27) | 4.18.4 |
 
 - Innerhalb 4.10.x (`4.10.3 → 4.10.7`, in 1.2.4): reiner Patch-Bump.
 - **Der relevante Sprung ist 4.10.7 → 4.18.1 in 1.3.1** (sieben Minor-Versionen auf einmal,
