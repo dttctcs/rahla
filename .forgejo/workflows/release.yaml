@@ -115,6 +115,11 @@ jobs:
           # matches the noreply domain Forgejo already uses for merge commits
           git config --global user.email "${ACTOR}@noreply.datatactics.de"
           git config --global --add safe.directory "$PWD"
+          # release:prepare pushes to the pom's <developerConnection>
+          # (https://repo.datatactics.dev/...), but the credentials above are
+          # stored for SERVER_URL. Without this rewrite: "could not read
+          # Username for 'https://repo.datatactics.dev'" (run 139, 2026-10-27).
+          git config --global url."${SERVER_URL}/".insteadOf "https://repo.datatactics.dev/"
 
       # Mirrors what was done by hand until now, e.g. cfc0729 "docs: finalize
       # 1.3.4 changelog (date 2026-07-06)" sitting right before the release
