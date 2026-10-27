@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  Camel is NOT preinstalled in Rahla. This features repository installs everything the routes in
+  routes.xml need. install="auto" makes the FeaturesService install it as soon as the file appears.
+-->
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="example-runtime">
+  <feature name="example" install="auto">
+    <feature>camel-blueprint</feature>   <!-- the Camel runtime + Blueprint XML support -->
+    <feature>camel-jetty</feature>       <!-- for the REST endpoint below (not camel-undertow: it rewires pax-web, see CHANGELOG 1.3.6) -->
+    <feature>camel-jackson</feature>     <!-- JSON marshalling -->
+  </feature>
+</features>

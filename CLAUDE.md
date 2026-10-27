@@ -27,7 +27,7 @@ won't exist at runtime.
 
 ## Build commands
 
-JDK 21 is required (matches the CI workflow and `maven-compiler-plugin` source/target). The reactor has no tests, so the standard build is just `package`:
+JDK 21 is required (matches the CI workflow and `maven-compiler-plugin` source/target). Only the `rahla` module has unit tests (JUnit 5 via surefire, run automatically in `package`; `mvn -pl rahla test` runs just those). The standard build is `package`:
 
 ```sh
 mvn --batch-mode --update-snapshots clean package
@@ -74,7 +74,7 @@ Logs land in `assembly/target/assembly/data/log/karaf.log`. Note this layout dif
 
 The root `pom.xml` is `<packaging>pom</packaging>` and lists modules in `<modules>`. Each bundle module has a sibling `features/<name>` module that emits a Karaf feature XML referencing it.
 
-- **`rahla/`** — main OSGi bundle. Embeds Groovy 4 (private-packaged + exported, since Karaf's stock Groovy is blacklisted in the assembly) and provides `rahla.api.GroovyBeanFactory` (compiles a Groovy class from any URL into a bean usable from a Camel context). Also contributes a Karaf shell command (`log:logs`, see `rahla/commands/ShowCommand.java`).
+- **`rahla/`** — main OSGi bundle. Groovy 4 is **not** embedded any more (that was the shaded-jar era; a stale `META-INF/groovy/…ExtensionModule` descriptor named `groovy-multi` still lives in `rahla/src/main/resources` and only causes warnings on flat classpaths) — the `groovy-*` jars ship as separate bundles via the `features/rahla` feature, Karaf's stock Groovy is blacklisted in the assembly, and the rahla bundle reaches them through `DynamicImport-Package: *`. Provides `rahla.api.GroovyBeanFactory` (legacy: compiles a Groovy class from any URL into a bean, in-memory, one shared `GroovyClassLoader`) and `rahla.groovy.GroovyBundleDeployer` (1.3.6: fileinstall `ArtifactUrlTransformer` + `rahla-groovy:` URL handler that turns every `*.groovy` in deploy into a bundle `rahla.groovy.<file>`; the pure compile-to-jar step is `GroovyBundleBuilder`, covered by unit tests). Also contributes a Karaf shell command (`log:logs`, see `rahla/commands/ShowCommand.java`).
 - **`graphsource/`** — OSGi component, factory PID `rahla.graphsource`. Each `rahla.graphsource-<name>.cfg` becomes a `rahla.graphsource.GraphSource` service (TinkerPop/Gremlin client + GraphTraversalSource), filterable by `graphSourceName`.
 - **`jedissource/`** — OSGi component, factory PID `rahla.jedissource`. Each `rahla.jedissource-<name>.cfg` becomes a `rahla.jedissource.JedisSource` service (pooled Jedis), filterable by `jedisSourceName`.
 - **`camel-osgi-route-templates/`** — implements `org.apache.felix.fileinstall.ArtifactInstaller` to translate route-template YAML files dropped in `/config/deploy` into `camel.route.template` factory configurations (see `TemplateFileInstaller.java`). YAML schema: `templateId`, `sharedConfigPid` (optional), `routes[].id`, `routes[].parameters` (a flat map of template parameters).

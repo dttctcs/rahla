@@ -32,7 +32,7 @@ Rahla's `org.apache.felix.fileinstall` configuration polls one directory and dis
 | File ext | What happens when it lands |
 |----------|----------------------------|
 | `*.xml`  | Loaded as a **Camel Blueprint context** (routes, REST, beans, OSGi `<reference>`s) |
-| `*.groovy` | Compiled at runtime, available as a bean via `rahla.api.GroovyBeanFactory` |
+| `*.groovy` | Compiled into an OSGi bundle `rahla.groovy.<file>` (Rahla ≥ 1.3.6, classes usable as `<bean class="…"/>`); legacy: referenced by URL via `rahla.api.GroovyBeanFactory` |
 | `*.cfg`  | Registered as an **OSGi configuration** (factory PIDs split on the `-` in the filename) |
 | `*.yaml` | If it parses as a Rahla route-template doc, becomes Camel route templates via `TemplateFileInstaller` |
 | `*.jar`  | Installed as an OSGi bundle |
@@ -113,8 +113,8 @@ A typical Rahla Blueprint XML has four parts: namespace declaration, OSGi servic
         <restConfiguration component="undertow" port="8183" contextPath="/my-app" enableCORS="true"/>
 
         <rest>
-            <post uri="/push"><to uri="direct:in"/></post>
-            <get  uri="/health"><to uri="direct:health"/></get>
+            <post path="/push"><to uri="direct:in"/></post>
+            <get  path="/health"><to uri="direct:health"/></get>
         </rest>
 
         <route id="in">
@@ -255,6 +255,24 @@ class MyProcessor implements Processor {
     }
 }
 ```
+
+### Groovy files as bundles (Rahla ≥ 1.3.6)
+
+Every `*.groovy` directly in a watched deploy dir is additionally compiled into a real OSGi bundle (`rahla.groovy.GroovyBundleDeployer`). Prefer this for new work: no factory bean, and editing the `.groovy` hot-reloads the class.
+
+```xml
+<bean id="MyProcessor" class="processors.MyProcessor"/>   <!-- no <reference> to the factory needed -->
+```
+
+Rules of thumb:
+
+* The class **must declare a package** — default-package classes cannot be exported, so the XML cannot see them. Rahla rejects such a file at deploy time with an explicit message rather than installing an unusable bundle.
+* **Several classes per file are fine.** Groovy allows one `package` per file, so they share it and all land in the same bundle; the *file* name decides the bundle name, not the class names.
+* One file = one bundle `rahla.groovy.<filename>`; `bundle:list -s` shows it, `bundle:headers` shows `Rahla-Groovy-Source`. Version qualifier = hash of the source.
+* Editing the file → `bundle.update()` → every Blueprint context using the class restarts (Camel routes included). Deleting the file uninstalls the bundle; the XML then parks in `GracePeriod` until the class returns.
+* **Missing packages are not an error.** If the source imports something the runtime does not provide yet (Camel still installing, feature missing), a class-less *placeholder* bundle with `Import-Package` on those packages is installed; `bundle:list` shows it `Installed`, `bundle:headers` says `Rahla-Groovy-Status: unresolved`, `bundle:diag` names the package. Once the package appears the deployer recompiles in place (log: `Packages [...] are available now, compiling ...`). So deploy order between `features.xml`, `.groovy` and `.xml` does not matter.
+* Real compile errors (syntax, a class name that is nowhere imported) land once per revision in the log (`Compilation of MyProcessor.groovy failed: … @ line N`) and no bundle is installed. Fix the file, fileinstall retries on the next checksum change.
+* Files in **subdirectories** (`deploy/processors/…`) are not picked up by fileinstall as artifacts (default `subdir.mode`), so existing factory-loaded processors in subfolders are untouched. A `.groovy` directly in `deploy/` that is also referenced via `createBean` simply exists twice: once as bundle class, once as factory-compiled class.
 
 ### How `createBean` instantiates the class
 

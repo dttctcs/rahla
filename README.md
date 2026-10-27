@@ -76,7 +76,7 @@ Rahla dispatches each file in `/config/deploy` by extension:
 | File         | What happens |
 |--------------|--------------|
 | `*.xml`      | loaded as a **Camel Blueprint context** (routes, REST, beans, OSGi `<reference>`s) |
-| `*.groovy`   | compiled at runtime via `rahla.api.GroovyBeanFactory` (referenced by URL from an XML) |
+| `*.groovy`   | compiled into an **OSGi bundle** `rahla.groovy.<name>` (classes usable as `<bean class="…"/>`); legacy: referenced by URL via `rahla.api.GroovyBeanFactory` |
 | `*.cfg`      | registered as an **OSGi configuration** (factory PIDs split on the `-` in the filename) |
 | `*.yaml`     | turned into **Camel route templates** by `TemplateFileInstaller` |
 | `*.jar`      | installed as an **OSGi bundle** |
@@ -105,6 +105,53 @@ Compile a Groovy class from any URL into a Camel `Processor`/bean at runtime —
 
 `createBean` tries a constructor taking `org.osgi.framework.BundleContext`, then a no-arg one. Use a
 real URL (`file://`, `http://`); the old `resource:` prefix is deprecated.
+
+### Groovy files as bundles
+
+Since 1.3.6 every `*.groovy` dropped into `/config/deploy` is also compiled into a real OSGi bundle
+(`rahla.groovy.GroovyBundleDeployer`, a fileinstall `ArtifactUrlTransformer` plus `rahla-groovy:` URL
+handler, the same mechanism Karaf's blueprint deployer uses). The classes then need no factory:
+
+```groovy
+// /config/deploy/MyProcessor.groovy — declare a package, default-package classes cannot be exported
+package processors
+
+import org.apache.camel.Exchange
+import org.apache.camel.Processor
+
+class MyProcessor implements Processor {
+  void process(Exchange exchange) throws Exception { exchange.message.setHeader('seen', true) }
+}
+```
+
+```xml
+<bean id="myProcessor" class="processors.MyProcessor"/>
+```
+
+What you get, compared to the factory:
+
+* `bundle:list` shows `rahla.groovy.MyProcessor`; the version qualifier is a hash of the source, so
+  you can see which revision is live. `bundle:headers` shows `Rahla-Groovy-Source`.
+* Editing the file updates the bundle and restarts the Blueprint contexts that use it — no need to
+  touch the XML. Deleting the file uninstalls the bundle.
+* The bundle exports its packages and dynamically imports everything else, so the code sees the same
+  Camel/Groovy/Jackson packages the factory-compiled classes do.
+* Deploy order does not matter. If the source imports packages that are not in the runtime yet
+  (Camel still installing, a feature missing), a class-less **placeholder** bundle with an
+  `Import-Package` on those packages is installed instead; it shows up as `Installed` and
+  `bundle:diag` names the missing package. As soon as the packages appear the deployer recompiles
+  the source in place. Everything else (syntax errors, typos in class names) is a hard error, logged
+  once with file name and line, and retried only when the file changes.
+
+One file may hold several classes — they share the file's `package` and all land in the same bundle.
+A package declaration is required; classes in the default package cannot be exported and are refused
+at deploy time with an explicit message.
+
+A complete, runnable example (features + multi-class Groovy + REST routes, no Docker) lives in
+[`examples/local/`](examples/local/).
+
+The factory path is unchanged: an XML that references the same file via `createBean` keeps working
+(it compiles its own copy of the class, so the two do not share static state).
 
 ### Camel route templates
 

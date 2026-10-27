@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <!--
+    The classes come from the bundle Rahla built out of Toolbox.groovy. No factory and no OSGi
+    <reference>: a plain class name, exactly like a class from any other bundle.
+  -->
+  <bean id="validator"  class="example.Validator"/>
+  <bean id="enricher"   class="example.Enricher"/>
+  <bean id="summarizer" class="example.Summarizer"/>
+  <bean id="orders"     class="example.Orders"/>
+
+  <camelContext id="example" xmlns="http://camel.apache.org/schema/blueprint">
+
+    <!--
+      Schema order matters: onException has to come before restConfiguration/rest/route.
+      Without it a failing Processor answers HTTP 500 with a raw Java stack trace.
+      skipBindingOnErrorCode defaults to true, so the string body below is returned as-is.
+    -->
+    <onException>
+      <exception>java.lang.IllegalArgumentException</exception>
+      <handled><constant>true</constant></handled>
+      <setHeader name="CamelHttpResponseCode"><constant>400</constant></setHeader>
+      <setHeader name="Content-Type"><constant>application/json</constant></setHeader>
+      <transform><simple>{"error": "${exception.message}"}</simple></transform>
+    </onException>
+
+    <restConfiguration component="jetty" port="8283" contextPath="/example" bindingMode="json"/>
+
+    <rest>
+      <!-- curl -s localhost:8283/example/orders -->
+      <get path="/orders"><to uri="direct:sample"/></get>
+      <!--
+        curl -s -XPOST localhost:8283/example/orders -H 'Content-Type: application/json' \
+             -d '{"id":"B-2","items":[{"price":1.50,"qty":4}]}'
+      -->
+      <post path="/orders"><to uri="direct:handle"/></post>
+    </rest>
+
+    <route id="sample">
+      <from uri="direct:sample"/>
+      <bean ref="orders" method="sample"/>
+      <process ref="validator"/>
+      <process ref="enricher"/>
+      <process ref="summarizer"/>
+    </route>
+
+    <route id="handle">
+      <from uri="direct:handle"/>
+      <process ref="validator"/>
+      <process ref="enricher"/>
+      <process ref="summarizer"/>
+    </route>
+
+    <!-- Proof that it lives: one line every 10s, no HTTP needed. -->
+    <route id="heartbeat">
+      <from uri="timer:heartbeat?period=10000"/>
+      <bean ref="orders" method="sample"/>
+      <process ref="validator"/>
+      <process ref="enricher"/>
+      <log message="heartbeat: order=${header.orderId} total=${header.total} by=${header.enrichedBy}"/>
+    </route>
+
+  </camelContext>
+</blueprint>
