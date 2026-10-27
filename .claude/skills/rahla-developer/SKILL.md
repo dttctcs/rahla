@@ -125,9 +125,11 @@ A typical Rahla Blueprint XML has four parts: namespace declaration, OSGi servic
 </blueprint>
 ```
 
-### REST components: `undertow` is the default, `jetty` still works
+### REST components: `jetty` (recommended) or `undertow`
 
 Since Rahla 1.3 the boot HTTP runtime is `pax-web-http-undertow` (serving the OSGi/Pax-Web port **8181**), and `<restConfiguration component="undertow" .../>` is the default choice. The Camel REST components (`camel-undertow`, `camel-jetty`) run their own listener on the port you configure — pick a service-specific port (commonly **8183**) so it doesn't clash with 8181. `component="jetty"` still works fine on Rahla 1.3+ when you install the `camel-jetty` feature via your deploy `features.xml` (this is what the FLT fuel-service runs); the pax-web boot feature being Undertow doesn't prevent that.
+
+**Prefer `camel-jetty` for Camel REST endpoints (1.3.6 known issue):** installing `camel-undertow` (Camel 4, jakarta, Undertow 2.3.x) makes the feature refresh rewire pax-web's Undertow (2.2.x, javax) to 2.3 — port 8181/Jolokia then answers 404 and Karaf logs `Default404Servlet does not implement jakarta.servlet.Servlet`; the Camel routes themselves keep working.
 
 If you bring in Jetty (via `camel-jetty` or `pax-web-http-jetty`), pin a fixed version via `<blacklistedBundles>` (or a feature override) — the Jetty version transitively pulled on Karaf 4.4.x has known CVEs. Run only one Pax-Web HTTP feature at a time.
 

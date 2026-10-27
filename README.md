@@ -190,8 +190,13 @@ The boot HTTP runtime is **Undertow** (`pax-web-http-undertow`); the OSGi/Pax-We
 ```
 
 Jetty is **not** the default. `camel-jetty` / `pax-web-http-jetty` still work, but the Jetty version
-pulled by Karaf 4.4.x has known CVEs — pin a fixed version (or just stay on Undertow). Run one
-Pax-Web HTTP feature at a time.
+pulled by Karaf 4.4.x has known CVEs — pin a fixed version. Run one Pax-Web HTTP feature at a time.
+
+> **Known issue (1.3.6):** `camel-undertow` (Camel 4, jakarta) brings Undertow 2.3.x next to pax-web's
+> 2.2.x; installing it rewires pax-web to 2.3 and breaks port 8181 (Jolokia answers 404,
+> `Default404Servlet does not implement jakarta.servlet.Servlet`). Camel routes keep working. For a
+> Camel REST endpoint prefer `camel-jetty` (`<restConfiguration component="jetty" …/>`); all examples
+> in `examples/` do.
 
 ## Air-gapped / offline images
 

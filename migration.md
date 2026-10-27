@@ -341,6 +341,68 @@ Jedis 7.5.0→7.5.2, OTel-SDK-extension-autoconfigure 1.61.0→1.63.0, Agrona 1.
   `FrameworkUtil.getBundle(getClass()).getBundleContext()`. Achtung: Eine Bundle-Bean-Klasse hat einen
   eigenen Classloader — `static`-Zustand wird nicht mit einer per Factory kompilierten Kopie geteilt.
 
+#### Rezept: Redis ohne JedisSource
+
+Lauffähiges Beispiel: [`examples/redis/`](examples/redis/) (getestet gegen Valkey 8 im Container).
+
+1. **Bibliothek per `features.xml`.** Jedis ist ein echtes OSGi-Bundle, braucht aber seine
+   Laufzeit-Deps daneben: `commons-pool2` (≥ 2.12), `gson` (≥ 2.13), `org.json` (exakt die
+   Version aus dem Jedis-Manifest, bei 7.5.3 `20251224`) und `redis-authx-core` (0.1.x).
+   `dependency="true"` für commons-pool2/gson, damit eine schon vorhandene Version (Camel)
+   wiederverwendet wird. Kein `wrap:` nötig.
+2. **Client als Groovy-Klasse** im Deploy-Verzeichnis (`RedisStore.groovy`, mit `package`): Felder
+   für die Config, `start()` baut `redis.clients.jedis.RedisClient` (Jedis-7-Nachfolger von
+   `JedisPooled`, gepoolt), `close()` schließt ihn.
+3. **Config aus `.cfg`** per `cm:property-placeholder persistent-id="…"` mit
+   `placeholder-prefix="$["` / `placeholder-suffix="]"` (sonst kollidiert `${…}` mit Camels
+   `${header.x}` in derselben Datei); `update-strategy="reload"` baut den Kontext bei Änderung neu.
+4. **Bean statt Reference:** `<bean id="myRedis" class="…RedisStore" init-method="start"
+   destroy-method="close">` mit `<property>`s ersetzt `<reference interface="rahla.jedissource.JedisSource"
+   filter="(jedisSourceName=…)"/>`. Aufrufer: statt `getResource()`/`returnResource()` direkt
+   `myRedis.client.get(k)` — `RedisClient` leiht/gibt Pool-Verbindungen selbst zurück.
+5. Config-Keys alt → neu: `db` → `database`, `pass` → `password`, `jedisSourceName` entfällt.
+
+Verifiziert: alle Bundles `Active`; `.cfg`-Änderung (`database=1`) wirkt nach Reload; Redis weg →
+HTTP 500, Kontext bleibt oben, danach automatisch wieder ok; Entfernen der XML schließt den Pool
+(`CLIENT LIST` leer).
+
+#### Rezept: GraphSource per Groovy-Bean
+
+Lauffähiges Beispiel: [`examples/janusgraph/`](examples/janusgraph/) (getestet gegen
+`docker.io/janusgraph/janusgraph:1.1.0`, inkl. Edge-Anlage → `RelationIdentifier`, d. h.
+`JanusGraphIoRegistry` greift).
+
+1. **Bibliotheken als ein Classloader.** TinkerPop/JanusGraph-Jars sind keine Bundles und splitten
+   Packages (`org.apache.tinkerpop.gremlin.util` in gremlin-core **und** gremlin-util,
+   `…language.grammar` in gremlin-core **und** gremlin-language); zudem lädt der Driver Serializer
+   und IoRegistry per Klassenname. Das alte graphsource-Bundle hat deshalb alles per `Private-Package`
+   in ein Jar kopiert. Das Rezept macht dasselbe zur Laufzeit nur mit `wrap:`: `gremlin-core` als
+   Host-Bundle `tinkerpop.client`, gremlin-util/-language/-driver/-shaded, janusgraph-driver,
+   javatuples, hppc, noggit als **Fragmente** (`Fragment-Host=tinkerpop.client`). Fragmente
+   exportieren die Split-Packages nicht noch einmal (`Export-Package=!…,org.apache.tinkerpop.*`),
+   Imports sind optional + `DynamicImport-Package=*`, netty auf `[4.1,4.2)` gepinnt (netty 4.1.101 als
+   eigene Bundles, kann neben Camels netty 4.2 laufen). Dazu als normale Bundles: guava +
+   failureaccess, commons-lang3/-text/-configuration2, **commons-collections 3.2.2**, antlr4-runtime,
+   spatial4j, jts-core.
+2. **Client als Groovy-Klasse** (`GraphClient.groovy`): gleiche Keys wie die alte
+   `rahla.graphsource-<name>.cfg` (`hosts`, `port`, `user`, `pass`, `graphTraversalSourceName`,
+   `serializer`; `serializerConfig`-JSON → `ioRegistries` als Komma-Liste, Pool-Größen). Serializer und
+   Registry **über `Cluster.classLoader`** laden, nicht über den eigenen Classloader. `g()` liefert
+   eine Remote-`GraphTraversalSource`, `client` den `Client`.
+3. **Bean statt Reference:** `<bean id="myGraph" class="…GraphClient" init-method="start"
+   destroy-method="close">` ersetzt `<reference interface="rahla.graphsource.GraphSource"
+   filter="(graphSourceName=…)"/>`; `getGraphTraversalSource()` → `g()`, `getClient()` → `client`.
+4. `start()` lässt den Kontext nie scheitern: Host nicht auflösbar/Server down → WARN
+   `Gremlin server … not reachable yet`, Verbindung beim ersten Aufruf. (`GraphSourceImpl` scheiterte
+   in `activate`, Blueprint versucht eine gescheiterte Bean nicht erneut.)
+
+**Was umständlich bleibt:** Optionale Imports verstecken fehlende Jars bis zum Aufruf — die erste
+Fassung lief für `count()`/`addV()` und scheiterte erst bei `g.V(v).addE(…)` an
+`NoClassDefFoundError: org/apache/commons/collections/IteratorUtils`. Nicht enthalten sind u. a.
+`exp4j` (clientseitiges `math()`) und `gremlin-groovy` (Script-Übersetzung) — die eigenen Traversals
+testen. Die Versionsliste ist Handarbeit (`mvn dependency:tree` von `org.janusgraph:janusgraph-driver`);
+TinkerPop muss zur Server-Minor passen (JanusGraph 1.1 → TinkerPop 3.7).
+
 **Stolpersteine**
 - **Camel 4.18.5 ist für Karaf noch nicht verfügbar.** Die Camel-Advisories vom 2026-10-16
   (u. a. CVE-2026-78162 camel-hazelcast, CVE-2026-83531 dynamic-router, CVE-2026-78165

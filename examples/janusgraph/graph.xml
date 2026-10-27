@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
+
+  <!-- $[...] instead of ${...}: keeps Blueprint placeholders apart from Camel's ${header.x} -->
+  <cm:property-placeholder persistent-id="example.graph" update-strategy="reload"
+                           placeholder-prefix="$[" placeholder-suffix="]">
+    <cm:default-properties>
+      <cm:property name="hosts" value="localhost"/>
+      <cm:property name="port" value="8182"/>
+      <cm:property name="user" value=""/>
+      <cm:property name="pass" value=""/>
+      <cm:property name="graphTraversalSourceName" value="g"/>
+      <cm:property name="serializer" value="org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1"/>
+      <cm:property name="ioRegistries" value="org.janusgraph.graphdb.tinkerpop.JanusGraphIoRegistry"/>
+      <cm:property name="minConnectionPoolSize" value="2"/>
+      <cm:property name="maxConnectionPoolSize" value="8"/>
+      <cm:property name="maxWaitForConnection" value="3000"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <!-- example.graph.GraphClient comes from GraphClient.groovy in this directory -->
+  <bean id="graph" class="example.graph.GraphClient" init-method="start" destroy-method="close">
+    <property name="hosts" value="$[hosts]"/>
+    <property name="port" value="$[port]"/>
+    <property name="user" value="$[user]"/>
+    <property name="pass" value="$[pass]"/>
+    <property name="graphTraversalSourceName" value="$[graphTraversalSourceName]"/>
+    <property name="serializer" value="$[serializer]"/>
+    <property name="ioRegistries" value="$[ioRegistries]"/>
+    <property name="minConnectionPoolSize" value="$[minConnectionPoolSize]"/>
+    <property name="maxConnectionPoolSize" value="$[maxConnectionPoolSize]"/>
+    <property name="maxWaitForConnection" value="$[maxWaitForConnection]"/>
+  </bean>
+
+  <camelContext id="graph-example" xmlns="http://camel.apache.org/schema/blueprint">
+    <restConfiguration component="jetty" port="8286" contextPath="/graph" bindingMode="off"/>
+    <rest>
+      <get path="/count"><to uri="direct:count"/></get>
+      <post path="/person/{name}"><to uri="direct:addPerson"/></post>
+      <get path="/person"><to uri="direct:names"/></get>
+      <post path="/knows/{from}/{to}"><to uri="direct:knows"/></post>
+    </rest>
+
+    <route id="graph-count">
+      <from uri="direct:count"/>
+      <setBody><method ref="graph" method="countVertices"/></setBody>
+      <convertBodyTo type="java.lang.String"/>
+    </route>
+    <route id="graph-add">
+      <from uri="direct:addPerson"/>
+      <setBody><method ref="graph" method="addPerson(${header.name})"/></setBody>
+      <convertBodyTo type="java.lang.String"/>
+    </route>
+    <route id="graph-names">
+      <from uri="direct:names"/>
+      <setBody><method ref="graph" method="names"/></setBody>
+      <convertBodyTo type="java.lang.String"/>
+    </route>
+    <route id="graph-knows">
+      <from uri="direct:knows"/>
+      <setBody><method ref="graph" method="connect(${header.from}, ${header.to})"/></setBody>
+    </route>
+  </camelContext>
+</blueprint>
