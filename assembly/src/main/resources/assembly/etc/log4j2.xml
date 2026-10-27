@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--<Configuration packages="pl.tkowalcz.tjahzi.log4j2">-->
-  <Configuration packages="pl.tkowalcz.tjahzi.log4j2">
+<Configuration>
   <Appenders>
     <Console name="Console" direct="${rahla.log.console.direct:-false}">
       <JsonLayout compact="true" eventEol="true" complete="false" properties="true"
@@ -13,25 +12,6 @@
       -->
     </Console>
 
-    <!--
-    <Loki name="Loki" bufferSizeMegabytes="64"
-          host="${rahla.log.loki.host:-localhost}"
-          port="${rahla.log.loki.port:-3100}">
-      <ThresholdFilter level="${rahla.log.loki.level:-OFF}"/>
-      <JsonLayout compact="true"
-                  eventEol="true"
-                  complete="false"
-                  properties="true"
-                  includeStacktrace="true"
-                  stacktraceAsString="true"
-                  objectMessageAsJsonObject="true"/>
-
-      <Label name="app" value="rahla"/>
-      <Label name="log_name" pattern="%c"/>
-
-      <LogLevelLabel>logging_level</LogLevelLabel>
-    </Loki>
-    -->
     <PaxOsgi name="PaxOsgi" filter="*"/>
   </Appenders>
 
@@ -44,7 +24,6 @@
 
     <Logger name="trace" level="TRACE" additivity="false">
       <AppenderRef ref="Console"/>
-      <!--<AppenderRef ref="Loki"/>-->
     </Logger>
 
     <Logger name="org.apache.sshd" level="WARN"/>

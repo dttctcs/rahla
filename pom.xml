@@ -107,11 +107,6 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <artifactId>loki-appender</artifactId>
-                <groupId>rahla</groupId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
                 <artifactId>rahla</artifactId>
                 <classifier>features</classifier>
                 <groupId>rahla.feature</groupId>
@@ -663,24 +658,6 @@
                 <groupId>org.apache.tinkerpop</groupId>
                 <version>${gremlin-groovy.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>pl.tkowalcz.tjahzi</groupId>
-                <artifactId>log4j2-appender-nodep</artifactId>
-                <version>${log4j2-appender-loki.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>pl.tkowalcz.tjahzi</groupId>
-                <artifactId>core</artifactId>
-                <version>${log4j2-appender-loki.version}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.lmax</groupId>
-                <artifactId>disruptor</artifactId>
-                <version>${disruptor.version}</version>
-            </dependency>
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
@@ -698,7 +675,6 @@
 
     <modules>
         <module>rahla</module>
-        <module>loki-appender</module>
         <module>graphsource</module>
         <module>jedissource</module>
         <module>camel-osgi-route-templates</module>
@@ -745,7 +721,6 @@
         <!-- Logging -->
         <pax-logging.version>2.3.5</pax-logging.version>
         <log4j2.version>2.26.1</log4j2.version>
-        <log4j2-appender-loki.version>0.9.43</log4j2-appender-loki.version>
         <stax2-api.version>4.3.2</stax2-api.version>
 
         <!-- Libraries -->
@@ -758,7 +733,6 @@
         <janusgraph-driver.version>1.1.0</janusgraph-driver.version>
         <gremlin-groovy.version>3.8.2</gremlin-groovy.version>
         <jedis.version>7.5.3</jedis.version>
-        <disruptor.version>3.4.4</disruptor.version>
 
         <!-- Observability -->
         <jmx_exporter.version>1.0.1</jmx_exporter.version>

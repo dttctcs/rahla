@@ -449,7 +449,8 @@ When a Blueprint context refuses to start, `bundle:diag` on the relevant bundle 
 - **KAR-based offline packaging** — removed in 1.3.3. Air-gapped images use the boot-once cache-priming pattern (see above).
 - **Fradi / Siddhi (`*.siddhi` files, `<bean class="rahla.components.fradi.FradiComponent"/>`)** — removed in 1.3.6. A `*.siddhi` file in `/config/deploy` is no longer loaded and a `FradiComponent` bean fails to resolve; migrate to `camel-mybatis`, `camel-stream`, or another supported Camel component.
 - **Karaf-bundled Groovy** — the assembly blacklists `org.apache.groovy/groovy/[4,5)` and ships its own embedded Groovy 4 inside the `rahla` bundle. Do not declare a separate Groovy feature; if a feature pulls one in, add it to `<blacklistedBundles>` in `assembly/pom.xml`.
-- **Karaf-bundled pax-logging** — replaced by the `rahla-logging` feature so the Loki appender (`Fragment-Host: pax-logging-log4j2`) loads correctly. Don't re-pin pax-logging from elsewhere.
+- **Karaf-bundled pax-logging** — replaced by the `rahla-logging` feature. Don't re-pin pax-logging from elsewhere.
+- **Loki appender (`<Loki/>`, `rahla.log.loki.*`)** — removed in 1.3.6. Ship logs via the OpenTelemetry logs exporter (`OTEL_LOGS_EXPORTER`) or scrape the JSON console log.
 - **Hardcoded `/rahla/deploy` or `/deploy` paths in container artifacts** — only `/config/deploy` is monitored on 1.3+; the s6 init script warns on the legacy paths.
 
 ## Constraints

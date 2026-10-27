@@ -26,7 +26,7 @@ OSGi-DS statt Blueprint im Rahla-eigenen Code, `rahla.api.GroovyBeanFactory`, Fa
 | 1.3.3   | 2026-06-10   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.23`          | Cert-Import-Service, pax-url-Repo nach `/config/.m2` gepinnt, KAR-Offline-Packaging entfernt |
 | 1.3.4   | 2026-07-06   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.24`          | Forgejo-CI, GitHub-Mirror-Releases, Base-Image 3.23 → 3.24 |
 | 1.3.5   | 2026-08-10   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.24`          | Release aus der Forgejo-UI, Undertow-Pin entfernt, Loki-Appender deprecated |
-| 1.3.6   | *unreleased* | **4.18.4** | **4.4.12** | `linuxserver/baseimage-alpine:3.24`      | **Security:** Karaf-CVEs vom 2026-09-28, Camel-CVEs bis 4.18.4; Fradi/Siddhi entfernt |
+| 1.3.6   | *unreleased* | **4.18.4** | **4.4.12** | `linuxserver/baseimage-alpine:3.24`      | **Security:** Karaf-CVEs vom 2026-09-28, Camel-CVEs bis 4.18.4; Fradi/Siddhi und Loki-Appender entfernt; Groovy-Dateien als Bundles |
 
 Quelle Camel/Karaf-Spalte: `git show <tag>:pom.xml` (`<camel.version>` / `<karaf.version>`).
 Quelle Tag-Daten: `git log -1 --format=%ci <tag>`.
@@ -167,7 +167,7 @@ Markiert in `CHANGELOG.md` ausdrücklich als **„Changes *BREAKING*"**.
   `org.apachle.felix` → `org.apache.felix`.) Quelle: `git show HEAD:root/.../init-rahla/run`.
 - Camel ist (seit 1.2.0) weiterhin **nicht** vorinstalliert — ein gedropptes `*.xml` ohne Camel-
   Feature bleibt `Waiting` (`bundle:diag <id>`). Quelle: `README.md` FAQ; `rahla-developer/SKILL.md`.
-- Loki-Appender braucht die `rahla-logging`-pax-logging-Bundles; pax-logging **nicht** von
+- Loki-Appender (bis 1.3.5; in 1.3.6 entfernt) braucht die `rahla-logging`-pax-logging-Bundles; pax-logging **nicht** von
   woanders re-pinnen. Quelle: `CLAUDE.md` / `rahla-developer/SKILL.md`.
 
 ---
@@ -298,6 +298,14 @@ Jedis 7.5.0→7.5.2, OTel-SDK-extension-autoconfigure 1.61.0→1.63.0, Agrona 1.
   Ein `deploy/features.xml` mit `<feature>fradi</feature>` lässt sich auf 1.3.6 **nicht mehr
   auflösen** → das ganze Service-Feature bleibt uninstalliert. Quelle: `CHANGELOG.md` 1.3.6
   „Removals"; Commit `7ba0551`.
+- **Loki-Appender entfernt** (deprecated seit 1.3.5): Modul `loki-appender`, das Bundle im
+  `rahla-logging`-Feature, die `pl.tkowalcz.tjahzi`-Abhängigkeiten und der (auskommentierte)
+  `<Loki>`-Block samt `packages="pl.tkowalcz.tjahzi.log4j2"` und `rahla.log.loki.*`-Properties in
+  `etc/log4j2.xml`. Ein eigenes `log4j2.xml` mit `<Loki …/>` oder `packages="pl.tkowalcz…"` startet
+  auf 1.3.6 nicht mehr sauber (log4j2 kennt das Plugin nicht) → Block entfernen. **Ersatz:**
+  OpenTelemetry-Logs-Exporter (`OTEL_LOGS_EXPORTER=otlp` + `OTEL_EXPORTER_OTLP_ENDPOINT`, Agent ist im
+  Image) oder das JSON-Console-Log von der Plattform einsammeln lassen (Promtail/Alloy,
+  `loki.io/parser`-Annotation). Quelle: `CHANGELOG.md` 1.3.6 „Removals".
 - **Karaf 4.4.12 verschärft die mitgelieferten ACLs** (Quelle: Diff `etc/` der Upstream-Distributionen
   `apache-karaf-4.4.11` vs. `4.4.12`): `jmx.acl.cfg` → `createMBean`/`registerMBean`/`unregisterMBean
   = admin`; `org.apache.karaf.command.acl.config.cfg` → `install = admin`;
@@ -522,8 +530,8 @@ Zeitliche Abfolge der Base-Image-/Deployment-Brüche (alle mit Quelle):
   nur eine Pax-Web-HTTP-Feature gleichzeitig. Quelle: `README.md` HTTP/REST; `rahla-developer/SKILL.md`.
 
 **(e) pax-logging via `rahla-logging` (1.3.0)** — Quelle `CHANGELOG.md` 1.3.0; `e600d75`
-- Karaf-Default-pax-logging ersetzt; Loki-Appender (`Fragment-Host: pax-logging-log4j2`) hängt daran.
-  pax-logging nicht von anderswo re-pinnen.
+- Karaf-Default-pax-logging ersetzt; pax-logging nicht von anderswo re-pinnen. (Bis 1.3.5 hing der
+  Loki-Appender als `Fragment-Host: pax-logging-log4j2` daran; in 1.3.6 entfernt.)
 
 **(f) Kubernetes (1.3.0)** — Quelle `CHANGELOG.md` 1.3.0; `fb10df6`/`b357d08`
 - `manifests/rahla.yaml` als Sample (Ports SSH 8101, HTTP 8181, Prometheus 9001; Volumes).

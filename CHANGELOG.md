@@ -28,6 +28,7 @@
 * **Fradi / Siddhi removed** (EOL since 1.2.0): the `fradi` module, the `fradi` Karaf feature and all `io.siddhi` dependencies are gone. `*.siddhi` files in `/config/deploy` are no longer loaded and `rahla.components.fradi.FradiComponent` no longer exists — migrate to `camel-mybatis`, `camel-stream` or another supported Camel component
 * The extra Maven repository `dtacs` (`https://mvn.datatactics.dev`, only needed for the patched Siddhi artifacts) is gone; everything resolves from Maven Central. The old host no longer existed — every lookup there returned 404
 * `guava` dropped from the parent's dependency management — only Fradi used it
+* **Loki appender removed** (deprecated since 1.3.5): the `loki-appender` module, its bundle in the `rahla-logging` feature, the `pl.tkowalcz.tjahzi` and `disruptor` dependencies, and the commented-out `<Loki>` block, the `packages="pl.tkowalcz.tjahzi.log4j2"` attribute and the `rahla.log.loki.*` properties in `etc/log4j2.xml`. A custom `log4j2.xml` that still declares `<Loki …/>` must drop it — ship logs with the OpenTelemetry logs exporter (`OTEL_LOGS_EXPORTER`) or let the platform scrape the JSON console log
 
 
 # 1.3.5 (2026-08-10)
