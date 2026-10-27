@@ -217,7 +217,7 @@ How it works:
 A project `Dockerfile.airgap`:
 
 ```dockerfile
-FROM docker.io/datatactics/rahla:1.3.3
+FROM docker.io/datatactics/rahla:1.3.6
 
 COPY --chown=911:911 deploy /config/deploy
 

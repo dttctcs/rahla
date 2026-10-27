@@ -348,7 +348,7 @@ Multiple template documents can share one YAML file (use `---` separators) and t
 A Rahla-based service repo is typically just a `deploy/` directory plus a two-line Dockerfile:
 
 ```dockerfile
-FROM datatactics/rahla:1.3.4
+FROM datatactics/rahla:1.3.6
 # rahla runs as the LSIO user abc (uid/gid 911)
 COPY --chown=911:911 deploy /config/deploy
 ```
@@ -364,7 +364,7 @@ Conventions that go with it:
 KAR-based offline packaging was **removed in 1.3.3**. The supported pattern: boot the real Karaf once at build time so it installs the whole `deploy/features.xml` closure (including `wrap:` bundles) into the OSGi cache and `/config/.m2`, then remove the install trigger and force offline mode:
 
 ```dockerfile
-FROM docker.io/datatactics/rahla:1.3.4
+FROM docker.io/datatactics/rahla:1.3.6
 COPY --chown=911:911 deploy /config/deploy
 
 # boot once → Karaf installs the full closure, then stop it.
