@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +20,9 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
+import org.osgi.framework.Constants;
+import org.osgi.framework.startlevel.BundleStartLevel;
+import org.osgi.framework.startlevel.FrameworkStartLevel;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.framework.wiring.FrameworkWiring;
 import org.osgi.service.component.ComponentContext;
@@ -106,6 +110,7 @@ public class GroovyBundleDeployer extends AbstractURLStreamHandlerService
   /** Placeholders whose imports can be satisfied now are updated, which recompiles the source. */
   void compileResolvablePlaceholders() {
     FrameworkWiring wiring = context.getBundle(0).adapt(FrameworkWiring.class);
+    boolean compiled = false;
     for (Bundle bundle : context.getBundles()) {
       if (!isPlaceholder(bundle)) {
         continue;
@@ -125,6 +130,7 @@ public class GroovyBundleDeployer extends AbstractURLStreamHandlerService
             location);
         bundle.update();
         failedRevisions.remove(location);
+        compiled = true;
         if (bundle.getState() != Bundle.ACTIVE) {
           bundle.start();
         }
@@ -136,6 +142,60 @@ public class GroovyBundleDeployer extends AbstractURLStreamHandlerService
             "Recompiling {} failed; not retrying until the file changes", location, e);
       }
     }
+    if (compiled) {
+      startWaitingBundles(wiring);
+    }
+  }
+
+  /**
+   * Starts bundles that failed to start earlier because they needed a package a placeholder now
+   * provides — typically a Blueprint XML that landed in an earlier fileinstall scan than its Groovy
+   * classes. fileinstall would retry them itself, but only on a later scan whose "state changed"
+   * flag survived; a placeholder recompiled while that scan was running loses the wake-up, and the
+   * XML bundle stayed INSTALLED until it was touched.
+   */
+  void startWaitingBundles(FrameworkWiring wiring) {
+    int frameworkLevel = context.getBundle(0).adapt(FrameworkStartLevel.class).getStartLevel();
+    List<Bundle> waiting = waitingToStart(context.getBundles(), frameworkLevel);
+    if (waiting.isEmpty()) {
+      return;
+    }
+    wiring.resolveBundles(waiting);
+    for (Bundle bundle : waiting) {
+      if (bundle.getState() != Bundle.RESOLVED) {
+        continue; // still missing something unrelated to Groovy; leave it to fileinstall
+      }
+      try {
+        bundle.start();
+        log.info("Started {}, which was waiting for packages of a Groovy bundle", bundle.getLocation());
+      } catch (Exception e) {
+        log.warn("Starting {} failed", bundle.getLocation(), e);
+      }
+    }
+  }
+
+  /**
+   * Bundles that should run but do not: INSTALLED (never resolved), marked persistently started
+   * (fileinstall starts with options 0), within the current start level, not a fragment and not
+   * one of our own placeholders.
+   */
+  static List<Bundle> waitingToStart(Bundle[] bundles, int frameworkStartLevel) {
+    List<Bundle> waiting = new ArrayList<>();
+    for (Bundle bundle : bundles) {
+      if (bundle.getBundleId() == 0
+          || bundle.getState() != Bundle.INSTALLED
+          || isPlaceholder(bundle)
+          || bundle.getHeaders("").get(Constants.FRAGMENT_HOST) != null) {
+        continue;
+      }
+      BundleStartLevel startLevel = bundle.adapt(BundleStartLevel.class);
+      if (startLevel != null
+          && startLevel.isPersistentlyStarted()
+          && startLevel.getStartLevel() <= frameworkStartLevel) {
+        waiting.add(bundle);
+      }
+    }
+    return waiting;
   }
 
   /** Hash of the current source behind a {@code rahla-groovy:} location, null if unreadable. */

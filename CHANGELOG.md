@@ -1,5 +1,9 @@
 # 1.3.7 (unreleased)
 
+### Bug Fixes
+
+* `GroovyBundleDeployer`: a Blueprint XML that landed in an earlier fileinstall scan than the Groovy classes it uses could stay `INSTALLED` for good. Placeholder bundles are recompiled asynchronously; when that happened while fileinstall's scan was still running, the scan cleared its "state changed" flag afterwards and never retried the XML (only a `touch` helped). After recompiling placeholders the deployer now resolves and starts every bundle that is `INSTALLED`, persistently started, within the start level and not a fragment or placeholder. The gap came with the deployer in 1.3.6; `GroovyBeanFactory` XMLs only waited for an OSGi service and were not affected
+
 # 1.3.6 (2026-10-27)
 
 ### Security
