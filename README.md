@@ -148,10 +148,36 @@ the deploy directory (add a `package` if it has none) and replacing
 </bean>
 ```
 
-with `<bean id="myProcessor" class="processors.MyProcessor"/>`. Note that files in subdirectories of
-the deploy directory (like `processors/` above) are not picked up by the bundle deployer — move them
-to the top level. The factory compiles its own copy of the class, so a factory bean and a bundle bean
-of the same source do not share static state.
+with `<bean id="myProcessor" class="processors.MyProcessor"/>`. Files in a subdirectory (like
+`processors/` above) are not deployed by default — either move them to the top level or watch the
+subdirectory explicitly (next section). Give every file its own package: one bundle per file, and two
+bundles exporting the same package (all files in `package processors`) is a split package. The
+factory compiles its own copy of the class, so a factory bean and a bundle bean of the same source do
+not share static state.
+
+#### Groovy files in a subdirectory
+
+fileinstall does not look into subdirectories of a watched directory file by file: with the default
+`felix.fileinstall.subdir.mode=jar` every subdirectory is installed as one exploded-jar bundle
+(`wrap:jardir:…/processors`, symbolic name = directory name) — a harmless but useless bundle, and the
+`.groovy` files inside are never compiled. To keep classes in `deploy/processors/`, add a second
+fileinstall configuration for exactly that directory, e.g. `deploy/org.apache.felix.fileinstall-processors.cfg`:
+
+```ini
+felix.fileinstall.dir           = /config/deploy/processors
+felix.fileinstall.filter        = .*\\.groovy
+felix.fileinstall.tmpdir        = ${karaf.data}/generated-bundles-processors
+felix.fileinstall.poll          = 1000
+felix.fileinstall.start.level   = 80
+felix.fileinstall.active.level  = 80
+```
+
+and, to get rid of the jardir bundle, `felix.fileinstall.subdir.mode = skip` in the configuration of
+the parent directory. Do **not** switch the parent to `subdir.mode = recurse`: XML and features
+files are installed under their *file name* as bundle symbolic name, so a `features.xml` or `routes.xml`
+in a subdirectory silently replaces the one at the top level (fileinstall logs "A bundle with the
+same symbolic name … is already installed. Updating this bundle instead") — in a test that
+uninstalled the whole Camel runtime.
 
 ### Camel route templates
 
