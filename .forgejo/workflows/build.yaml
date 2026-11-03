@@ -44,21 +44,61 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       
+      # Push (and sign) only from main and release tags. Every other branch —
+      # notably renovate/* — is built as a CI gate only: Renovate's automerge
+      # waits for this job, and must not overwrite `latest` on the way.
+      - name: Decide whether to push
+        id: push
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          case "$REF" in
+            refs/heads/main|refs/tags/*) echo "push=true"  >> $GITHUB_OUTPUT ;;
+            *)                           echo "push=false" >> $GITHUB_OUTPUT ;;
+          esac
+
       - name: Login to Dockerhub
-        if: github.event_name != 'pull_request'
+        if: steps.push.outputs.push == 'true'
         uses: docker/login-action@v1
         with:          
           username: ${{ vars.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASS }}          
       
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ steps.push.outputs.push == 'true' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # SLSA provenance + SPDX SBOM as in-toto attestations next to the
+          # image (unsigned on their own — the cosign signature below covers
+          # the image index they hang off).
+          provenance: mode=max
+          sbom: true
+
+      - name: Install cosign
+        if: steps.push.outputs.push == 'true'
+        uses: https://github.com/sigstore/cosign-installer@v4.1.2
+
+      # Key-based signing: public Fulcio/keyless does not accept Forgejo as an
+      # OIDC issuer. Verify with the committed public key:
+      #   cosign verify --key cosign.pub docker.io/datatactics/rahla:<tag>
+      - name: Sign image (cosign)
+        if: steps.push.outputs.push == 'true'
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          set -eu
+          if [ -z "$COSIGN_PRIVATE_KEY" ]; then
+            echo "::error::secret COSIGN_PRIVATE_KEY is missing — image pushed unsigned"
+            exit 1
+          fi
+          cosign sign --yes --key env://COSIGN_PRIVATE_KEY "docker.io/datatactics/rahla@${DIGEST}"
 
   forgejo-release:
     name: Forgejo Release

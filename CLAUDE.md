@@ -6,19 +6,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Rahla is an Apache Karaf assembly (OSGi container) preconfigured for Apache Camel, packaged as a Docker image. The Maven reactor produces a Karaf distribution under `assembly/target/assembly/`, which the `Dockerfile` copies into `/app/rahla` of a `linuxserver/baseimage-alpine` image. Runtime convention is LSIO: `/app/rahla/etc` and `/app/rahla/deploy` are symlinks to `/config/etc` and `/config/deploy`, and the `org.apache.felix.fileinstall` bundle hot-loads anything dropped into `/config/deploy` (jars, `.cfg`, `.groovy`, Camel XML/YAML, route-template YAML). The `Dockerfile` also pins the pax-url maven repo to `/config/.m2` (`org.ops4j.pax.url.mvn.localRepository`, set there — **not** in the assembly's `org.ops4j.pax.url.mvn.cfg`, so local non-container runs are unaffected) and pre-creates it owned by `abc`: feature-install downloads then land at a deterministic, persistent path instead of an ambiguous `~/.m2` (under a numeric `USER`, `$HOME` is not read from passwd). This is what lets an offline image pre-seed `/config/.m2` at build time so the FeaturesService re-resolves `install="auto"` features offline without re-downloading.
 
-## Dockerfile & base image (manually synced from adoptium)
+## Dockerfile & base image (Renovate-automerged, nightly auto-release)
 
-The `Dockerfile` is `FROM ghcr.io/linuxserver/baseimage-alpine:3.24` (LSIO), but the **JRE-install
-portion is copied from the upstream Eclipse Temurin image**:
-<https://github.com/adoptium/containers/tree/main/21/jre/alpine/3.24> (the `apk add` dependency list,
-`ENV JAVA_VERSION`, and the arch-`case` block that downloads + gpg-verifies + extracts the Temurin
-JRE). **Renovate only _monitors_ the version, it cannot apply the bump.** A `# renovate:` annotation
-above `ENV JAVA_VERSION` (customManager → `github-releases` on `adoptium/temurin21-binaries`, see
-`renovate.json`) surfaces new `21.0.x` releases in the **Dependency Dashboard** (approval-gated, no
-auto-PR — Renovate can't recompute the sha256 `ESUM`s). When the dashboard flags one, manually copy
-from upstream and update **all** of: `JAVA_VERSION`, both `ESUM` checksums (aarch64 + x86_64), the two
-`BINARY_URL`s, and the `apk add` list. Keep the alpine tag (`3.24`) aligned with the adoptium variant
-you copy from.
+The `Dockerfile` has two digest-pinned images: `ghcr.io/linuxserver/baseimage-alpine:3.24@sha256:…`
+(LSIO, the runtime base) and `eclipse-temurin:21.0.x_y-jre-alpine-3.24@sha256:…` as stage `jre`,
+from which only `/opt/java/openjdk` is copied (`COPY --from=jre`). The `apk add` list is the runtime
+deps from adoptium's `21/jre/alpine/3.24` Dockerfile (minus `gnupg`) — re-check it when moving to a
+new alpine release. There is no wget/ESUM/gpg block any more; the digest pin is the integrity check.
+
+`renovate.json` puts both images in one group (`renovate/base-images`, digest + minor/patch,
+**automerge** once `build.yaml` is green on the branch — non-main branches build but never push).
+Temurin uses a `regex:` versioning that parses `21.0.13_9` / respins `21.0.12.1_1` and keeps the
+`-jre-alpine-3.24` suffix fixed; the LSIO tag only follows its digest. **Moving to alpine 3.25 is
+manual and must change both `FROM` lines together** (musl JRE must match the base).
+
+`.forgejo/workflows/release.yaml` also runs nightly (`schedule`, 02:30 UTC): its gate step releases a
+patch **only if every non-merge commit since the last `v*` tag (ignoring `[maven-release-plugin]`)
+is authored by `renovate-bot@datatactics.de`**, and writes the `### Dependency Updates` bullets into
+the unreleased CHANGELOG section itself. Any human commit on `main` → nightly skips (warning in the
+run log) and the release goes through the button as before. Maven Renovate PRs are **not**
+automerged — they are triaged by hand weekly (tests); once merged they ride the next nightly release.
+
+Images are signed in `build.yaml` with cosign (key-based — public Fulcio does not trust Forgejo as
+OIDC issuer): secrets `COSIGN_PRIVATE_KEY` + `COSIGN_PASSWORD`, public key `cosign.pub` in the repo
+root (`cosign.key` is gitignored and must never be committed). `build-push-action` also attaches
+`provenance: mode=max` and `sbom: true`.
 
 Also manually coupled: `KARAF_SYSTEM_OPTS` hardcodes the **agent jar filenames+versions**
 (`jmx_prometheus_javaagent-*.jar`, `opentelemetry-javaagent-*.jar`). These must match the versions
@@ -52,7 +64,7 @@ Releases use `maven-release-plugin` (the recent commits `[maven-release-plugin] 
 
 Keep the two changelog-extraction `awk` snippets in sync when you touch either. All dependencies come from Maven Central — there is no extra repository (the `dtacs` repo for the patched Siddhi artifacts went with Fradi in 1.3.6).
 
-**On every version bump (incl. Renovate updates), hand-update the version strings that are NOT derived from the pom:** the `README.md` lines `Current release ships **Karaf … + Camel …**` and `Rahla x.y.z ships **Camel …**`, and add a `CHANGELOG.md` entry. On a **Karaf** bump also update the hardcoded `version=4.4.x` entries in `assembly/src/main/resources/assembly/etc/custom.properties` (copied from Karaf's own `config.properties`) and check that `pax-logging.version` still matches the pax-logging that Karaf's `startup.properties` ships — otherwise the assembly starts two pax-logging versions. Also keep **`camel.version` capped at the latest published `org.apache.camel.karaf:apache-camel` features release** — `assembly/pom.xml` pulls the Karaf `apache-camel` features descriptor by `${camel.version}` (no explicit version), and the Karaf distribution lags camel-core, so don't take Renovate's camel-core version blindly (e.g. use `4.18.2`, not `4.20.0`). Always `mvn package` after a Camel bump. `renovate.json` enforces this automatically for bot PRs: updates for `org.apache.camel:*` (base camel) are disabled so the shared `${camel.version}` property tracks only `org.apache.camel.karaf` (<https://github.com/apache/camel-karaf>) — a "missing" camel PR is intentional; the cap rule above still applies to manual bumps. It also restricts `janusgraph-driver` to clean `X.Y.Z` releases (upstream ships only timestamped dev builds past 1.1.0) and sets `dependencyDashboard: true` (the global self-hosted config disables the dashboard; without the re-enable the approval-gated JRE update would surface nowhere).
+**On every version bump (incl. Renovate updates), hand-update the version strings that are NOT derived from the pom:** the `README.md` lines `Current release ships **Karaf … + Camel …**` and `Rahla x.y.z ships **Camel …**`, and add a `CHANGELOG.md` entry. On a **Karaf** bump also update the hardcoded `version=4.4.x` entries in `assembly/src/main/resources/assembly/etc/custom.properties` (copied from Karaf's own `config.properties`) and check that `pax-logging.version` still matches the pax-logging that Karaf's `startup.properties` ships — otherwise the assembly starts two pax-logging versions. Also keep **`camel.version` capped at the latest published `org.apache.camel.karaf:apache-camel` features release** — `assembly/pom.xml` pulls the Karaf `apache-camel` features descriptor by `${camel.version}` (no explicit version), and the Karaf distribution lags camel-core, so don't take Renovate's camel-core version blindly (e.g. use `4.18.2`, not `4.20.0`). Always `mvn package` after a Camel bump. `renovate.json` enforces this automatically for bot PRs: updates for `org.apache.camel:*` (base camel) are disabled so the shared `${camel.version}` property tracks only `org.apache.camel.karaf` (<https://github.com/apache/camel-karaf>) — a "missing" camel PR is intentional; the cap rule above still applies to manual bumps. It also restricts `janusgraph-driver` to clean `X.Y.Z` releases (upstream ships only timestamped dev builds past 1.1.0) and sets `dependencyDashboard: true` (the global self-hosted config disables the dashboard; it is the overview of pending and rate-limited updates).
 
 ## Running locally (without Docker)
 

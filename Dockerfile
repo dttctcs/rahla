@@ -1,5 +1,10 @@
-#FROM ghcr.io/linuxserver/baseimage-debian:trixie
-FROM ghcr.io/linuxserver/baseimage-alpine:3.24
+# Both images are pinned by digest and kept current by Renovate (one grouped,
+# automerged PR, see renovate.json). The Temurin JRE comes from the official
+# eclipse-temurin image of the SAME alpine release (musl), so the alpine tag in
+# both lines must move together — Renovate is told not to bump it on its own.
+FROM eclipse-temurin:21.0.13_9-jre-alpine-3.24@sha256:82cf3d9ccbe1ed46252008d51b2f2329e6b9e8a2f4394c4bebefc3ea7f4b1372 AS jre
+
+FROM ghcr.io/linuxserver/baseimage-alpine:3.24@sha256:d07ad0eb9e65feb40ded2125e17ad8e1b33228b3cf480567378c8042ef0a8b2d
 
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH=$JAVA_HOME/bin:$PATH
@@ -7,14 +12,13 @@ ENV PATH=$JAVA_HOME/bin:$PATH
 # Default to UTF-8 file.encoding
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
+# runtime deps of the Temurin JRE, same list as adoptium's 21/jre/alpine Dockerfile
 RUN set -eux; \
     apk add --no-cache \
         # java.lang.UnsatisfiedLinkError: libfontmanager.so: libfreetype.so.6: cannot open shared object file: No such file or directory
         # java.lang.NoClassDefFoundError: Could not initialize class sun.awt.X11FontManager
         # https://github.com/docker-library/openjdk/pull/235#issuecomment-424466077
         fontconfig ttf-dejavu \
-        # gnupg required to verify the signature
-        gnupg \
         # utilities for keeping Alpine and OpenJDK CA certificates in sync
         # https://github.com/adoptium/containers/issues/293
         ca-certificates p11-kit-trust \
@@ -29,41 +33,7 @@ RUN set -eux; \
     ; \
     rm -rf /var/cache/apk/*
 
-# renovate: datasource=github-releases depName=adoptium/temurin21-binaries versioning=regex:^jdk-(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)\+(?<build>\d+)$
-ENV JAVA_VERSION=jdk-21.0.12+8
-
-RUN set -eux; \
-    ARCH="$(apk --print-arch)"; \
-    case "${ARCH}" in \
-       aarch64) \
-         ESUM='a4f70d2be5c55940dd60b6636643a05125e60e6c3dbc2a8402032b0346744dfa'; \
-         BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12%2B8/OpenJDK21U-jre_aarch64_alpine-linux_hotspot_21.0.12_8.tar.gz'; \
-         ;; \
-       x86_64) \
-         ESUM='9a7f8712a2741bb14e2452eed2de99f62d02e05617e27d59f1861a0cdad58486'; \
-         BINARY_URL='https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12%2B8/OpenJDK21U-jre_x64_alpine-linux_hotspot_21.0.12_8.tar.gz'; \
-         ;; \
-       *) \
-         echo "Unsupported arch: ${ARCH}"; \
-         exit 1; \
-         ;; \
-    esac; \
-    wget -O /tmp/openjdk.tar.gz ${BINARY_URL}; \
-    wget -O /tmp/openjdk.tar.gz.sig ${BINARY_URL}.sig; \
-    export GNUPGHOME="$(mktemp -d)"; \
-    # gpg: key 843C48A565F8F04B: "Adoptium GPG Key (DEB/RPM Signing Key) <temurin-dev@eclipse.org>" imported
-    gpg --batch --keyserver keyserver.ubuntu.com --recv-keys 3B04D753C9050D9A5D343F39843C48A565F8F04B; \
-    gpg --batch --verify /tmp/openjdk.tar.gz.sig /tmp/openjdk.tar.gz; \
-    rm -rf "${GNUPGHOME}" /tmp/openjdk.tar.gz.sig; \
-    echo "${ESUM} */tmp/openjdk.tar.gz" | sha256sum -c -; \
-    mkdir -p "$JAVA_HOME"; \
-    tar --extract \
-        --file /tmp/openjdk.tar.gz \
-        --directory "$JAVA_HOME" \
-        --strip-components 1 \
-        --no-same-owner \
-    ; \
-    rm -f /tmp/openjdk.tar.gz;
+COPY --from=jre /opt/java/openjdk $JAVA_HOME
 
 RUN set -eux; \
     echo "Verifying install ..."; \

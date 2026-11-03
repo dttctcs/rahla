@@ -19,6 +19,7 @@ Current release ships **Karaf 4.4.12 + Camel 4.18.4** on JDK 21.
 - [Configuration](#configuration)
 - [Monitoring](#monitoring)
 - [Kubernetes](#kubernetes)
+- [Image signatures & updates](#image-signatures--updates)
 - [Build from source](#build-from-source)
 - [FAQ](#faq)
 - [Contributing](#contributing)
@@ -305,6 +306,21 @@ Both agents ship in the assembly (attached via `KARAF_SYSTEM_OPTS`, see [Configu
 
 A sample manifest is in [`manifests/rahla.yaml`](manifests/rahla.yaml): it wires the ports (SSH 8101,
 HTTP 8181, Prometheus 9001) and volumes. Mount your routes to `/config/deploy` (ConfigMap / PVC).
+
+## Image signatures & updates
+
+Every image pushed to `docker.io/datatactics/rahla` (from `main` and from release tags) is signed
+with [cosign](https://github.com/sigstore/cosign) and carries SLSA provenance and an SBOM as
+attestations. Verify against the public key in this repo ([`cosign.pub`](cosign.pub)):
+
+```sh
+cosign verify --key cosign.pub docker.io/datatactics/rahla:<version>
+docker buildx imagetools inspect docker.io/datatactics/rahla:<version> --format '{{ json .Provenance }}'
+```
+
+The base image (`linuxserver/baseimage-alpine`) and the Temurin JRE are pinned by digest and kept
+current by Renovate in one automerged PR. A nightly job cuts a patch release when only Renovate
+commits landed since the last tag, so security fixes in the base layers ship without manual work.
 
 ## Build from source
 

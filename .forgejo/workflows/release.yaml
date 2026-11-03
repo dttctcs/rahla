@@ -15,8 +15,18 @@ name: Prepare Release
 #
 # Only release:prepare runs — the pom has no <distributionManagement>, so
 # release:perform would have nowhere to deploy to.
+#
+# Nightly auto-release (schedule): cuts a patch release on its own, but ONLY
+# when every commit since the last tag was authored by Renovate (ignoring the
+# `[maven-release-plugin]` commits and merge commits). Typical case: the
+# automerged `renovate/base-images` PR (LSIO alpine digest + Temurin JRE). As
+# soon as a human commit sits on main, the nightly run skips and the release
+# is cut by hand via the button. The gate also writes the CHANGELOG entry for
+# the bot commits, so nobody has to.
 
 on:
+  schedule:
+    - cron: '30 2 * * *'   # 02:30 UTC, at most one release per day
   workflow_dispatch:
     inputs:
       releaseVersion:
@@ -42,7 +52,7 @@ jobs:
       - name: Guard — main only, RELEASE_TOKEN present
         env:
           REF: ${{ github.ref }}
-          DRY_RUN: ${{ github.event.inputs.dryRun }}
+          DRY_RUN: ${{ github.event.inputs.dryRun || 'false' }}
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           if [ "$REF" != "refs/heads/main" ]; then
@@ -65,16 +75,68 @@ jobs:
           fetch-depth: 0            # release:prepare needs the full history + tags
           persist-credentials: false  # auth comes from the credential store below
 
+      - name: Auto-release gate (nightly only)
+        id: gate
+        if: github.event_name == 'schedule'
+        shell: bash
+        env:
+          RENOVATE_EMAIL: renovate-bot@datatactics.de
+        run: |
+          set -eu
+          git config --global --add safe.directory "$PWD"
+          LAST=$(git describe --tags --abbrev=0 --match 'v*')
+          # the bot's commits and everyone else's, release-plugin + merges ignored
+          log() { git log --no-merges --format='%ae%x09%s' "${LAST}..HEAD" | grep -v $'\t\[maven-release-plugin\]' || true; }
+          BOT=$(log | awk -F'\t' -v e="$RENOVATE_EMAIL" '$1 == e { print $2 }')
+          OTHER=$(log | awk -F'\t' -v e="$RENOVATE_EMAIL" '$1 != e { print $1 ": " $2 }')
+          if [ -z "$BOT" ]; then
+            echo "nothing new since ${LAST} — no release"
+            echo "skip=true" >> $GITHUB_OUTPUT; exit 0
+          fi
+          if [ -n "$OTHER" ]; then
+            echo "::warning::non-Renovate commits since ${LAST} — no auto-release, cut it by hand:"
+            echo "$OTHER"
+            echo "skip=true" >> $GITHUB_OUTPUT; exit 0
+          fi
+          echo "skip=false" >> $GITHUB_OUTPUT
+
+          # CHANGELOG: one bullet per bot commit, plus the resolved image refs
+          # (the grouped base-image commit is just "Update base images").
+          ref() { git show "$1:Dockerfile" | sed -n "s|^FROM \(\S*$2\S*\).*|\1|p" | head -1; }
+          {
+            echo "### Dependency Updates"
+            echo
+            echo "$BOT" | sed 's/^/* Renovate: /'
+            for img in eclipse-temurin baseimage-alpine; do
+              OLD=$(ref "$LAST" "$img"); NEW=$(ref HEAD "$img")
+              if [ -n "$NEW" ] && [ "$OLD" != "$NEW" ]; then
+                echo "* \`${NEW%%@*}\` → \`@${NEW##*@}\`${OLD:+ (was \`${OLD}\`)}"
+              fi
+            done
+            echo
+          } > bullets.md
+          cat bullets.md
+          # insert right below the "# X.Y.Z (unreleased)" heading
+          awk 'NR==FNR { b = b $0 "\n"; next }
+               !done && /^# .*\(unreleased\)/ { print; print ""; printf "%s", b; done=1; getline; if ($0 != "") print; next }
+               { print }' bullets.md CHANGELOG.md > CHANGELOG.new
+          mv CHANGELOG.new CHANGELOG.md
+          rm bullets.md
+          git --no-pager diff -- CHANGELOG.md | head -30
+
       - name: Set up JDK 21
+        if: steps.gate.outputs.skip != 'true'
         uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'temurin'
 
       - name: Install maven
+        if: steps.gate.outputs.skip != 'true'
         run: apt update -qq && apt install -qq -y maven
 
       - name: Work out versions
+        if: steps.gate.outputs.skip != 'true'
         id: versions
         env:
           IN_RELEASE: ${{ github.event.inputs.releaseVersion }}
@@ -95,6 +157,7 @@ jobs:
           echo "${CURRENT}  ->  release ${RELEASE}, tag v${RELEASE}, next ${DEV}"
 
       - name: Configure git
+        if: steps.gate.outputs.skip != 'true'
         env:
           SERVER_URL: ${{ github.server_url }}
           ACTOR: ${{ github.actor }}
@@ -127,6 +190,7 @@ jobs:
       # version. Committed before release:prepare, which requires a clean tree
       # and pushes this commit along with its own two.
       - name: Date the changelog section
+        if: steps.gate.outputs.skip != 'true'
         env:
           RELEASE: ${{ steps.versions.outputs.release }}
           DEV: ${{ steps.versions.outputs.dev }}
@@ -156,10 +220,11 @@ jobs:
           fi
 
       - name: mvn release:prepare
+        if: steps.gate.outputs.skip != 'true'
         env:
           RELEASE: ${{ steps.versions.outputs.release }}
           DEV: ${{ steps.versions.outputs.dev }}
-          DRY_RUN: ${{ github.event.inputs.dryRun }}
+          DRY_RUN: ${{ github.event.inputs.dryRun || 'false' }}
         run: |
           set -eu
           # -Dtag is mandatory: the pom sets no <tagNameFormat>, so the plugin
@@ -171,10 +236,11 @@ jobs:
             -DdryRun="${DRY_RUN}"
 
       - name: Summary
+        if: steps.gate.outputs.skip != 'true'
         env:
           RELEASE: ${{ steps.versions.outputs.release }}
           DEV: ${{ steps.versions.outputs.dev }}
-          DRY_RUN: ${{ github.event.inputs.dryRun }}
+          DRY_RUN: ${{ github.event.inputs.dryRun || 'false' }}
         run: |
           if [ "$DRY_RUN" = "true" ]; then
             echo "Dry run — nothing was committed, tagged or pushed."
