@@ -1,5 +1,15 @@
 # 1.3.9 (unreleased)
 
+### Improvements
+
+* Images are signed with cosign (key in `cosign.pub`, verify with `cosign verify --key cosign.pub docker.io/datatactics/rahla:<tag>`) and carry SLSA provenance + SBOM attestations
+* Base image and JRE are digest-pinned: `ghcr.io/linuxserver/baseimage-alpine:3.24@sha256:…` and the JRE now comes from `eclipse-temurin:21.0.13_9-jre-alpine-3.24@sha256:…` (`COPY --from`) instead of a hand-maintained wget/ESUM/gpg block. Renovate updates both in one automerged PR; a nightly job cuts a patch release when only Renovate commits landed since the last tag
+* CI pushes images only from `main` and release tags — other branches (e.g. `renovate/*`) are built as a gate but no longer overwrite `latest`
+
+### Dependency Updates
+
+* Temurin JRE `21.0.12+8 > 21.0.13+9`
+
 # 1.3.8 (2026-11-03)
 
 # 1.3.7 (2026-10-28)

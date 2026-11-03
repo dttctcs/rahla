@@ -4,19 +4,6 @@
     "config:recommended"
   ],
   "dependencyDashboard": true,
-  "customManagers": [
-    {
-      "customType": "regex",
-      "description": "Monitor the Temurin JRE version baked into the Dockerfile (ESUMs/URLs still need manual sync)",
-      "managerFilePatterns": [
-        "/(^|/)Dockerfile$/"
-      ],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\s+ENV JAVA_VERSION=(?<currentValue>\\S+)"
-      ],
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
-    }
-  ],
   "packageRules": [
     {
       "description": "Only open PRs for minor and patch updates (no major)",
@@ -28,13 +15,6 @@
         "rollback"
       ],
       "enabled": false
-    },
-    {
-      "description": "JRE: monitor only via dashboard - renovate cannot update the coupled ESUMs/URLs, so do the full sync by hand",
-      "matchDepNames": [
-        "adoptium/temurin21-binaries"
-      ],
-      "dependencyDashboardApproval": true
     },
     {
       "description": "Ignore wagon-ssh-external (being removed) - no updates at all",
@@ -50,6 +30,55 @@
       ],
       "matchPackageNames": [
         "/^org\\.apache\\.camel:/"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Base images (LSIO alpine + Temurin JRE): pinned by digest in the Dockerfile. Re-enable digest/pin for them (the global rule above turns those off for Maven) and ship both in ONE automerged PR; build.yaml on the renovate branch is the gate. The nightly auto-release in release.yaml then cuts a patch release.",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "ghcr.io/linuxserver/baseimage-alpine",
+        "eclipse-temurin"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin"
+      ],
+      "enabled": true,
+      "groupName": "base images",
+      "groupSlug": "base-images",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": false,
+      "pinDigests": true
+    },
+    {
+      "description": "Temurin tags look like 21.0.13_9-jre-alpine-3.24 (or a respin 21.0.12.1_1-…): parse the build after '_' and keep the -jre-alpine-3.24 suffix fixed, so Renovate never switches the alpine release",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "eclipse-temurin"
+      ],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:\\.(?<revision>\\d+))?_(?<build>\\d+)-(?<compatibility>.+)$",
+      "allowedVersions": "/^21\\./"
+    },
+    {
+      "description": "LSIO alpine: only follow the digest of the 3.24 tag. A move to 3.25 has to happen together with the temurin -alpine-3.25 variant, by hand",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "ghcr.io/linuxserver/baseimage-alpine"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch"
       ],
       "enabled": false
     }

@@ -4,3 +4,4 @@ target
 dev_deploy
 testing
 .serena
+cosign.key
