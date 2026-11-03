@@ -1,7 +1,5 @@
 # 1.3.9 (unreleased)
 
-# 1.3.8 (2026-11-03)
-
 ### Improvements
 
 * Images are signed with cosign (key in `cosign.pub`, verify with `cosign verify --key cosign.pub docker.io/datatactics/rahla:<tag>`) and carry SLSA provenance + SBOM attestations
@@ -11,6 +9,8 @@
 ### Dependency Updates
 
 * Temurin JRE `21.0.12+8 > 21.0.13+9`
+
+# 1.3.8 (2026-11-03)
 
 # 1.3.7 (2026-10-28)
 
