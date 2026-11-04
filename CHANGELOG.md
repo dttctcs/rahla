@@ -1,5 +1,10 @@
 # 1.3.10 (unreleased)
 
+### Improvements
+
+* Docker Hub page is maintained by CI now: `build.yaml` (job `dockerhub-description`, on `main` and tags) publishes the README as the repository overview — relative links rewritten to the public GitHub mirror — plus a short description
+* Dependency-Track: the released version is uploaded with `isLatest`, and all other `datatactics/rahla` versions are set inactive (`dtrack-upload` inputs `is-latest` / `deactivate-other-versions`)
+
 # 1.3.9 (2026-11-03)
 
 ### Improvements
