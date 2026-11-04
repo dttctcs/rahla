@@ -642,8 +642,8 @@
     </properties>
 
     <scm>
-        <connection>scm:git:https://repo.datatactics.dev/oss/rahla.git</connection>
-        <developerConnection>scm:git:https://repo.datatactics.dev/oss/rahla.git</developerConnection>
+        <connection>scm:git:https://repo.priv.datatactics.de/oss/rahla.git</connection>
+        <developerConnection>scm:git:https://repo.priv.datatactics.de/oss/rahla.git</developerConnection>
         <tag>HEAD</tag>
         <url>https://codeberg.org/dataTactics/rahla</url>
     </scm>
