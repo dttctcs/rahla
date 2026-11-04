@@ -100,6 +100,35 @@ jobs:
           fi
           cosign sign --yes --key env://COSIGN_PRIVATE_KEY "docker.io/datatactics/rahla@${DIGEST}"
 
+  dockerhub-description:
+    name: Docker Hub overview
+    runs-on: docker
+    needs: build
+    # Same refs that push images. A failure here (e.g. a PAT without the
+    # read/write/delete scope Docker Hub needs for repo metadata) must not
+    # turn a release red — the image is already out.
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      # The Forgejo server is private, so relative README links (cosign.pub,
+      # examples/, migration.md, …) are pointed at the public GitHub mirror.
+      - name: README with absolute links
+        run: |
+          sed -E 's#\]\((\.?/?)([^)#:][^):]*)\)#](https://github.com/dttctcs/rahla/blob/main/\2)#g' \
+            README.md > README.dockerhub.md
+          grep -o -E '\]\(https://github.com/dttctcs/rahla/[^)]*\)' README.dockerhub.md | sort -u
+
+      - name: Update Docker Hub description
+        continue-on-error: true
+        uses: https://github.com/peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
+        with:
+          username: ${{ vars.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASS }}
+          repository: datatactics/rahla
+          short-description: 'Apache Karaf + Camel appliance: hot-deploys Camel routes, Groovy beans and configs'
+          readme-filepath: ./README.dockerhub.md
+
   forgejo-release:
     name: Forgejo Release
     runs-on: docker
@@ -188,6 +217,8 @@ jobs:
           project-name: datatactics/rahla
           project-version: ${{ steps.set-filename.outputs.version }}
           parent-uuid: cff07b40-c95c-47e9-9367-cb9e8df75dcd   # rahla parent project in Dependency Track
+          is-latest: true                  # this release is the one DT reports as current
+          deactivate-other-versions: true  # older releases drop out of the portfolio metrics
         env:
           DTRACK_URL: ${{ vars.DTRACK_URL }}
           DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
