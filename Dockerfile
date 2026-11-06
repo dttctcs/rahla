@@ -2,7 +2,7 @@
 # automerged PR, see renovate.json). The Temurin JRE comes from the official
 # eclipse-temurin image of the SAME alpine release (musl), so the alpine tag in
 # both lines must move together — Renovate is told not to bump it on its own.
-FROM eclipse-temurin:21.0.13_9-jre-alpine-3.24@sha256:82cf3d9ccbe1ed46252008d51b2f2329e6b9e8a2f4394c4bebefc3ea7f4b1372 AS jre
+FROM eclipse-temurin:21.0.13_9-jre-alpine-3.24@sha256:ac05c3c42b7c2f1a52c9bd52f01041fa1958231b15ebeae7420429cbc5baf474 AS jre
 
 FROM ghcr.io/linuxserver/baseimage-alpine:3.24@sha256:d07ad0eb9e65feb40ded2125e17ad8e1b33228b3cf480567378c8042ef0a8b2d
 
