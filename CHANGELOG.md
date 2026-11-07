@@ -1,4 +1,11 @@
-# 1.3.11 (unreleased)
+# 1.3.12 (unreleased)
+
+# 1.3.11 (2026-11-07)
+
+### Dependency Updates
+
+* Renovate: Update eclipse-temurin:21.0.13_9-jre-alpine-3.24 Docker digest to ac05c3c
+* `eclipse-temurin:21.0.13_9-jre-alpine-3.24` → `@sha256:ac05c3c42b7c2f1a52c9bd52f01041fa1958231b15ebeae7420429cbc5baf474` (was `eclipse-temurin:21.0.13_9-jre-alpine-3.24@sha256:82cf3d9ccbe1ed46252008d51b2f2329e6b9e8a2f4394c4bebefc3ea7f4b1372`)
 
 # 1.3.10 (2026-11-04)
 
