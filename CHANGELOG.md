@@ -1,4 +1,11 @@
-# 1.3.12 (unreleased)
+# 1.3.13 (unreleased)
+
+# 1.3.12 (2026-11-08)
+
+### Dependency Updates
+
+* Renovate: Update ghcr.io/linuxserver/baseimage-alpine:3.24 Docker digest to 7315b19
+* `ghcr.io/linuxserver/baseimage-alpine:3.24` → `@sha256:7315b19a32460a84b4474993ef33065483ffec792fbc70dbe12eab918aa2bbf4` (was `ghcr.io/linuxserver/baseimage-alpine:3.24@sha256:d07ad0eb9e65feb40ded2125e17ad8e1b33228b3cf480567378c8042ef0a8b2d`)
 
 # 1.3.11 (2026-11-07)
 
