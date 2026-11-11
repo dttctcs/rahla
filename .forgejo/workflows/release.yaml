@@ -1,8 +1,8 @@
 name: Prepare Release
 
-# The "Run workflow" button for cutting a release: runs maven-release-plugin,
-# which pushes the two `[maven-release-plugin] prepare release/next iteration`
-# commits and the `vX.Y.Z` tag. Everything downstream hangs off that tag push
+# The "Run workflow" button for cutting a release: runs maven-release-plugin
+# locally and publishes its two `[maven-release-plugin] prepare release/next
+# iteration` commits and the `vX.Y.Z` tag. Everything downstream hangs off that tag push
 # in build.yaml (docker image, Trivy -> Dependency Track, Forgejo release), so
 # this workflow deliberately does nothing but the version bump.
 #
@@ -12,6 +12,16 @@ name: Prepare Release
 # land the tag but silently skip build.yaml. One-time setup:
 #   Settings -> Actions -> Secrets -> RELEASE_TOKEN = PAT with write:repository
 #   (optional) Settings -> Actions -> Variables -> RELEASE_USER = that PAT's owner
+#
+# Why the commits go through the API instead of `git push`: main requires
+# signed commits, and Forgejo signs only what it commits itself (instance key,
+# `[repository.signing] CRUD_ACTIONS = always`). A pushed, unsigned release
+# commit is rejected with "branch main is protected from unverified commit"
+# (run 202, 2026-11-11). So release:prepare runs with -DpushChanges=false and
+# every local commit is replayed through `POST .../contents`; the tag itself is
+# pushed with git, because that push is what triggers build.yaml.
+# The owner of RELEASE_TOKEN must be on the push whitelist of main's branch
+# protection — the API honours neither "push disabled" nor an admin exemption.
 #
 # Only release:prepare runs — the pom has no <distributionManagement>, so
 # release:perform would have nowhere to deploy to.
@@ -133,7 +143,7 @@ jobs:
 
       - name: Install maven
         if: steps.gate.outputs.skip != 'true'
-        run: apt update -qq && apt install -qq -y maven
+        run: apt update -qq && apt install -qq -y maven jq
 
       - name: Work out versions
         if: steps.gate.outputs.skip != 'true'
@@ -233,7 +243,70 @@ jobs:
             -DreleaseVersion="${RELEASE}" \
             -DdevelopmentVersion="${DEV}" \
             -Dtag="v${RELEASE}" \
+            -DpushChanges=false \
             -DdryRun="${DRY_RUN}"
+
+      # Replays the local commits (changelog stamp, release, next iteration) on
+      # main through the contents API, so Forgejo signs them. Blob SHAs of the
+      # previous file versions are sent along: if main moved in the meantime the
+      # API refuses instead of overwriting.
+      - name: Publish commits via API, push the tag
+        if: steps.gate.outputs.skip != 'true' && (github.event.inputs.dryRun || 'false') != 'true'
+        shell: bash
+        env:
+          RELEASE: ${{ steps.versions.outputs.release }}
+          API: ${{ github.server_url }}/api/v1/repos/${{ github.repository }}
+          BASE: ${{ github.sha }}
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          set -euo pipefail
+          TMP=$(mktemp -d)
+          TAG_SHA=
+          for C in $(git rev-list --reverse "${BASE}..HEAD"); do
+            echo '[]' > "$TMP/files.json"
+            while IFS=$'\t' read -r STATUS FILE; do
+              case "$STATUS" in
+                A) OP=create ;;
+                M) OP=update ;;
+                D) OP=delete ;;
+                *) echo "::error::unexpected change ${STATUS} ${FILE} in ${C}"; exit 1 ;;
+              esac
+              : > "$TMP/content"; OLD=
+              [ "$OP" = delete ] || git show "${C}:${FILE}" | base64 -w0 > "$TMP/content"
+              [ "$OP" = create ] || OLD=$(git rev-parse "${C}^:${FILE}")
+              jq --arg op "$OP" --arg path "$FILE" --arg sha "$OLD" --rawfile content "$TMP/content" \
+                '. + [{operation: $op, path: $path}
+                      + (if $op == "delete" then {} else {content: $content} end)
+                      + (if $sha == "" then {} else {sha: $sha} end)]' \
+                "$TMP/files.json" > "$TMP/files.next"
+              mv "$TMP/files.next" "$TMP/files.json"
+            done < <(git diff-tree --no-commit-id -r --no-renames --name-status "$C")
+
+            git log -1 --format=%B "$C" > "$TMP/message"
+            jq -n --rawfile message "$TMP/message" --slurpfile files "$TMP/files.json" \
+              '{branch: "main", message: ($message | rtrimstr("\n")), files: $files[0]}' > "$TMP/body.json"
+            SUBJECT=$(git log -1 --format=%s "$C")
+            CODE=$(curl -sS -o "$TMP/response.json" -w '%{http_code}' -X POST "${API}/contents" \
+              -H "Authorization: token ${RELEASE_TOKEN}" -H 'Content-Type: application/json' \
+              --data-binary "@$TMP/body.json")
+            if [ "$CODE" != 201 ]; then
+              echo "::error::API commit '${SUBJECT}' failed with HTTP ${CODE}: $(head -c 500 "$TMP/response.json")"
+              exit 1
+            fi
+            SHA=$(jq -r '.commit.sha' "$TMP/response.json")
+            echo "${SHA}  ${SUBJECT}"
+            case "$SUBJECT" in "[maven-release-plugin] prepare release "*) TAG_SHA="$SHA" ;; esac
+          done
+          if [ -z "$TAG_SHA" ]; then
+            echo "::error::no '[maven-release-plugin] prepare release' commit found — nothing to tag"
+            exit 1
+          fi
+
+          # release:prepare tagged its local (unpublished) commit; move the tag
+          # to the commit Forgejo created and push it.
+          git fetch --quiet origin main
+          git tag -f "v${RELEASE}" "$TAG_SHA"
+          git push origin "refs/tags/v${RELEASE}"
 
       - name: Summary
         if: steps.gate.outputs.skip != 'true'
