@@ -72,6 +72,9 @@ public class GroovyBundleDeployer extends AbstractURLStreamHandlerService
    */
   private final Map<String, String> failedRevisions = new ConcurrentHashMap<>();
 
+  /** A compiled Groovy bundle could not start yet; keep retrying on bundle events. */
+  private volatile boolean startPending;
+
   /** Used by Declarative Services; the builder is created in {@link #activate}. */
   public GroovyBundleDeployer() {}
 
@@ -107,7 +110,16 @@ public class GroovyBundleDeployer extends AbstractURLStreamHandlerService
     }
   }
 
-  /** Placeholders whose imports can be satisfied now are updated, which recompiles the source. */
+  /**
+   * Placeholders whose imports can be satisfied now are recompiled and updated.
+   *
+   * <p>The source is compiled <em>before</em> {@code bundle.update(stream)}. A plain {@code
+   * bundle.update()} would open the {@code rahla-groovy:} URL — and thus compile — while Felix
+   * holds the bundle's lock; the Groovy compiler resolves classes through dynamic imports, which
+   * needs Felix' global lock. A thread starting bundles at the same time (fileinstall, the
+   * features service) holds that global lock and waits for the bundle: a deadlock that froze the
+   * whole container during a feature install.
+   */
   void compileResolvablePlaceholders() {
     FrameworkWiring wiring = context.getBundle(0).adapt(FrameworkWiring.class);
     boolean compiled = false;
@@ -120,6 +132,7 @@ public class GroovyBundleDeployer extends AbstractURLStreamHandlerService
       if (revision != null && revision.equals(failedRevisions.get(location))) {
         continue; // this revision already failed to compile; wait for the file to change
       }
+      InputStream recompiled;
       try {
         if (!wiring.resolveBundles(List.of(bundle))) {
           continue;
@@ -128,22 +141,34 @@ public class GroovyBundleDeployer extends AbstractURLStreamHandlerService
             "Packages {} are available now, compiling {}",
             bundle.getHeaders("").get("Import-Package"),
             location);
-        bundle.update();
-        failedRevisions.remove(location);
-        compiled = true;
-        if (bundle.getState() != Bundle.ACTIVE) {
-          bundle.start();
-        }
+        recompiled = openConnection(handlerUrl(location)).getInputStream();
       } catch (Exception e) {
         if (revision != null) {
           failedRevisions.put(location, revision);
         }
         log.warn(
             "Recompiling {} failed; not retrying until the file changes", location, e);
+        continue;
+      }
+      try {
+        bundle.update(recompiled);
+        failedRevisions.remove(location);
+        if (isPlaceholder(bundle)) {
+          continue; // the packages went away again (refresh in progress); the next event retries
+        }
+        compiled = true;
+        if (bundle.getState() != Bundle.ACTIVE) {
+          bundle.start();
+        }
+      } catch (Exception e) {
+        // not a compile error: typically the bundle cannot resolve while a feature install is
+        // still refreshing its providers. Nothing to remember; start it once it resolves.
+        startPending = true;
+        log.info("{} is compiled but cannot start yet ({}); retrying", location, e.getMessage());
       }
     }
-    if (compiled) {
-      startWaitingBundles(wiring);
+    if (compiled || startPending) {
+      startPending = startWaitingBundles(wiring);
     }
   }
 
@@ -153,25 +178,33 @@ public class GroovyBundleDeployer extends AbstractURLStreamHandlerService
    * classes. fileinstall would retry them itself, but only on a later scan whose "state changed"
    * flag survived; a placeholder recompiled while that scan was running loses the wake-up, and the
    * XML bundle stayed INSTALLED until it was touched.
+   *
+   * @return true if a compiled Groovy bundle is still waiting to start (retry on the next event)
    */
-  void startWaitingBundles(FrameworkWiring wiring) {
+  boolean startWaitingBundles(FrameworkWiring wiring) {
     int frameworkLevel = context.getBundle(0).adapt(FrameworkStartLevel.class).getStartLevel();
     List<Bundle> waiting = waitingToStart(context.getBundles(), frameworkLevel);
     if (waiting.isEmpty()) {
-      return;
+      return false;
     }
     wiring.resolveBundles(waiting);
+    boolean groovyStillWaiting = false;
     for (Bundle bundle : waiting) {
+      String location = bundle.getLocation();
+      boolean groovy = location != null && location.startsWith(PROTOCOL + ":");
       if (bundle.getState() != Bundle.RESOLVED) {
-        continue; // still missing something unrelated to Groovy; leave it to fileinstall
+        groovyStillWaiting |= groovy;
+        continue; // still missing something; a Groovy bundle is retried, the rest is fileinstall's
       }
       try {
         bundle.start();
-        log.info("Started {}, which was waiting for packages of a Groovy bundle", bundle.getLocation());
+        log.info("Started {}, which was waiting for packages of a Groovy bundle", location);
       } catch (Exception e) {
-        log.warn("Starting {} failed", bundle.getLocation(), e);
+        groovyStillWaiting |= groovy;
+        log.warn("Starting {} failed", location, e);
       }
     }
+    return groovyStillWaiting;
   }
 
   /**
@@ -229,7 +262,12 @@ public class GroovyBundleDeployer extends AbstractURLStreamHandlerService
   @Override
   @SuppressWarnings("deprecation") // no URI-based way to attach a handler to a URL
   public URL transform(URL artifact) throws Exception {
-    return new URL(null, PROTOCOL + ":" + artifact.toExternalForm(), new Handler());
+    return handlerUrl(PROTOCOL + ":" + artifact.toExternalForm());
+  }
+
+  @SuppressWarnings("deprecation") // no URI-based way to attach a handler to a URL
+  private URL handlerUrl(String location) throws java.net.MalformedURLException {
+    return new URL(null, location, new Handler());
   }
 
   private final class Handler extends java.net.URLStreamHandler {
