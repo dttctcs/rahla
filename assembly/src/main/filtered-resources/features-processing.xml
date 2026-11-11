@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Features processing input for the Rahla assembly (karaf-maven-plugin <featuresProcessing>).
+    The plugin merges the <blacklistedBundles> from assembly/pom.xml into it and writes the
+    result to etc/org.apache.karaf.features.xml, so it applies to runtime feature installs.
+
+    bundleReplacements: camel-karaf's camel-jetty pins an older Jetty 12.1.x in its features
+    descriptor; every Jetty bundle it lists is replaced by ${jetty.version} (parent pom, tracked by
+    Renovate). The wrap:ped jetty-client is not covered (wrap URIs carry the version in their
+    instructions).
+-->
+<featuresProcessing xmlns="http://karaf.apache.org/xmlns/features-processing/v1.0.0" xmlns:f="http://karaf.apache.org/xmlns/features/v1.6.0">
+    <bundleReplacements>
+        <bundle originalUri="mvn:org.eclipse.jetty/jetty-alpn-client/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty/jetty-alpn-client/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty/jetty-alpn-server/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty/jetty-alpn-server/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty/jetty-http/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty/jetty-http/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty/jetty-io/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty/jetty-io/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty/jetty-jmx/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty/jetty-jmx/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty/jetty-security/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty/jetty-security/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty/jetty-server/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty/jetty-server/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty/jetty-session/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty/jetty-session/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty/jetty-util/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty/jetty-util/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty/jetty-util-ajax/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty/jetty-util-ajax/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty.http2/jetty-http2-common/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty.http2/jetty-http2-common/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty.http2/jetty-http2-hpack/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty.http2/jetty-http2-hpack/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty.http2/jetty-http2-server/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty.http2/jetty-http2-server/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty.ee10/jetty-ee10-servlet/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty.ee10/jetty-ee10-servlet/${jetty.version}" mode="maven"/>
+        <bundle originalUri="mvn:org.eclipse.jetty.ee10/jetty-ee10-servlets/[12.1,${jetty.version})" replacement="mvn:org.eclipse.jetty.ee10/jetty-ee10-servlets/${jetty.version}" mode="maven"/>
+    </bundleReplacements>
+</featuresProcessing>

@@ -1,5 +1,20 @@
 # 1.3.13 (unreleased)
 
+### Breaking
+
+* **No servlet container in the boot set any more:** `pax-web-http-undertow` (pax-web 8, Undertow 2.2 / javax) and the OSGi `jolokia` feature are gone from `<bootFeatures>`. The base image no longer provides the OSGi `HttpService` / HTTP whiteboard; nothing listens on 8181 except Jolokia (see below). Services that need pax-web add `pax-web-http-undertow` (or `-jetty`) to their own `features.xml`. Reason: pax-web 8 is frozen on javax servers (Undertow 2.2, Jetty 9.4 EOL, Tomcat 9) and clashed with Camel 4's jakarta `camel-undertow` (the 1.3.6 known issue — gone now)
+* **Jetty is the default REST server again:** `<restConfiguration component="jetty" …/>` with `<feature>camel-jetty</feature>` (Jetty 12.1, jakarta). Undertow is not shipped; `camel-undertow` stays installable for whoever adds it explicitly. README, `migration.md` and the `rahla-developer` skill are updated
+
+### Improvements
+
+* Jolokia runs as a JVM agent (`org.jolokia:jolokia-agent-jvm` `2.6.5`, replaces the OSGi bundle `jolokia-osgi` 1.7.3): still `http://<host>:8181/jolokia`, still HTTP basic auth against the Karaf JAAS realm (`authMode=jaas,realm=karaf`). Wired through `KARAF_SYSTEM_OPTS` in the `Dockerfile` like the Prometheus and OpenTelemetry agents — overriding `KARAF_SYSTEM_OPTS` without the agent turns Jolokia off. Jolokia 2 speaks protocol 8.x; `etc/org.jolokia.osgi.cfg` is no longer read
+* `camel-jetty` runs on Jetty `12.1.15` instead of the `12.1.6` pinned in camel-karaf 4.18.4's features descriptor: `assembly/src/main/filtered-resources/features-processing.xml` (`<bundleReplacements>`, new `jetty.version` property, tracked by Renovate) is merged with the blacklist into `etc/org.apache.karaf.features.xml`, so it also applies to runtime feature installs
+
+### Bug Fixes
+
+* `GroovyBundleDeployer`: deadlock that could freeze the whole container during a feature install (no further bundle starts, SSH shell hangs). A placeholder was recompiled via `bundle.update()`, i.e. inside Felix' bundle lock, while the Groovy compiler needs Felix' global lock for dynamic imports — and fileinstall / the features service hold that lock while waiting for the bundle. The source is now compiled first and handed to `bundle.update(stream)`
+* `GroovyBundleDeployer`: a recompiled bundle that could not start because its packages were briefly unresolvable (feature refresh in progress) was remembered as "failed, not retrying until the file changes"; the Blueprint XML using it stayed `Installed`. Only real compile errors are remembered now, a start that fails is retried on the next bundle event
+
 # 1.3.12 (2026-11-08)
 
 ### Dependency Updates

@@ -109,7 +109,7 @@ A typical Rahla Blueprint XML has four parts: namespace declaration, OSGi servic
 
     <!-- 3. Camel context — REST configuration and routes -->
     <camelContext id="my-context" xmlns="http://camel.apache.org/schema/blueprint">
-        <restConfiguration component="undertow" port="8183" contextPath="/my-app" enableCORS="true"/>
+        <restConfiguration component="jetty" port="8183" contextPath="/my-app"/>
 
         <rest>
             <post path="/push"><to uri="direct:in"/></post>
@@ -125,13 +125,11 @@ A typical Rahla Blueprint XML has four parts: namespace declaration, OSGi servic
 </blueprint>
 ```
 
-### REST components: `jetty` (recommended) or `undertow`
+### REST component: `jetty`
 
-Since Rahla 1.3 the boot HTTP runtime is `pax-web-http-undertow` (serving the OSGi/Pax-Web port **8181**), and `<restConfiguration component="undertow" .../>` is the default choice. The Camel REST components (`camel-undertow`, `camel-jetty`) run their own listener on the port you configure — pick a service-specific port (commonly **8183**) so it doesn't clash with 8181. `component="jetty"` still works fine on Rahla 1.3+ when you install the `camel-jetty` feature via your deploy `features.xml` (this is what the FLT fuel-service runs); the pax-web boot feature being Undertow doesn't prevent that.
+Rahla ≥ 1.3.13 boots **no servlet container** (no pax-web, no OSGi `HttpService`). A REST endpoint brings its own server through the Camel component: install `camel-jetty` in the deploy `features.xml` and use `<restConfiguration component="jetty" .../>` on a service-specific port (commonly **8183**). The assembly replaces the Jetty 12.1.x that camel-karaf pins with the current patch release, so there is nothing to pin by hand. Port **8181** is only Jolokia (JVM agent, basic auth against the Karaf realm).
 
-**Prefer `camel-jetty` for Camel REST endpoints (1.3.6 known issue):** installing `camel-undertow` (Camel 4, jakarta, Undertow 2.3.x) makes the feature refresh rewire pax-web's Undertow (2.2.x, javax) to 2.3 — port 8181/Jolokia then answers 404 and Karaf logs `Default404Servlet does not implement jakarta.servlet.Servlet`; the Camel routes themselves keep working.
-
-If you bring in Jetty (via `camel-jetty` or `pax-web-http-jetty`), pin a fixed version via `<blacklistedBundles>` (or a feature override) — the Jetty version transitively pulled on Karaf 4.4.x has known CVEs. Run only one Pax-Web HTTP feature at a time.
+`camel-undertow` is opt-in: add the feature yourself if you want it. On Rahla 1.3.0–1.3.12 (pax-web Undertow 2.2 in boot) installing it rewired pax-web to Undertow 2.3 and broke 8181 — on those versions use `camel-jetty` as well. If a service needs the OSGi `HttpService` / whiteboard, add `pax-web-http-undertow` (or `-jetty`) to its `features.xml`; mind that pax-web 8 is javax and clashes with Camel 4's jakarta `camel-undertow`.
 
 ### OSGi service references with filters
 
@@ -413,7 +411,7 @@ When a Blueprint context refuses to start, `bundle:diag` on the relevant bundle 
 
 - **`resource:file:` and `resource:deploy:` prefixes** — deprecated. Use real URLs (`file://`, `http://`).
 - **`RAHLA_DEPLOY_PATH`** — removed in 1.3. Add a `org.apache.felix.fileinstall-<name>.cfg` instead if a second watch directory is needed.
-- **Unpinned Jetty.** Jetty is still usable on Rahla 1.3+ (it's just no longer the boot default), but the version that comes with Karaf 4.4.x's `pax-web-http-jetty` has a known zero-day — pin a fixed version via `<blacklistedBundles>` or a feature override before relying on it.
+- **`component="undertow"` by habit** — Undertow is no longer in the image (1.3.13). Use `component="jetty"` + `camel-jetty`; add `camel-undertow` explicitly only if you really need it.
 - **New `GroovyBeanFactory` beans** (`factory-ref="beanFactory" factory-method="createBean"`) — deprecated since 1.3.6, warns on every call. Put the `.groovy` at the top level of the deploy dir and use `<bean class>`.
 - **`JedisSource` / `GraphSource`** — removed in 1.3.6; `<reference interface="rahla.jedissource.JedisSource">` / `rahla.graphsource.GraphSource` never resolves. Use the Groovy-bean recipes (`examples/redis/`, `examples/janusgraph/`).
 - **KAR-based offline packaging** — removed in 1.3.3. Air-gapped images use the boot-once cache-priming pattern (see above).

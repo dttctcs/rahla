@@ -398,6 +398,19 @@
             </dependency>
 
 
+            <!-- Not on any classpath: declared so Renovate tracks jetty.version / jolokia.version
+                 (used by the assembly: features processing and the Jolokia JVM agent library) -->
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jolokia</groupId>
+                <artifactId>jolokia-agent-jvm</artifactId>
+                <version>${jolokia.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-ant</artifactId>
@@ -628,6 +641,10 @@
         <!-- Observability -->
         <jmx_exporter.version>1.0.1</jmx_exporter.version>
         <opentelemetry_agent.version>2.30.0</opentelemetry_agent.version>
+        <jolokia.version>2.6.5</jolokia.version>
+
+        <!-- HTTP: camel-karaf's camel-jetty pins an older 12.1.x; the assembly replaces it (features processing) -->
+        <jetty.version>12.1.15</jetty.version>
         <opentelemetry-sdk-extension-autoconfigure.version>1.67.0</opentelemetry-sdk-extension-autoconfigure.version>
 
 

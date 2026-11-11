@@ -113,4 +113,4 @@ still there once `camel:route-list` shows no routes.
 * For scripting, `bin/client` needs batch mode: `printf 'bundle:list\n' | bin/client -b -u admin -p admin`.
   Karaf's built-in `grep` takes a Java regex, so alternation is `grep -i 'a|b'`, not `grep -E`.
 * Port `8283` is the example's own; change it in `routes.xml` if it collides. Karaf itself uses
-  8101 (SSH), 8181 (HTTP/Jolokia), 1099 and 44444 (JMX).
+  8101 (SSH), 8181 (Jolokia, container only — it is a JVM agent set in the image's `KARAF_SYSTEM_OPTS`), 1099 and 44444 (JMX).

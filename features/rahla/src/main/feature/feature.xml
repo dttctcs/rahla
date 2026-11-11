@@ -4,8 +4,8 @@
   <feature description='${project.name}' name='${project.artifactId}' start-level="100"
            version='${project.version}'>
 
-    <!-- Undertow is no longer pinned here: pax-web 8.0.35 ships 2.2.39.Final itself,
-         which is what the former HOTFIX pin was waiting for. -->
+    <!-- No HTTP server here: Rahla boots no servlet container (1.3.13). REST endpoints bring
+         their own via camel-jetty; Jolokia is a JVM agent. -->
   </feature>
 
 

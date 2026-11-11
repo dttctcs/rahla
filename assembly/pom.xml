@@ -136,8 +136,6 @@
             <feature>standard</feature>
             <feature>scr</feature>
             <feature>spifly</feature>
-            <feature>pax-web-http-undertow</feature>
-            <feature>jolokia</feature>
             <feature>rahla</feature>
           </bootFeatures>
           <installedFeatures>
@@ -146,6 +144,8 @@
           <libraries>
             <library>mvn:io.prometheus.jmx/jmx_prometheus_javaagent/${jmx_exporter.version}</library>
             <library>mvn:io.opentelemetry.javaagent/opentelemetry-javaagent/${opentelemetry_agent.version}</library>
+            <!-- Jolokia runs as a JVM agent (port 8181, JAAS realm karaf) - no servlet container in the boot set -->
+            <library>mvn:org.jolokia/jolokia-agent-jvm/${jolokia.version}/jar/javaagent</library>
           </libraries>
           <blacklistedBundles>
             <!-- Exactly one version of each shared library may start: Rahla's own (rahla /
@@ -154,8 +154,9 @@
                  or camel-karaf (jackson 2.21.4, groovy 4.0.32, woodstox 7.1.1, stax2 4.2.2) bring
                  along is blacklisted by version range, so a Karaf/Camel bump cannot silently
                  reintroduce a second copy. Ranges are applied at runtime too
-                 (etc/org.apache.karaf.features.xml). Undertow is deliberately NOT listed:
-                 pax-web 8 needs 2.2.x (javax.servlet), camel-undertow 4.x needs 2.3.x (jakarta). -->
+                 (etc/org.apache.karaf.features.xml). No pax-web/servlet container is booted any
+                 more; the Jetty 12.1 of camel-jetty is lifted to ${jetty.version} via
+                 <bundleReplacements> in src/main/filtered-resources/features-processing.xml. -->
             <bundle>mvn:com.fasterxml.jackson.core/jackson-core/[2,${jackson2.version})</bundle>
             <bundle>mvn:com.fasterxml.jackson.core/jackson-core/(${jackson2.version},3)</bundle>
             <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/[2,${jackson2.version})</bundle>
@@ -175,6 +176,8 @@
             <bundle>mvn:org.apache.groovy/groovy/[4,${groovy.version})</bundle>
             <bundle>mvn:org.apache.groovy/groovy-xml/[4,${groovy.version})</bundle>
           </blacklistedBundles>
+          <!-- bundleReplacements (Jetty ${jetty.version}); the blacklist above is merged into it -->
+          <featuresProcessing>${project.build.outputDirectory}/features-processing.xml</featuresProcessing>
           <javase>17</javase>
         </configuration>
         <groupId>org.apache.karaf.tooling</groupId>

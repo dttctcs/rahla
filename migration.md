@@ -28,6 +28,7 @@ jedissource/graphsource, Loki-Appender.
 | 1.3.4   | 2026-07-06   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.24`          | Forgejo-CI, GitHub-Mirror-Releases, Base-Image 3.23 → 3.24 |
 | 1.3.5   | 2026-08-10   | 4.18.2   | 4.4.11  | `linuxserver/baseimage-alpine:3.24`          | Release aus der Forgejo-UI, Undertow-Pin entfernt, Loki-Appender deprecated |
 | 1.3.6   | 2026-10-27   | **4.18.4** | **4.4.12** | `linuxserver/baseimage-alpine:3.24`      | **Security:** Karaf-CVEs vom 2026-09-28, Camel-CVEs bis 4.18.4; Fradi/Siddhi, jedis-/graphsource, Loki-Appender entfernt; Groovy-Dateien als Bundles |
+| 1.3.13  | unreleased   | 4.18.4   | 4.4.12  | `linuxserver/baseimage-alpine:3.24`          | **Breaking:** kein pax-web/Undertow mehr im Boot, Jetty (`camel-jetty`, 12.1.15) wieder REST-Default, Jolokia als JVM-Agent |
 
 Quelle Camel/Karaf-Spalte: `git show <tag>:pom.xml` (`<camel.version>` / `<karaf.version>`).
 Quelle Tag-Daten: `git log -1 --format=%ci <tag>`.
@@ -448,6 +449,36 @@ und antwortet (`pong camel=4.18.4`). Zusätzlich löst die Feature-Union der FLT
 `camel-opentelemetry`, `camel-quartz`, `camel-cron`, `camel-exec`, …) ohne `Installed`/`Waiting`-Bundles auf.
 
 ---
+
+### 1.3.13 (unreleased) — kein pax-web/Undertow im Boot, Jetty wieder REST-Default
+
+1.3.7–1.3.12 enthalten nur Doku-, CI- und Base-Image-Änderungen (siehe `CHANGELOG.md`).
+
+1. **`pax-web-http-undertow` und das `jolokia`-Feature sind aus den Boot-Features entfernt
+   (Breaking).** Das Basis-Image startet keinen Servlet-Container mehr; OSGi-`HttpService` und
+   HTTP-Whiteboard gibt es nur noch, wenn ein Service pax-web selbst installiert. Grund: pax-web 8
+   hängt an javax-Servern (Undertow 2.2, Jetty 9.4 EOL, Tomcat 9) und kollidierte mit dem
+   jakarta-`camel-undertow` von Camel 4 (bekanntes Problem aus 1.3.6). Quelle: `assembly/pom.xml`
+   `<bootFeatures>`.
+2. **Jolokia läuft als JVM-Agent** (`jolokia-agent-jvm` 2.6.5 statt `jolokia-osgi` 1.7.3), weiter
+   auf `:8181/jolokia` mit Basic-Auth gegen den Karaf-Realm. Quelle: `Dockerfile`
+   (`KARAF_SYSTEM_OPTS`), `assembly/pom.xml` `<libraries>`.
+3. **Jetty 12.1.15 für `camel-jetty`** per `<bundleReplacements>` (camel-karaf 4.18.4 pinnt 12.1.6).
+   Quelle: `assembly/src/main/filtered-resources/features-processing.xml`, `jetty.version`.
+
+**Was Service-Repos tun müssen**
+
+- REST auf Undertow → Jetty: im `features.xml` `camel-undertow` durch `camel-jetty` ersetzen, im
+  Blueprint `<restConfiguration component="jetty" …/>`. Undertow-spezifische Endpoint-Optionen
+  (`undertow:`-URIs, `UndertowHeaderFilterStrategy`) prüfen.
+- Wer bei Undertow bleiben will: `<feature>camel-undertow</feature>` weiter im eigenen
+  `features.xml` führen — es wird nur nicht mehr mitgeliefert/empfohlen.
+- Wer `KARAF_SYSTEM_OPTS` im eigenen Image/Manifest überschreibt, muss den Jolokia-Agent
+  (`-javaagent:./lib/jolokia-agent-jvm-2.6.5-javaagent.jar=port=8181,host=0.0.0.0,authMode=jaas,realm=karaf`)
+  mit übernehmen, sonst ist 8181 zu (Liveness-/Readiness-Probes auf 8181 prüfen!).
+- Wer Servlets/WABs/Whiteboard oder die Webconsole nutzt: `pax-web-http-undertow` (bzw. `-jetty`)
+  ins eigene `features.xml`; dann darf der Jolokia-Agent nicht denselben Port 8181 belegen.
+- Jolokia-Clients: Agent 2.x (Protokoll 8.x) statt 1.7; `etc/org.jolokia.osgi.cfg` wird nicht mehr gelesen.
 
 ## 3. Querschnitt: Camel-Upgrade-Pfad (4.10 → 4.18)
 

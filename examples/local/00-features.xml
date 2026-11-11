@@ -6,7 +6,7 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="example-runtime">
   <feature name="example" install="auto">
     <feature>camel-blueprint</feature>   <!-- the Camel runtime + Blueprint XML support -->
-    <feature>camel-jetty</feature>       <!-- for the REST endpoint below (not camel-undertow: it rewires pax-web, see CHANGELOG 1.3.6) -->
+    <feature>camel-jetty</feature>       <!-- for the REST endpoint below (Rahla's default REST server) -->
     <feature>camel-jackson</feature>     <!-- JSON marshalling -->
   </feature>
 </features>

@@ -209,21 +209,25 @@ migration steps are in [`migration.md`](migration.md) (1.3.6).
 
 ## HTTP / REST
 
-The boot HTTP runtime is **Undertow** (`pax-web-http-undertow`); the OSGi/Pax-Web port defaults to
-**8181**. Use it from a Camel REST config:
+Rahla boots **no servlet container** (since 1.3.13): no pax-web, no OSGi `HttpService`. A Camel REST
+endpoint brings its own server via the Camel component — the default is **Jetty** (`camel-jetty`,
+Jetty 12.1 / jakarta), which all `examples/` use:
 
 ```xml
-<restConfiguration component="undertow" port="8183" contextPath="/my-app"/>
+<!-- features.xml: <feature>camel-jetty</feature> -->
+<restConfiguration component="jetty" port="8183" contextPath="/my-app"/>
 ```
 
-Jetty is **not** the default. `camel-jetty` / `pax-web-http-jetty` still work, but the Jetty version
-pulled by Karaf 4.4.x has known CVEs — pin a fixed version. Run one Pax-Web HTTP feature at a time.
+The assembly lifts the Jetty that camel-karaf pins to the current 12.1.x patch
+(`jetty.version` in the parent pom, applied through `etc/org.apache.karaf.features.xml`).
 
-> **Known issue (1.3.6):** `camel-undertow` (Camel 4, jakarta) brings Undertow 2.3.x next to pax-web's
-> 2.2.x; installing it rewires pax-web to 2.3 and breaks port 8181 (Jolokia answers 404,
-> `Default404Servlet does not implement jakarta.servlet.Servlet`). Camel routes keep working. For a
-> Camel REST endpoint prefer `camel-jetty` (`<restConfiguration component="jetty" …/>`); all examples
-> in `examples/` do.
+Port **8181** serves only **Jolokia** (`/jolokia`, HTTP basic auth against the Karaf realm —
+`admin` / `$ADMIN_PASS`). It runs as a JVM agent (`-javaagent:…jolokia-agent-jvm…` in
+`KARAF_SYSTEM_OPTS`), not as an OSGi bundle; drop the agent from `KARAF_SYSTEM_OPTS` to turn it off.
+
+Undertow is not shipped any more. If you want it, add it yourself in your `features.xml`:
+`camel-undertow` for a Camel REST endpoint, or `pax-web-http-undertow` (+ `jolokia`, `webconsole`, …)
+if you need the OSGi `HttpService` / whiteboard back — see [`migration.md`](migration.md) (1.3.13).
 
 ## Air-gapped / offline images
 
@@ -305,7 +309,7 @@ Both agents ship in the assembly (attached via `KARAF_SYSTEM_OPTS`, see [Configu
 ## Kubernetes
 
 A sample manifest is in [`manifests/rahla.yaml`](manifests/rahla.yaml): it wires the ports (SSH 8101,
-HTTP 8181, Prometheus 9001) and volumes. Mount your routes to `/config/deploy` (ConfigMap / PVC).
+Jolokia 8181, Prometheus 9001) and volumes. Mount your routes to `/config/deploy` (ConfigMap / PVC).
 
 ## Image signatures & updates
 
@@ -348,8 +352,9 @@ Camel is not preinstalled — make sure the Camel runtime is installed (a `featu
 means an unsatisfied OSGi `<reference>` (missing service or feature).
 
 **Trivy / a scanner flags Jetty.**
-`camel-jetty` pulls in Eclipse Jetty even though Rahla serves HTTP via Undertow. If your routes
-don't use Jetty, drop `<feature>camel-jetty</feature>`.
+`camel-jetty` pulls in Eclipse Jetty 12.1 (Rahla replaces camel-karaf's pin with the current patch,
+`jetty.version`). If your routes don't expose HTTP, drop `<feature>camel-jetty</feature>` — the base
+image itself contains no servlet container.
 
 **How do I make a fully offline / air-gapped image?**
 Let Karaf install the closure at build time and ship its caches — see
