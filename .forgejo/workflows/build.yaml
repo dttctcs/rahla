@@ -214,11 +214,13 @@ jobs:
         uses: https://codeberg.org/datatactics/forgejo-actions/dtrack-upload@main
         with:
           bom: ${{ steps.sbom.outputs.sbom-file }}
-          project-name: datatactics/rahla
+          # Release convention (forgejo-actions README): <org>/<repo> under the
+          # `containers` collection, addressed by name — no UUID to keep in sync.
+          project-name: ${{ github.repository }}
           project-version: ${{ steps.set-filename.outputs.version }}
-          parent-uuid: cff07b40-c95c-47e9-9367-cb9e8df75dcd   # rahla parent project in Dependency Track
-          is-latest: true                  # this release is the one DT reports as current
-          deactivate-other-versions: true  # older releases drop out of the portfolio metrics
+          parent-name: containers
+          is-latest: true     # this release is the one DT reports as current
+          keep-versions: 3    # the newest three stay active, older ones go inactive
         env:
           DTRACK_URL: ${{ vars.DTRACK_URL }}
           DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
